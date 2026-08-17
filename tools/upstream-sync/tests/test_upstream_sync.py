@@ -132,6 +132,52 @@ def test_이력이_비어_있어도_붙는다():
     assert list(us.split_sections(doc)) == ["v5.87"]
 
 
+# --- 감시가 여는 이슈 -------------------------------------------------------
+#
+# 이걸 CI 안에서 조립하면 이 머신에서 돌려 볼 수가 없다. 못 돌려 보는
+# 코드는 처음 필요한 날 깨져 있는다 - 그래서 도구가 만들고 여기서 잡는다.
+
+
+FOUND = {
+    "pin": {"tag": "v5.85", "commit": "30512023e7a6", "synced": "2026-08-18"},
+    "new_tags": ["v5.86", "v5.87"],
+    "newest": "v5.87",
+    "commits": 5,
+    "changed_files": 10,
+    "overlap": ["FF14Accessibility/Plugin.cs"],
+    "applies": True,
+    "failing_patch": None,
+    "subjects": [{"sha": "a8ac7c5", "subject": "Release v5.87: Jagdziele laufen"}],
+}
+
+
+def test_새_태그가_없으면_이슈도_없다():
+    assert us.render_issue_body({**FOUND, "newest": None, "new_tags": []}) is None
+
+
+def test_첫_줄이_제목이다():
+    body = us.render_issue_body(FOUND)
+    assert body.splitlines()[0] == "업스트림 v5.87 — 동기화 대기"
+    assert body.splitlines()[1] == ""
+
+
+def test_독일어_원문을_그대로_싣는다():
+    # 러너에는 옮길 수단이 없다. 원문이라도 있어야 무슨 일인지 짐작한다.
+    assert "Release v5.87: Jagdziele laufen" in us.render_issue_body(FOUND)
+
+
+def test_붙는지_여부를_말한다():
+    assert "깨끗이 붙는다" in us.render_issue_body(FOUND)
+    broken = {**FOUND, "applies": False, "failing_patch": "Compat shim"}
+    body = us.render_issue_body(broken)
+    assert "안 붙는다" in body and "Compat shim" in body
+
+
+def test_겹치는_파일이_없으면_없다고_말한다():
+    body = us.render_issue_body({**FOUND, "overlap": []})
+    assert "겹치는 파일 없음" in body
+
+
 # --- 핀 ------------------------------------------------------------------
 
 

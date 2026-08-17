@@ -11,6 +11,11 @@
 # 번역은 여기서 못 한다. 업스트림 커밋은 독일어고 러너에는 옮길 수단이
 # 없다. 그래서 이슈에는 **원문을 그대로** 싣고, 한국어 이력은 로컬에서
 # `--notes`로 만든다. 절차: docs/upstream-sync.md
+#
+# **판정도 조립도 전부 우리 도구가 한다.** 러너에만 있는 도구(jq 등)로
+# 여기서 조립하면 개발 머신에서 돌려 볼 수가 없고, 못 돌려 보는 코드는
+# 처음 필요한 날 깨져 있는다. 이 파일은 도구를 부르고 결과를 옮기기만
+# 한다 - 이슈 본문은 `tools/upstream-sync/tests`가 검사한다.
 
 name: 업스트림 감시
 
@@ -32,67 +37,45 @@ jobs:
 
       - name: 업스트림 클론
         run: |
-          git clone --no-checkout \
-            "$(python3 -c 'import json;print(json.load(open("upstream.json"))["repo"])')" \
-            vendor/ff14-accessibility
+          REPO=$(python3 -c 'import json;print(json.load(open("upstream.json"))["repo"])')
+          git clone --no-checkout "$REPO" vendor/ff14-accessibility
           git -C vendor/ff14-accessibility fetch --tags origin
 
       - name: 점검
-        id: survey
         run: |
-          # 새 태그가 있으면 tool이 0을 내도 이슈를 연다. 종료 코드는
-          # 판정이 아니라 사고 신호로만 쓴다.
-          python3 tools/upstream-sync/upstream_sync.py --json --offline > survey.json || true
-          cat survey.json
-          {
-            echo "newest=$(jq -r '.newest // ""' survey.json)"
-            echo "applies=$(jq -r '.applies // ""' survey.json)"
-          } >> "$GITHUB_OUTPUT"
+          # 방금 클론했으므로 --offline. 종료 코드는 판정이 아니라 사고
+          # 신호로만 쓴다 - 새 태그가 있는 것은 사고가 아니다.
+          TOOL=tools/upstream-sync/upstream_sync.py
+          python3 "$TOOL" --offline | tee check.txt || true
+          python3 "$TOOL" --issue-body --offline > body.md || true
 
       - name: 요약
         run: |
           {
-            echo "## 업스트림 감시"
-            echo ""
-            jq -r '"- 핀: \(.pin.tag) (\(.pin.commit[0:7]))"' survey.json
-            jq -r 'if .newest then "- 새 태그: \(.new_tags | join(", "))" else "- 새 태그 없음" end' survey.json
-            jq -r 'if .newest then "- 패치가 붙는가: \(if .applies then "예" else "아니오 (" + .failing_patch + ")" end)" else empty end' survey.json
+            echo '## 업스트림 감시'
+            echo ''
+            echo '```'
+            cat check.txt
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 이슈 열기
-        if: steps.survey.outputs.newest != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          NEWEST: ${{ steps.survey.outputs.newest }}
         run: |
-          TITLE="업스트림 $NEWEST — 동기화 대기"
+          # 본문이 비면 새 태그가 없다는 뜻이다. 도구가 그렇게 정한다.
+          if [ ! -s body.md ]; then
+            echo "새 태그 없음 - 이슈를 열지 않는다."
+            exit 0
+          fi
+
+          TITLE=$(head -n 1 body.md)
+          tail -n +3 body.md > issue.md
+
           if gh issue list --state open --search "$TITLE" --json title \
-              | jq -e --arg t "$TITLE" 'any(.title == $t)' > /dev/null; then
+              --jq "any(.[]; .title == \"$TITLE\")" | grep -q true; then
             echo "이미 열려 있다: $TITLE"
             exit 0
           fi
 
-          {
-            jq -r '"핀 `\(.pin.tag)` (`\(.pin.commit[0:7])`, \(.pin.synced) 동기화) 이후 업스트림이 움직였다."' survey.json
-            echo ""
-            jq -r '"- 새 태그 \(.new_tags | length)개: \(.new_tags | join(", "))"' survey.json
-            jq -r '"- 새 커밋 \(.commits)건, 바뀐 파일 \(.changed_files)개"' survey.json
-            jq -r 'if (.overlap | length) > 0 then "- 우리 패치가 건드리는 파일과 겹침: " + (.overlap | join(", ")) else "- 우리 패치와 겹치는 파일 없음" end' survey.json
-            jq -r 'if .applies then "- 우리 패치는 새 태그에 **깨끗이 붙는다**" else "- **패치가 안 붙는다** (처음 실패: " + .failing_patch + ")" end' survey.json
-            echo ""
-            echo "## 원문 (독일어)"
-            echo ""
-            echo "여기서는 못 옮긴다. 한국어 이력은 로컬에서 만든다."
-            echo ""
-            jq -r '.subjects[] | "- `\(.sha)` \(.subject)"' survey.json
-            echo ""
-            echo "## 할 것"
-            echo ""
-            echo '```'
-            echo "run\\sync.bat $NEWEST"
-            echo '```'
-            echo ""
-            echo "그다음 변경 이력을 한국어로 채운다 — docs/upstream-sync.md §6."
-          } > body.md
-
-          gh issue create --title "$TITLE" --body-file body.md
+          gh issue create --title "$TITLE" --body-file issue.md

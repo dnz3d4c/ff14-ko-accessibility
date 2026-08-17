@@ -348,6 +348,61 @@ def survey(offline: bool) -> dict:
     return result
 
 
+def render_issue_body(found: dict) -> str | None:
+    """감시가 열 이슈. 첫 줄이 제목이고, 빈 줄 하나 뒤가 본문이다.
+
+    새 태그가 없으면 None - 알릴 게 없으면 이슈도 없다.
+
+    **이걸 CI 안에서 만들지 않는다.** 러너에만 있는 도구로 조립하면 이
+    머신에서 돌려 볼 수가 없고, 못 돌려 보는 코드는 처음 필요한 날
+    깨져 있는다.
+    """
+    newest = found.get("newest")
+    if not newest:
+        return None
+
+    pin = found["pin"]
+    overlap = found["overlap"]
+    lines = [
+        f"업스트림 {newest} — 동기화 대기",
+        "",
+        f"핀 `{pin['tag']}` (`{pin['commit'][:7]}`, {pin['synced']} 동기화) 이후 "
+        "업스트림이 움직였다.",
+        "",
+        f"- 새 태그 {len(found['new_tags'])}개: {', '.join(found['new_tags'])}",
+        f"- 새 커밋 {found['commits']}건, 바뀐 파일 {found['changed_files']}개",
+    ]
+    if overlap:
+        lines.append(f"- 우리 패치가 건드리는 파일과 겹침: {', '.join(overlap)}")
+    else:
+        lines.append("- 우리 패치와 겹치는 파일 없음")
+    lines.append(
+        "- 우리 패치는 새 태그에 **깨끗이 붙는다**"
+        if found["applies"]
+        else f"- **패치가 안 붙는다** (처음 실패: {found['failing_patch']})"
+    )
+
+    lines += ["", "## 원문 (독일어)", ""]
+    lines.append("여기서는 못 옮긴다. 한국어 이력은 로컬에서 만든다.")
+    lines.append("")
+    for item in found.get("subjects", []):
+        lines.append(f"- `{item['sha']}` {item['subject']}")
+
+    lines += ["", "## 할 것", "", "```", f"run\\sync.bat {newest}", "```", ""]
+    lines.append("그다음 변경 이력을 한국어로 채운다 — `docs/upstream-sync.md` §6.")
+    return "\n".join(lines) + "\n"
+
+
+def cmd_issue_body(offline: bool) -> int:
+    if not vendor_present():
+        return 0
+    body = render_issue_body(survey(offline))
+    if body is None:
+        return 0
+    print(body, end="")
+    return 0
+
+
 def cmd_check(offline: bool, fail_on_new: bool, as_json: bool) -> int:
     if not vendor_present():
         if as_json:
@@ -543,6 +598,8 @@ def cmd_to(tag: str, offline: bool) -> int:
 
 def main(argv: list[str]) -> int:
     offline = "--offline" in argv
+    if "--issue-body" in argv:
+        return cmd_issue_body(offline)
     if "--notes" in argv:
         return cmd_notes(offline)
     if "--to" in argv:

@@ -47,32 +47,44 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | 출처 | `MiqoKR/kr-dalamud-updater` 릴리스 `updater-v0.5.0` (2026-08-17 게시) |
 | 라이선스 | **없음** — 재배포하지 않는다. 사용자가 직접 받는 것만 안내한다 |
 | 프로필 루트 | `%APPDATA%\XIVLauncherKR` |
-| Hook 루트 | `%APPDATA%\XIVLauncherKR\addon\Hooks\dev` |
+| Hook 루트 | `%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2` |
+| 에셋 | `%APPDATA%\XIVLauncherKR\dalamudAssets\437` (44개 파일) |
 
-Hook 루트에는 goatcorp 공식 Dalamud stable(`15.0.3.2`)을 받아 넣고 업데이터의 `--patch-hook`으로 KR 호환 패치를 적용했다. 결과는 자체 검증까지 통과했다("Dalamud KR compatibility patch applied and verified").
+업데이터 GUI의 Check Update로 공식 Dalamud stable `15.0.3.2`와 에셋 `437`을 받고 KR 호환 패치까지 자동 적용했다.
 
 적용 확인:
 
 - `Dalamud.dll` 15.0.3.2 (IL 패치됨, 원본은 `kr-language-backup\Dalamud.dll.official`)
 - `FFXIVClientStructs.dll` **7.51.0.8667** (공식 7.55.1.8875에서 다운그레이드됨)
+- `Lumina.dll` 7.6.0.0 / `Lumina.Excel.dll` 7.5.1.0
 - `version.json`의 `supportedGameVer`가 `2026.08.11` → `2026.08.05`로 재작성됨
 - 마커 3종: `Dalamud.KR.Compatibility.Patch.json`, `Dalamud.KR.Language.Patch.json`, `Dalamud.KR.755.Signature.Patch.json`
 
+### `Hooks\dev`는 남겨 둔다
+
+Check Update 이전에 공식 stable을 손으로 받아 `Hooks\dev`에 넣고 `--patch-hook`으로 패치한 적이 있다(194MB). 그 구성에는 **에셋이 빠져 있었다** — 빌드 참조로는 충분하지만 실행에는 부족했다.
+
+지우지 않는 이유는 업데이터가 이걸 롤백 대상으로 기록해 뒀기 때문이다.
+
+`kr-dalamud-backups\last-successful-update.json`: `PreviousHookVersion: "dev"`, `InstalledHookVersion: "15.0.3.2"`
+
 ### `DALAMUD_HOME`
 
-사용자 환경변수로 걸어 뒀다.
+사용자 환경변수로 걸어 뒀다. Check Update로 hook 경로가 `dev`에서 버전 폴더로 바뀌었으므로 그에 맞춰 갱신했다.
 
-DALAMUD_HOME=C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\dev
+DALAMUD_HOME=C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2
 
 글로벌 클라이언트용으로 빌드하려면 그 쉘에서만 덮어쓴다. 사용자 환경변수는 KR로 둔다.
 
-### 아직 안 한 것 — 게임 주입은 사용자 작업이다
+**업데이터가 hook 버전을 올릴 때마다 이 값이 낡는다.** 빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다.
 
-업데이터의 GUI 단계는 자동화하지 않았다. 프로필 초기화 CLI(`--initialize-first-install-profile`)는 안전장치가 걸려 있어 메인 프로필에 쓰지 못한다("테스트 전용 프로필만 허용"). 게임에 실제로 붙이려면 GUI로 해야 한다.
+### 아직 안 한 것 — 게임 주입
+
+Dalamud를 게임에 붙이는 마지막 단계는 GUI 조작이라 남아 있다. 프로필 초기화 CLI(`--initialize-first-install-profile`)는 안전장치가 걸려 있어 메인 프로필에 쓰지 못한다("테스트 전용 프로필만 허용").
 
 절차(README-KR.txt 기준):
 
-1. 게임을 종료한 상태에서 `Dalamud.Updater.exe` 실행 → Check Update
+1. ~~게임을 종료한 상태에서 `Dalamud.Updater.exe` 실행 → Check Update~~ (2026-08-17 완료)
 2. 게임 실행
 3. "달라무드 적용" 누름
 
@@ -104,9 +116,11 @@ Services/InventoryService.cs(199,28): error CS1061:
 
 **아직 안 정한 것**: 이 1건을 어떻게 다룰지. 후보는 (a) 7.51에 있는 다른 API로 대체, (b) 조건부 컴파일, (c) 리플렉션. 어느 쪽이든 업스트림에 올릴 성격은 아니라 오버레이/패치 영역이다. CS 7.51에 대체 API가 있는지는 **미확인**이다.
 
+Check Update로 정식 설치된 hook(`Hooks\15.0.3.2`)에서도 **같은 오류 1건**이다. 손으로 만든 hook와 정식 hook가 빌드상 동등하다는 뜻이라, 위 결과는 수동 구성의 부작용이 아니다.
+
 재현 명령(복사용, 저장소 루트에서):
 
-DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\dev" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
+DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
 
 ## 5. 남은 미확인 항목
 

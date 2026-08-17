@@ -1454,6 +1454,10 @@
         "Head"
       ],
       [
+        "Koreanisch",
+        "Korean"
+      ],
+      [
         "Kreis",
         "circle"
       ],
@@ -1842,8 +1846,8 @@
         "Language now follows Windows: {language}."
       ],
       [
-        "Sprache wählen mit: /acc lang de, /acc lang en oder /acc lang auto.",
-        "Choose a language with: /acc lang de, /acc lang en or /acc lang auto."
+        "Sprache wählen mit: /acc lang de, /acc lang en, /acc lang ko oder /acc lang auto.",
+        "Choose a language with: /acc lang de, /acc lang en, /acc lang ko or /acc lang auto."
       ],
       [
         "Spur geloescht: {name}.",
@@ -2708,6 +2712,6 @@
     ]
   },
   "note": "한국어화 전 독일어/영어 스냅샷. 옮긴 뒤에도 이게 그대로여야 한다.",
-  "pairs": 675,
-  "unparsed": 41
+  "pairs": 676,
+  "unparsed": 40
 }

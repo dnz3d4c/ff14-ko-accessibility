@@ -1,0 +1,135 @@
+From b566bd9d986420b5ee99ae9e5bb7eba89c1b191c Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Tue, 18 Aug 2026 07:36:36 +0900
+Subject: [PATCH] Loc: resolve the language once, and make adding one a
+ two-line change
+
+IsGerman was a bool, so every caller had exactly two answers available and
+the OS-culture check sat inside it. A third language could not be expressed
+without touching the bool at every call site.
+
+Loc.Current now returns the language actually in use, with Auto already
+resolved against the OS culture. IsGerman stays and is derived from it, so
+nothing else has to change today.
+
+The two lookups are tables instead of switch arms. Adding a language is now
+one enum member plus one row in each table - no logic to re-read.
+
+Behaviour is unchanged. German Windows still resolves to German, everything
+else still falls back to English; before, "not de" WAS the fallback, now it
+is stated as one.
+
+Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
+In-Game: not checked - no observable change to verify
+---
+ FF14Accessibility/Loc.cs | 78 +++++++++++++++++++++++++++-------------
+ 1 file changed, 54 insertions(+), 24 deletions(-)
+
+diff --git a/FF14Accessibility/Loc.cs b/FF14Accessibility/Loc.cs
+index 8144bdf..e4e069b 100644
+--- a/FF14Accessibility/Loc.cs
++++ b/FF14Accessibility/Loc.cs
+@@ -1,4 +1,5 @@
+ using System;
++using System.Collections.Generic;
+ using System.Globalization;
+ 
+ namespace FF14Accessibility;
+@@ -6,7 +7,7 @@ namespace FF14Accessibility;
+ /// <summary>Language for all screen-reader output of the mod.</summary>
+ public enum LanguageMode
+ {
+-    /// <summary>Follow the Windows UI culture (German Windows -> German, else English).</summary>
++    /// <summary>Follow the Windows UI culture, falling back to English.</summary>
+     Auto = 0,
+     German = 1,
+     English = 2,
+@@ -17,33 +18,62 @@ public enum LanguageMode
+ /// Set once at startup from the config and updated by "/acc lang". "Auto"
+ /// follows the Windows UI culture so users get their OS language with no setup.
+ ///
+-/// All user-facing strings resolve through <see cref="Services.AccessibilityStrings"/>,
+-/// which reads <see cref="IsGerman"/> here. Game-provided content (item/NPC
+-/// names, quest text) is NOT routed through this - it already comes from the
+-/// game in the player's game language and is spoken verbatim.
++/// All user-facing strings resolve through <see cref="Services.AccessibilityStrings"/>.
++/// Game-provided content (item/NPC names, quest text) is NOT routed through this -
++/// it already comes from the game in the player's game language and is spoken
++/// verbatim.
++///
++/// Adding a language is meant to be cheap: one enum member, one row in
++/// <see cref="ByCulture"/>, one row in <see cref="Aliases"/>. Nothing else in
++/// here has to know how many languages exist.
+ /// </summary>
+ public static class Loc
+ {
+-    /// <summary>The active language selection (mirrors Configuration.Language).</summary>
++    /// <summary>What the user picked. May be <see cref="LanguageMode.Auto"/>.</summary>
+     public static LanguageMode Mode { get; set; } = LanguageMode.Auto;
+ 
+-    /// <summary>True when announcements should be German, resolving Auto against the OS culture.</summary>
+-    public static bool IsGerman => Mode switch
+-    {
+-        LanguageMode.German  => true,
+-        LanguageMode.English => false,
+-        _ => string.Equals(
+-                 CultureInfo.CurrentUICulture.TwoLetterISOLanguageName,
+-                 "de",
+-                 StringComparison.OrdinalIgnoreCase),
+-    };
+-
+-    /// <summary>Parses a "/acc lang" argument ("de"/"en"/"auto") to a mode, or null if unknown.</summary>
+-    public static LanguageMode? ParseArg(string arg) => arg.Trim().ToLowerInvariant() switch
++    /// <summary>Language used when the OS culture matches no known one.</summary>
++    public const LanguageMode Fallback = LanguageMode.English;
++
++    /// <summary>Two-letter OS culture to language. One row per supported language.</summary>
++    private static readonly Dictionary<string, LanguageMode> ByCulture =
++        new(StringComparer.OrdinalIgnoreCase)
++        {
++            ["de"] = LanguageMode.German,
++            ["en"] = LanguageMode.English,
++        };
++
++    /// <summary>What "/acc lang" accepts. Several spellings may map to one language.</summary>
++    private static readonly Dictionary<string, LanguageMode> Aliases =
++        new(StringComparer.OrdinalIgnoreCase)
++        {
++            ["de"] = LanguageMode.German,
++            ["deutsch"] = LanguageMode.German,
++            ["german"] = LanguageMode.German,
++            ["en"] = LanguageMode.English,
++            ["english"] = LanguageMode.English,
++            ["englisch"] = LanguageMode.English,
++            ["auto"] = LanguageMode.Auto,
++        };
++
++    /// <summary>
++    /// The language actually in use. Never <see cref="LanguageMode.Auto"/> -
++    /// "Auto" is resolved against the OS culture here, so callers never have to.
++    /// </summary>
++    public static LanguageMode Current
+     {
+-        "de" or "deutsch" or "german" => LanguageMode.German,
+-        "en" or "english" or "englisch" => LanguageMode.English,
+-        "auto" => LanguageMode.Auto,
+-        _ => null,
+-    };
++        get
++        {
++            if (Mode != LanguageMode.Auto) return Mode;
++            var culture = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
++            return ByCulture.TryGetValue(culture, out var found) ? found : Fallback;
++        }
++    }
++
++    /// <summary>True when announcements should be German.</summary>
++    public static bool IsGerman => Current == LanguageMode.German;
++
++    /// <summary>Parses a "/acc lang" argument to a mode, or null if unknown.</summary>
++    public static LanguageMode? ParseArg(string arg) =>
++        Aliases.TryGetValue(arg.Trim(), out var found) ? found : null;
+ }
+-- 
+2.55.0.windows.3
+

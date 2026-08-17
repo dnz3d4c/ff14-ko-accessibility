@@ -135,6 +135,23 @@ Check Update로 정식 설치된 hook(`Hooks\15.0.3.2`)에서도 **같은 오류
 
 DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
 
+### 글로벌(7.55) 참조를 다시 구하는 법 — 2026-08-17 23:47 확인
+
+업데이터의 Check Update가 공식 어셈블리를 KR 호환본으로 덮어쓰기 때문에 이 머신에는 7.55가 남지 않는다. 다시 받는다(복사용 한 줄):
+
+curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goatcorp.github.io/dalamud-distrib/latest.zip && 7z x -y -o"C:\Users\USER\AppData\Local\Temp\dalamud-official-15.0.3.2" "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip"
+
+**받은 게 맞는 물건인지 해시로 확인한다.** `Dalamud.KR.Compatibility.Patch.json`의 `OfficialClientStructsSha256`과 같아야 한다 — 2026-08-17 실측에서 `913FA3ED…8A8A43`으로 일치했다. `dalamud-distrib/version`도 `15.0.3.2`를 돌려주므로 KR 업데이터가 깐 것과 같은 판이다.
+
+그 폴더를 `DALAMUD_HOME`으로 주면 글로벌 빌드가 된다. 결과(패치 0004 포함):
+
+| 참조 CS | 결과 |
+|---------|------|
+| 7.55.1.8875 (공식) | 경고 0, 오류 0 |
+| 7.51.0.8667 (KR) | 경고 0, 오류 0 |
+
+**확장 메서드 바인딩 실증도 오늘 자 어셈블리로 다시 돌렸다.** shim에 `[Obsolete(error: true)]`를 붙이면 7.55 빌드는 그대로 성공하고(확장이 아예 후보에 안 들어간다 = 글로벌은 게임 함수를 부른다), 7.51 빌드만 `InventoryService.cs:199`에서 CS0619로 정확히 1건 실패한다.
+
 ## 5. 실기 검증 결과 (2026-08-17)
 
 캐릭터 생성 완료까지 진행했다. 근거는 전부 `%APPDATA%\XIVLauncherKR\dalamud-kr-gui.log`와 `Ctrl+F5` 노드 덤프다.
@@ -192,7 +209,14 @@ DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" 
 - 가시성에 의존하는 기능이 살아 있다 — 타이틀 메뉴 화살표 이동(항목 이름 + 위치), 창 제목·초점 읽기(`소지품`, `시스템`, `트러스트`), 로그아웃 확인 대화상자
 - 종료 시 `dalamud.crashhandler.log`에 남는 `error: 0x6d` + `Terminating target process`는 **이 변경 전 다섯 판에도 같이 있다.** 이 구성의 정상 종료 흔적이지 크래시가 아니다
 
-아직 안 해 본 것: `/acc compat`(온디맨드 보고), Ctrl+F5 노드 덤프, 모드 내 구현으로 내려가는 분기(시그니처가 깨져야 밟힌다).
+아직 안 해 본 것과 하는 방법:
+
+| 남은 것 | 어디서 | 어떻게 | 성공 신호 |
+|---------|--------|--------|-----------|
+| `/acc compat` | 인게임 채팅창 (로그인 후) | `/acc compat` 입력 | `Visibility: the game's own function via the Korean signature. Gearset marks: by item ID.` 발화 + 로그에 같은 줄 |
+| Ctrl+F5 노드 덤프 | 인게임, **게임 창이 열려 있는 상태** | Ctrl+F5 (`KeyDumpUI`) | 바탕화면 `FFXIV_UI_Dump.txt` 갱신 + 로그 `[Dump] Gespeichert:`. 실패면 `[Dump] Kein sichtbares Addon` |
+| 모드 내 구현 분기 | 이 저장소 (고장 주입) | `KoreanBodySignature` 첫 바이트를 `48`→`49`로 바꿔 빌드·배치. `AutomaticReloading`이 켜져 있어 게임 중 DLL만 덮으면 재적재된다 | 로그 `did not resolve` + 경고 `using the managed replica`, 기동 음성이 두 줄. 확인 후 `git checkout`으로 되돌리고 재빌드 |
+| 시그니처 중복 거부 분기 | 같은 방법 | 시그니처를 `48 85 C9`만 남겨 빌드 | 로그 `matched N times, expected 1 - refused` |
 
 ## 6. KR 바이너리에서 IsVisible 찾기 (2026-08-17)
 

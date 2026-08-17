@@ -10,9 +10,15 @@
 1. **개수** - `kr-port`의 커밋 수와 패치 파일 수가 같은가. 다르면 vendor에
    커밋해 놓고 떼어내지 않은 것이다
 2. **적용** - 문서에 적힌 순서(`patches/` 먼저, `overlay/patches/` 나중)로
-   pristine `main`에 깨끗이 붙는가. 업스트림 태그를 올릴 때 여기가 먼저 깨진다
+   핀이 가리키는 커밋에 깨끗이 붙는가. 업스트림 태그를 올릴 때 여기가 먼저 깨진다
 3. **동등** - 붙인 결과가 `kr-port`와 같은 트리인가. 패치를 뽑은 뒤 vendor에서
    더 손댔으면 여기서 잡힌다
+
+**붙는 자리는 `main`이 아니라 핀(`upstream.json`)이다.** `main`은 클론한
+날짜에 따라 다른 커밋을 가리킨다 - 업스트림이 거의 매일 릴리스를 내므로,
+어제 클론한 사람과 오늘 클론한 사람의 `main`이 다르고 그러면 이 검사가
+서로 다른 것을 검사하게 된다. 그걸 조용히 지나가지 않으려고 핀에 못박는다.
+핀을 옮기는 것은 `tools/upstream-sync`다.
 
 `vendor/` 클론이 없으면 검사를 건너뛴다(오류가 아니다). 있는데 깨졌으면 막는다.
 
@@ -24,6 +30,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
@@ -37,7 +44,9 @@ VENDOR = REPO / "vendor" / "ff14-accessibility"
 #: 업스트림에 병합되면 앞쪽이 사라지고 뒤쪽은 그대로 붙어야 한다.
 PATCH_DIRS = ("patches", "overlay/patches")
 
-BASE_BRANCH = "main"
+#: 우리 패치가 어느 판 위에 얹혀 있는지. tools/upstream-sync가 옮긴다.
+PIN = REPO / "upstream.json"
+
 WORK_BRANCH = "kr-port"
 
 
@@ -67,15 +76,32 @@ def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
+def base_commit(repo: Path = REPO) -> str:
+    """패치가 붙는 자리.
+
+    핀이 없으면 `main`으로 물러선다 - 핀을 도입하기 전에 만든 클론에서도
+    검사가 죽지 않게 한다. 다만 그때는 클론 시점에 따라 자리가 달라진다.
+    """
+    pin = repo / "upstream.json"
+    if not pin.is_file():
+        return "main"
+    return json.loads(pin.read_text(encoding="utf-8"))["commit"]
+
+
 def vendor_present(vendor: Path = VENDOR) -> bool:
     return (vendor / ".git").exists()
 
 
-def vendor_commit_count(vendor: Path = VENDOR) -> int:
-    """`main`에서 `kr-port`까지의 커밋 수."""
-    result = _git("rev-list", "--count", f"{BASE_BRANCH}..{WORK_BRANCH}", cwd=vendor)
+def vendor_commit_count(vendor: Path = VENDOR, base: str | None = None) -> int:
+    """핀에서 `kr-port`까지의 커밋 수."""
+    base = base or base_commit()
+    result = _git("rev-list", "--count", f"{base}..{WORK_BRANCH}", cwd=vendor)
     if result.returncode != 0:
-        raise RuntimeError(f"kr-port 커밋을 셀 수 없다: {result.stderr.strip()}")
+        raise RuntimeError(
+            f"핀({base[:7]})에서 kr-port까지를 셀 수 없다: {result.stderr.strip()}\n"
+            "  핀이 가리키는 커밋이 vendor에 없으면 받아온다: "
+            "cd vendor/ff14-accessibility && git fetch --tags origin"
+        )
     return int(result.stdout.strip())
 
 
@@ -97,17 +123,18 @@ def check_counts(patches: list[Path], commits: int) -> list[str]:
 
 
 def check_applies_and_matches(
-    patches: list[Path], vendor: Path = VENDOR
+    patches: list[Path], vendor: Path = VENDOR, base: str | None = None
 ) -> list[str]:
     """임시 워크트리에서 실제로 붙여 보고 결과 트리를 비교한다."""
     if not patches:
         return []
 
+    base = base or base_commit()
     problems: list[str] = []
     workdir = Path(tempfile.mkdtemp(prefix="patch-check-"))
     tree = workdir / "tree"
     try:
-        added = _git("worktree", "add", "--detach", str(tree), BASE_BRANCH, cwd=vendor)
+        added = _git("worktree", "add", "--detach", str(tree), base, cwd=vendor)
         if added.returncode != 0:
             return [f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"]
 
@@ -117,7 +144,7 @@ def check_applies_and_matches(
             _git("am", "--abort", cwd=tree)
             failing = _first_failing(applied.stdout)
             problems.append(
-                f"패치가 pristine {BASE_BRANCH}에 붙지 않는다"
+                f"패치가 핀({base[:7]})에 붙지 않는다"
                 + (f" (처음 실패: {failing})" if failing else "")
                 + ". 업스트림이 움직였으면 여기가 먼저 깨진다 - "
                 "patches/README.md의 순서대로 손으로 붙여 충돌을 본다"
@@ -156,6 +183,8 @@ def main(argv: list[str]) -> int:
         print("vendor 클론이 없다 - 패치 검사를 건너뛴다.")
         return 0
 
+    base = base_commit()
+    print(f"붙는 자리: {base[:7]} (upstream.json)")
     patches = ordered_patches()
     print(f"패치 {len(patches)}개:")
     for path in patches:

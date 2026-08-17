@@ -1,0 +1,98 @@
+# 업스트림이 움직였는지 주마다 본다.
+#
+# 왜 CI인가: 업스트림은 거의 매일 릴리스를 낸다. 우리가 안 볼 때도 움직이고,
+# 눈치채는 시점이 늦을수록 패치를 다시 붙이는 비용이 커진다. 이 워크플로가
+# 하는 일은 **알리는 것뿐**이다 - 아무것도 옮기지 않는다.
+#
+# 왜 여기서 안 옮기나: 올리려면 KR Dalamud로 빌드하고 인게임에서 들어 봐야
+# 하는데, 러너에는 게임도 KR Dalamud도 없다. 여기서 판정할 수 있는 것은
+# "우리 패치가 새 태그에 아직 붙는가"까지다. 그게 조기 경보로는 충분하다.
+#
+# 번역은 여기서 못 한다. 업스트림 커밋은 독일어고 러너에는 옮길 수단이
+# 없다. 그래서 이슈에는 **원문을 그대로** 싣고, 한국어 이력은 로컬에서
+# `--notes`로 만든다. 절차: docs/upstream-sync.md
+
+name: 업스트림 감시
+
+on:
+  schedule:
+    # 월요일 07:00 KST (일요일 22:00 UTC)
+    - cron: "0 22 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 업스트림 클론
+        run: |
+          git clone --no-checkout \
+            "$(python3 -c 'import json;print(json.load(open("upstream.json"))["repo"])')" \
+            vendor/ff14-accessibility
+          git -C vendor/ff14-accessibility fetch --tags origin
+
+      - name: 점검
+        id: survey
+        run: |
+          # 새 태그가 있으면 tool이 0을 내도 이슈를 연다. 종료 코드는
+          # 판정이 아니라 사고 신호로만 쓴다.
+          python3 tools/upstream-sync/upstream_sync.py --json --offline > survey.json || true
+          cat survey.json
+          {
+            echo "newest=$(jq -r '.newest // ""' survey.json)"
+            echo "applies=$(jq -r '.applies // ""' survey.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: 요약
+        run: |
+          {
+            echo "## 업스트림 감시"
+            echo ""
+            jq -r '"- 핀: \(.pin.tag) (\(.pin.commit[0:7]))"' survey.json
+            jq -r 'if .newest then "- 새 태그: \(.new_tags | join(", "))" else "- 새 태그 없음" end' survey.json
+            jq -r 'if .newest then "- 패치가 붙는가: \(if .applies then "예" else "아니오 (" + .failing_patch + ")" end)" else empty end' survey.json
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 이슈 열기
+        if: steps.survey.outputs.newest != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEWEST: ${{ steps.survey.outputs.newest }}
+        run: |
+          TITLE="업스트림 $NEWEST — 동기화 대기"
+          if gh issue list --state open --search "$TITLE" --json title \
+              | jq -e --arg t "$TITLE" 'any(.title == $t)' > /dev/null; then
+            echo "이미 열려 있다: $TITLE"
+            exit 0
+          fi
+
+          {
+            jq -r '"핀 `\(.pin.tag)` (`\(.pin.commit[0:7])`, \(.pin.synced) 동기화) 이후 업스트림이 움직였다."' survey.json
+            echo ""
+            jq -r '"- 새 태그 \(.new_tags | length)개: \(.new_tags | join(", "))"' survey.json
+            jq -r '"- 새 커밋 \(.commits)건, 바뀐 파일 \(.changed_files)개"' survey.json
+            jq -r 'if (.overlap | length) > 0 then "- 우리 패치가 건드리는 파일과 겹침: " + (.overlap | join(", ")) else "- 우리 패치와 겹치는 파일 없음" end' survey.json
+            jq -r 'if .applies then "- 우리 패치는 새 태그에 **깨끗이 붙는다**" else "- **패치가 안 붙는다** (처음 실패: " + .failing_patch + ")" end' survey.json
+            echo ""
+            echo "## 원문 (독일어)"
+            echo ""
+            echo "여기서는 못 옮긴다. 한국어 이력은 로컬에서 만든다."
+            echo ""
+            jq -r '.subjects[] | "- `\(.sha)` \(.subject)"' survey.json
+            echo ""
+            echo "## 할 것"
+            echo ""
+            echo '```'
+            echo "run\\sync.bat $NEWEST"
+            echo '```'
+            echo ""
+            echo "그다음 변경 이력을 한국어로 채운다 — docs/upstream-sync.md §6."
+          } > body.md
+
+          gh issue create --title "$TITLE" --body-file body.md

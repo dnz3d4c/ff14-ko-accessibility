@@ -46,6 +46,28 @@ def test_patch가_아닌_파일은_안_센다(tmp_path: Path):
     assert names == ["0001-x.patch"]
 
 
+# --- 붙는 자리 ------------------------------------------------------------
+
+
+def test_핀이_붙는_자리를_정한다(tmp_path: Path):
+    # `main`은 클론한 날짜에 따라 다른 커밋이다. 핀이 그걸 못박는다.
+    (tmp_path / "upstream.json").write_text(
+        '{"commit": "abc1234", "tag": "v5.85"}', encoding="utf-8"
+    )
+    assert patch_check.base_commit(tmp_path) == "abc1234"
+
+
+def test_핀이_없으면_main으로_물러선다(tmp_path: Path):
+    # 핀을 도입하기 전에 만든 클론에서도 검사가 죽지 않아야 한다.
+    assert patch_check.base_commit(tmp_path) == "main"
+
+
+def test_이_저장소의_핀이_커밋을_가리킨다():
+    base = patch_check.base_commit()
+    assert base != "main", "upstream.json이 있어야 한다"
+    assert len(base) == 40, "짧은 sha는 다른 커밋과 겹칠 수 있다"
+
+
 # --- 개수 판정 ------------------------------------------------------------
 
 

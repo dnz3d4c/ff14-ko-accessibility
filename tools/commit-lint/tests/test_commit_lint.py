@@ -72,6 +72,7 @@ UPSTREAM_OK = (
     "\n"
     "독일어 리터럴이 박혀 있어 다른 클라이언트에서 눌리지 않는다.\n"
     "\n"
+    "Status-Board: W-07 진행\n"
     "Upstream-Files: FF14Accessibility/Services/UIReaderService.cs\n"
     "Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen\n"
 )
@@ -133,6 +134,49 @@ def test_오버레이_커밋이_patches를_건드리면_거부한다():
 def test_경로_목록이_비면_혼합_검사를_건너뛴다():
     # 훅이 인덱스를 못 읽는 상황(rebase 등)에서 오탐을 내면 안 된다.
     assert "C7" not in codes(UPSTREAM_OK, [])
+
+
+# --- C8 현황판 갱신 --------------------------------------------------------
+#
+# 현황판(docs/status.md)이 남은 일의 단일 원천이다. 코드가 움직였는데 판이
+# 그대로면 판은 며칠 만에 거짓말이 되고, 그 뒤로는 아무도 안 본다. 그래서
+# 판을 같이 건드리거나, 안 건드리는 이유를 한 줄로 밝히게 한다.
+
+
+def test_오버레이_커밋이_현황판을_안_건드리면_거부한다():
+    assert "C8" in codes("[오버레이] 설치기를 KR 경로로", ["overlay/patches/0006.patch"])
+
+
+def test_현황판을_같이_건드리면_통과한다():
+    assert "C8" not in codes(
+        "[오버레이] 설치기를 KR 경로로",
+        ["overlay/patches/0006.patch", "docs/status.md"],
+    )
+
+
+def test_트레일러로_면제받을_수_있다():
+    msg = "[도구] 스크립트 오타 수정\n\nStatus-Board: 해당 없음 - 오타 수정\n"
+    assert "C8" not in codes(msg, ["tools/kr-setup/seed_devplugin.py"])
+
+
+def test_빈_트레일러는_면제가_아니다():
+    # "Status-Board:" 만 붙여 검사를 통과시키는 우회를 막는다.
+    msg = "[도구] 스크립트 오타 수정\n\nStatus-Board:\n"
+    assert "C8" in codes(msg, ["tools/kr-setup/seed_devplugin.py"])
+
+
+def test_문서_커밋은_현황판을_요구하지_않는다():
+    # 근거 문서를 고치는 것 자체는 할 일의 이동이 아니다.
+    assert "C8" not in codes("[문서] 환경 문서에 실측 결과 추가", ["docs/environment.md"])
+
+
+def test_벤더_커밋은_현황판을_요구하지_않는다():
+    assert "C8" not in codes("[벤더] 업스트림 v5.86으로 이동", ["vendor"])
+
+
+def test_경로_목록이_비면_현황판_검사를_건너뛴다():
+    # 훅이 인덱스를 못 읽는 상황에서 오탐을 내면 안 된다. C7과 같은 취급.
+    assert "C8" not in codes("[오버레이] 설치기를 KR 경로로", [])
 
 
 # --- 주석줄 처리 -----------------------------------------------------------

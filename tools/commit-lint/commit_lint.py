@@ -28,6 +28,17 @@ FORBIDDEN_PATHS = {
 #: `[상류]` 커밋이 반드시 달아야 하는 트레일러.
 REQUIRED_UPSTREAM_TRAILERS = ("Upstream-Files", "Upstream-Subject")
 
+#: 현황판을 같이 갱신해야 하는 영역. 코드·설비가 움직이는 쪽만이다.
+#: `[문서]`와 `[벤더]`는 뺀다 - 근거 문서를 고치거나 업스트림 포인터를 옮기는
+#: 것 자체는 할 일의 이동이 아니다.
+BOARD_AREAS = ("상류", "오버레이", "검증", "도구")
+
+#: 남은 일의 단일 원천. 규약은 이 파일의 §9.
+BOARD_PATH = "docs/status.md"
+
+#: 현황판을 안 건드리는 이유를 밝히는 트레일러. 값이 비면 면제가 아니다.
+BOARD_TRAILER = "Status-Board"
+
 SUBJECT_MAX = 72
 
 _SUBJECT_RE = re.compile(r"^\[(?P<area>[^\]]+)\]\s+(?P<rest>.*)$")
@@ -154,6 +165,19 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
                     "C7",
                     f"[{area}] 커밋이 {', '.join(hits)}를 건드린다. "
                     "영역을 섞으면 업스트림 PR로 떼어낼 수 없다 - 커밋을 쪼개라",
+                )
+            )
+
+    if area in BOARD_AREAS and changed_paths:
+        touched_board = BOARD_PATH in changed_paths
+        excused = bool(trailer_value(body, BOARD_TRAILER))
+        if not touched_board and not excused:
+            violations.append(
+                Violation(
+                    "C8",
+                    f"{BOARD_PATH}를 같이 갱신하거나 안 하는 이유를 밝혀라 - "
+                    f"예: `{BOARD_TRAILER}: W-01 진행` 또는 "
+                    f"`{BOARD_TRAILER}: 해당 없음 - 오타 수정`",
                 )
             )
 

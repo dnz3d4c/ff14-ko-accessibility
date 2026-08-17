@@ -56,7 +56,23 @@ Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen
 - `Upstream-Files` — **업스트림 기준 경로**. 우리 저장소 경로가 아니다. 나중에 PR을 조립할 때 이 줄만 모으면 건드릴 파일 목록이 나온다.
 - `Upstream-Subject` — 업스트림에 보낼 때 쓸 독일어 제목. **커밋을 쓰는 시점에 미리 써 둔다.** 몇 달 뒤에 diff만 보고 독일어 제목을 복원하는 것보다 지금 쓰는 게 정확하다. 움라우트는 `ae/oe/ue/ss`로 치환한다(§3.2).
 
-### 2.4 본문에 검증 결과를 적는다
+### 2.4 코드가 움직이면 현황판도 움직인다
+
+`[상류]`·`[오버레이]`·`[검증]`·`[도구]` 커밋은 [docs/status.md](status.md)를 같이 건드리거나, **안 건드리는 이유를 트레일러로 밝혀야 한다.**
+
+```
+Status-Board: W-01 진행
+```
+
+```
+Status-Board: 해당 없음 - 오타 수정
+```
+
+값이 비면 면제가 아니다(`Status-Board:` 만 붙여 통과시키는 우회를 막는다). `[문서]`와 `[벤더]`는 요구하지 않는다 — 근거 문서를 고치거나 업스트림 포인터를 옮기는 것 자체는 할 일의 이동이 아니다.
+
+이 규칙이 왜 있는가는 §0과 같은 이유다. **현황판이 코드보다 늦으면 며칠 만에 거짓말이 되고, 그 뒤로는 아무도 안 본다.** 비용은 커밋마다 한 줄이다.
+
+### 2.5 본문에 검증 결과를 적는다
 
 업스트림 관행이다(빌드 결과를 커밋 본문에 명기). 우리도 따른다.
 
@@ -68,11 +84,11 @@ Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen
 
 **"인게임: 안 함"을 숨기지 않는다.** 업스트림 외부 기여자도 매 PR에 미테스트 사실을 자진 명기하는 게 관행이고(`STATUS.md:1380-1381`), 이 프로젝트에서 침묵은 "정상"이 아니라 "고장과 구분 안 됨"이다.
 
-### 2.5 Conventional Commits를 쓰지 않는다
+### 2.6 Conventional Commits를 쓰지 않는다
 
 `feat:` `fix:` `chore:` 접두 금지. 업스트림 이력 140건 중 **0건**이 쓴다. 우리가 쓰면 상류 커밋을 옮길 때 제목을 다시 써야 한다.
 
-### 2.6 줄바꿈은 LF
+### 2.7 줄바꿈은 LF
 
 `.gitattributes`의 `* text=auto eol=lf`가 강제한다. 업스트림 blob도 전부 LF다(`git ls-files --eol` 153파일 전수 `i/lf`). 업스트림에는 `.gitattributes`가 **없으므로** CRLF로 오염된 PR을 보내면 diff 전체가 바뀐 것처럼 보인다. PR 전에 `git ls-files --eol`로 확인한다.
 
@@ -112,7 +128,7 @@ Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen
 
 git config core.hooksPath .githooks && git config commit.template .gitmessage && uv run --no-project --with pytest pytest tools/commit-lint/tests -q
 
-검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C7이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
+검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C8이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
 
 규칙을 고칠 때는 `commit_lint.py`와 이 문서를 같이 고친다. 영역 목록(`AREAS`)과 §2.1 표가 어긋나면 안 된다.
 

@@ -1,0 +1,55 @@
+From cd5a14ce51360d7dde97c3421be86b9b7f1b9929 Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Mon, 17 Aug 2026 22:45:58 +0900
+Subject: [PATCH 3/3] Accept the Korean confirm-button label
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+PressFocusedOk matched the confirm button by label against
+["Ok", "Bestaetigen"], both German. On the Korean client the button reads
+"확인", so nothing matched and character creation could not be left at all:
+the log shows "PressOk: kein Ok-Button in '_CharaMakeFeature'" once per
+Enter press.
+
+The label is measured, not guessed. A live node dump of KR
+2026.08.05.0000.0000 shows the confirm button as Comp(1001) with a text
+child "확인" in both _CharaMakeProgress and _CharaMakeFeature, and the
+button component itself carries the visible flag (F=0x2033) even though
+its text child does not - which is what TryClickButton tests.
+
+Confirmed in game: character creation completes end to end after this.
+
+This is a Korean hardcode in a list that is already a German hardcode. The
+right shape is a per-locale label set, the same generalisation the other
+five game-text matches need. Left for that change rather than done twice.
+
+Build: 0 warnings 0 errors against 7.51.0.8667 and against 7.55.1.8875
+In-game: confirmed, character creation finished
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+---
+ FF14Accessibility/Services/UIReaderService.cs | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/FF14Accessibility/Services/UIReaderService.cs b/FF14Accessibility/Services/UIReaderService.cs
+index 0a77eed..079dcb4 100644
+--- a/FF14Accessibility/Services/UIReaderService.cs
++++ b/FF14Accessibility/Services/UIReaderService.cs
+@@ -7150,7 +7150,12 @@ public sealed class UIReaderService : IDisposable
+     /// CharaMake*/TitleDCWorldMap so Enter keeps its game meaning elsewhere.
+     /// </summary>
+     // Confirm-button labels in priority order (German client).
+-    private static readonly string[] ConfirmButtonLabels = ["Ok", "Bestätigen"];
++    // "확인" is the Korean client's label, read out of a live node dump of
++    // _CharaMakeProgress and _CharaMakeFeature (KR 2026.08.05.0000.0000,
++    // 2026-08-17): both confirm buttons are Comp(1001) with the text child
++    // "확인". Without it PressFocusedOk logs "kein Ok-Button" on every step of
++    // character creation and the appearance step cannot be left at all.
++    private static readonly string[] ConfirmButtonLabels = ["Ok", "Bestätigen", "확인"];
+ 
+     public unsafe void PressFocusedOk()
+     {
+-- 
+2.55.0.windows.3
+

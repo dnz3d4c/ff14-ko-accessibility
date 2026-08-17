@@ -81,6 +81,6 @@ exit /b 0
 
 :fail
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 1

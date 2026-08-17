@@ -27,7 +27,7 @@ echo.
 echo 2/3  런처에서 로그인하고, 게임에 캐릭터로 접속할 때까지 기다린다.
 echo      접속이 끝나면 이 창으로 돌아와 엔터를 누른다.
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 
 echo.
 echo 3/3  업데이터를 켠다. 창에서 "달라무드 적용"을 누른다.
@@ -40,6 +40,6 @@ exit /b 0
 
 :fail
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 1

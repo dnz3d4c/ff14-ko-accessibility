@@ -16,7 +16,7 @@ echo == KR 프로필 최초 설정 ==
 echo.
 echo 게임과 업데이터를 모두 끈 상태여야 한다.
 echo 켜져 있으면 지금 끄고, 끝났으면 엔터.
-pause
+if not defined FF14_NOPAUSE pause
 echo.
 
 if not exist "%KR_PROFILE%" (
@@ -54,12 +54,12 @@ if exist "%KR_DEVPLUGINS%\vnavmesh\vnavmesh.dll" (
 echo.
 echo 끝. 이제 run\play.bat으로 켠다.
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 0
 
 :fail
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 1

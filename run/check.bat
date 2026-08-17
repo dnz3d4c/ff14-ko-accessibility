@@ -44,13 +44,13 @@ echo.
 if defined FAILED (
   echo == 실패:!FAILED! ==
   echo.
-  pause
+  if not defined FF14_NOPAUSE pause
   endlocal
   exit /b 1
 )
 echo == 전부 통과 ==
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 0
 

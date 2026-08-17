@@ -18,5 +18,5 @@ echo 로그 원문: %KR_LOG%
 
 :end
 echo.
-pause
+if not defined FF14_NOPAUSE pause
 endlocal

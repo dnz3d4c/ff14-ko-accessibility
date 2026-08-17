@@ -1,0 +1,8 @@
+# upstream 클론은 버전 관리 밖에 둔다.
+# 읽기 전용 참조이며, 채택 시 submodule로 전환한다 (docs/ko-client-port-feasibility.md §9).
+vendor/
+
+# .NET
+bin/
+obj/
+*.user

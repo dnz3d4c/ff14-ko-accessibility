@@ -179,6 +179,43 @@ def test_경로_목록이_비면_현황판_검사를_건너뛴다():
     assert "C8" not in codes("[한국전용] 설치기를 KR 경로로", [])
 
 
+# --- C9·C10 업스트림을 올릴 때 ---------------------------------------------
+#
+# 업스트림은 독일어로 개발된다. 핀만 옮기고 이력을 안 남기면 우리 저장소에
+# 뭐가 들어왔는지 **읽을 수 있는 사람이 아무도 없다.** 어디서 어디까지
+# 올렸는지(C9)와, 그게 한국어로 남았는지(C10)를 커밋 시점에 막는다.
+
+
+VENDOR_RANGE = "Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)"
+VENDOR_PATHS = ["upstream.json", "docs/upstream-changes.md"]
+
+
+def test_벤더_커밋에_올린_범위가_없으면_거부한다():
+    assert "C9" in codes("[벤더] 업스트림 v5.87로 올림", VENDOR_PATHS)
+
+
+def test_올린_범위를_적으면_통과한다():
+    msg = f"[벤더] 업스트림 v5.87로 올림\n\n{VENDOR_RANGE}\n"
+    assert "C9" not in codes(msg, VENDOR_PATHS)
+
+
+def test_범위만_적고_이력을_안_남기면_거부한다():
+    # 핀은 옮겼는데 무엇이 들어왔는지는 독일어로만 남은 상태.
+    msg = f"[벤더] 업스트림 v5.87로 올림\n\n{VENDOR_RANGE}\n"
+    assert "C10" in codes(msg, ["upstream.json", "patches/0001-x.patch"])
+
+
+def test_핀을_안_건드리는_벤더_커밋은_이력을_요구하지_않는다():
+    # 패치만 다시 뽑는 경우 같은 것.
+    msg = f"[벤더] 패치를 다시 뽑음\n\n{VENDOR_RANGE}\n"
+    assert "C10" not in codes(msg, ["patches/0001-x.patch"])
+
+
+def test_다른_영역은_이_규칙을_안_받는다():
+    assert "C9" not in codes("[문서] 동기화 절차 정리", ["docs/upstream-sync.md"])
+    assert "C10" not in codes("[문서] 핀 설명 추가", ["upstream.json"])
+
+
 # --- 주석줄 처리 -----------------------------------------------------------
 
 

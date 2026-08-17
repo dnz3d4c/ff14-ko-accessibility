@@ -28,6 +28,14 @@ FORBIDDEN_PATHS = {
 #: `[업스트림]` 커밋에 반드시 있어야 하는 줄.
 REQUIRED_UPSTREAM_TRAILERS = ("Upstream-Files", "Upstream-Subject")
 
+#: `[벤더]` 커밋에 반드시 있어야 하는 줄. 어디서 어디까지 올렸는지가 없으면
+#: 나중에 "이 판에서 뭐가 들어왔나"를 되짚을 수가 없다.
+REQUIRED_VENDOR_TRAILERS = ("Upstream-Range",)
+
+#: 핀을 옮기는 파일과, 그때 한국어로 남겨야 하는 이력.
+PIN_PATH = "upstream.json"
+CHANGES_PATH = "docs/upstream-changes.md"
+
 #: 현황판을 같이 고쳐야 하는 갈래. 코드나 설비가 움직이는 쪽만이다.
 #: `[문서]`와 `[벤더]`는 뺀다 - 근거 문서를 고치거나 업스트림 포인터를 옮기는
 #: 것 자체는 할 일의 이동이 아니다.
@@ -149,6 +157,29 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
                     "C6",
                     "Upstream-Subject의 움라우트를 ae/oe/ue/ss로 바꿔라 "
                     "(원래 저장소 커밋 140/140이 그렇게 쓴다)",
+                )
+            )
+
+    if area == "벤더":
+        missing = [
+            key for key in REQUIRED_VENDOR_TRAILERS if not trailer_value(body, key)
+        ]
+        if missing:
+            violations.append(
+                Violation(
+                    "C9",
+                    f"[벤더] 커밋에 빠진 줄이 있다: {', '.join(missing)}. "
+                    "예: `Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)`",
+                )
+            )
+
+        if PIN_PATH in changed_paths and CHANGES_PATH not in changed_paths:
+            violations.append(
+                Violation(
+                    "C10",
+                    f"핀을 옮기면서 {CHANGES_PATH}를 안 건드렸다. "
+                    "업스트림은 독일어로 개발된다 - 이력을 한국어로 남기지 않으면 "
+                    "무엇이 들어왔는지 아무도 못 읽는다",
                 )
             )
 

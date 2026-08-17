@@ -302,17 +302,41 @@ def main(argv: list[str]) -> int:
         return 0
 
     print("독일어/영어 문장이 스냅샷과 다르다:", file=sys.stderr)
+    gone: list[list[str]] = []
+    fresh: list[list[str]] = []
     for name in sorted(set(golden["by_file"]) | set(current["by_file"])):
         was = golden["by_file"].get(name, [])
         now = current["by_file"].get(name, [])
         if was == now:
             continue
+        removed = [p for p in was if p not in now]
+        added = [p for p in now if p not in was]
+        gone.extend(removed)
+        fresh.extend(added)
         print(f"  {name}: {len(was)}개 -> {len(now)}개", file=sys.stderr)
-        for pair in [p for p in was if p not in now][:3]:
+        for pair in removed[:3]:
             print(f"    사라짐: {pair[0][:50]}", file=sys.stderr)
-        for pair in [p for p in now if p not in was][:3]:
+        for pair in added[:3]:
             print(f"    새로:   {pair[0][:50]}", file=sys.stderr)
+
+    # 두 경우를 구분한다. 업스트림을 올린 직후에는 문장이 **늘기만** 하는 게
+    # 정상이고, 그때 갱신은 안전하다. 사라진 게 있으면 그건 다른 사건이다 -
+    # 우리가 옮기다 떨어뜨렸거나 업스트림이 문장을 고친 것이고, 둘 다
+    # 갱신하기 전에 봐야 한다.
     print("", file=sys.stderr)
+    if not gone:
+        print(
+            f"사라진 문장 없음 / 새 문장 {len(fresh)}개. 업스트림이 더한 것뿐이라면 "
+            "--write로 갱신해도 기존 문장은 안 바뀐다.",
+            file=sys.stderr,
+        )
+        print("새로 늘어난 만큼 한국어 번역이 밀린다 - docs/upstream-sync.md §7.", file=sys.stderr)
+    else:
+        print(
+            f"사라진 문장 {len(gone)}개. 업스트림을 올린 게 아니라면 옮기다 "
+            "떨어뜨린 것이다 - 갱신하기 전에 그 줄을 찾아라.",
+            file=sys.stderr,
+        )
     print("의도한 변경이면 --write로 갱신하고, 왜 바뀌는지 커밋에 적어라.", file=sys.stderr)
     return 1
 

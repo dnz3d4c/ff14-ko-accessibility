@@ -20,16 +20,17 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 
 - 설치된 KR 클라이언트 버전 `2026.08.05.0000.0000`이 KR Dalamud 지원 버전과 **정확히 일치**한다.
 - KR 호환 Dalamud(공식 15.0.3.2 + KR IL 패치, FFXIVClientStructs 7.51.0.8667)를 구성하고 자체 검증까지 통과했다.
-- **업스트림 소스를 KR 호환 CS로 빌드했을 때 오류가 정확히 1건이다** — 53,971줄에서 `RaptureGearsetModule.IsItemRegisteredToGearset` 하나. 공식 CS 7.55로는 경고·오류 0으로 빌드된다.
+- **업스트림 소스를 KR 호환 CS로 빌드했을 때 오류가 정확히 1건이었다** — 53,971줄에서 `RaptureGearsetModule.IsItemRegisteredToGearset` 하나. 확장 메서드 shim으로 메웠고(`overlay/patches/0001`), **글로벌 빌드의 바인딩은 바뀌지 않는다**(실증 완료). 지금은 양쪽 다 경고 0 오류 0으로 빌드된다.
 - 게임 `sqpack`이 있으므로 조사 §7의 1순위 미확인 항목(KR Addon 시트 행 ID)을 **게임 실행 없이 Lumina로 확인할 수 있다.**
 
 ## 구조
 
 - `docs/` — 조사·설계 문서
+- `overlay/patches/` — **한국 전용** 소스 패치. vendor 클론의 `kr-port` 브랜치에서 뽑아낸다
 - `tools/commit-lint/` — 커밋 메시지 검증기 (`.githooks/commit-msg`가 호출)
-- `vendor/ff14-accessibility/` — upstream 클론. **읽기 전용 참조이며 버전 관리에서 제외**된다. 채택 시 submodule로 전환한다.
+- `vendor/ff14-accessibility/` — upstream 클론. **버전 관리에서 제외**된다. 직접 손대지 않고 `kr-port` 브랜치에 커밋한 뒤 패치로 떼어낸다. 채택 시 submodule로 전환한다.
 
-아직 없는 것: `overlay/`(KR 전용 자산), `patches/`(업스트림 기여 대기 변경), `tests/`. 내용이 생길 때 만든다.
+아직 없는 것: `patches/`(업스트림 기여 대기 변경), `overlay/`의 데이터 자산(`ko.json` 등), `tests/`. 내용이 생길 때 만든다.
 
 ## 클론 직후 한 번
 

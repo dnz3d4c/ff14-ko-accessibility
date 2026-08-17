@@ -8,6 +8,8 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 
 그 뒤에 남아 있던 **"게임과 답이 다른 두 곳"을 정리했다.** 노드 가시성은 KR 바이너리에서 게임 함수를 찾아내 되돌렸고(추론이던 부모 사슬 판정을 폐기), 기어세트 마크의 id 단위 오차는 유지하되 기동 시 음성으로 알린다. 근거는 [개발 환경 문서](docs/environment.md) §5~6.
 
+자동 이동에 필요한 **vnavmesh를 설치하고 사전 검증까지 통과시켰다.** 접근성 모드가 요구하는 외부 플러그인은 이것 하나뿐이다(IPC 호출 16건 전수). 게임을 켜지 않고 어셈블리 참조·멤버 참조·시그니처를 검사해 미해결 0건을 확인했다 — [개발 환경 문서](docs/environment.md) §7. **인게임 적재는 아직 확인 못 했다.** 키를 사람이 눌러야 하기 때문이고, 판정 방법은 [KR 실행 환경 구축 절차](docs/kr-runtime-setup.md) §10에 적어 뒀다.
+
 - **[한국 클라이언트 포팅 타당성 조사](docs/ko-client-port-feasibility.md)** — 2026-08-17
 - **[개발 환경 실측과 설치 결과](docs/environment.md)** — 2026-08-17
 - **[KR 실행 환경 구축 절차](docs/kr-runtime-setup.md)** — 2026-08-17
@@ -35,6 +37,8 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 - `tools/kr-setup/` — KR 프로필에 dev 플러그인을 심는 스크립트
 - `tools/cs-api-diff/` — 두 FFXIVClientStructs 어셈블리의 API 차이를 뽑는 도구 (`sigs` 인자를 주면 시그니처 문자열과 필드 오프셋을 뽑는다)
 - `tools/sig-probe/` — 게임을 켜지 않고 `ffxiv_dx11.exe`에서 시그니처를 해석하는 검증기. 우리가 박아 넣은 KR 시그니처가 아직 유일하게 잡히는지 테스트가 확인한다
+- `tools/asmref-check/` — 플러그인 어셈블리가 부르는 타입·멤버가 KR이 깐 FFXIVClientStructs에 실제로 있는지 대조하는 도구. 게임을 켜지 않고 돌린다
+- `tools/asmstr/` — 어셈블리에 박힌 시그니처 문자열을 뽑는다. `#US` 힙(`ScanText`)과 `#Blob` 힙(`[Signature]` 특성) 양쪽을 읽고, 뽑은 것은 `sig-probe`로 해석한다
 - `vendor/ff14-accessibility/` — upstream 클론. **버전 관리에서 제외**된다. 직접 손대지 않고 `kr-port` 브랜치에 커밋한 뒤 패치로 떼어낸다. 채택 시 submodule로 전환한다.
 
 아직 없는 것: `patches/`(업스트림 기여 대기 변경), `overlay/`의 데이터 자산(`ko.json` 등), `tests/`. 내용이 생길 때 만든다.

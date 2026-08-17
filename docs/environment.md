@@ -165,7 +165,7 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 | 3 | addon 이름 90종 동일 | **대체로 해소** | `_TitleMenu`, `_CharaSelectListMenu`, `_CharaMake*` 9종이 그대로 잡힘 |
 | 4 | 플러그인 자체 오프셋 3곳 | **2/3 해소** | human.cmp 팔레트 46,688색 로드, LogFilter 278행·69채널 파싱(Broken 아님). 트리플 트라이어드는 미확인 |
 | 5 | 툴팁 후킹 3개 | **해소** | `[Tooltip] Hooks aktiv (Attach/Detach/DetachByAddon)` |
-| 6 | vnavmesh 동작 | **미확인** | 미설치 |
+| 6 | vnavmesh 동작 | **미확인** | 설치와 사전 검증은 끝났고 인게임 적재가 남았다. §7 |
 | 7 | CS 7.51 컴파일 | **해소** | §4 참조 |
 | 8 | KR에 영어 시트 존재 | **미확인** | |
 | 9 | UI 노드 ID/휴리스틱 | **부분 해소, 결함 1건 발견** | 아래 참조 |
@@ -277,3 +277,53 @@ C3                              ret
 **재확인 명령**(게임 패치 후 이걸 먼저 돌린다. 이 검사는 테스트에도 들어 있다 — `tools/sig-probe/tests/test_shipped_signature.py`가 패치 파일에서 시그니처를 꺼내 대조한다):
 
 uv run --no-project --with pytest pytest tools/sig-probe/tests -q
+
+## 7. vnavmesh 사전 검증 (2026-08-18)
+
+게임을 켜지 않고 할 수 있는 검증은 전부 통과했다. **인게임 적재와 실제 동작은 아직 미확인이다** — 키를 사람이 눌러야 하고 이 클라이언트에는 키 주입이 통하지 않는다(§5). 확인 방법은 `docs/kr-runtime-setup.md` §10.
+
+받은 것은 vnavmesh **1.2.3.13**이고 `https://puni.sh/api/repository/veyn` 매니페스트를 거쳤다. DalamudApiLevel 15, ApplicableVersion any. 업스트림 인스톨러가 쓰는 것과 같은 출처다(`Installer/InstallerService.cs:36`). 설치 경로와 절차는 `docs/kr-runtime-setup.md` §8.
+
+**재배포하지 않는다.** vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud 도구(§3)와 같은 취급이다.
+
+### 어셈블리 참조
+
+vnavmesh는 FFXIVClientStructs **7.51.0.8681**을 참조한다. KR이 깔아 둔 것은 **7.51.0.8667**이다(§3). 같은 7.51 라인의 리비전 차이다 — 7.55 기준으로 빌드된 물건이 아니다.
+
+### 멤버 참조
+
+`tools/asmref-check`로 검사했다. 이번에 새로 만든 도구다.
+
+| 대상 | 검사 | missing-type | missing-member | arity | sig-diff |
+|------|------|--------------|----------------|-------|----------|
+| FF14Accessibility (교정용) | 906 | 0 | 0 | 0 | 0 |
+| vnavmesh 1.2.3.13 | 659 | 0 | 0 | 0 | 0 |
+
+FF14Accessibility를 같이 돌린 것은 도구를 교정하기 위해서다. 이쪽은 KR 실기에서 동작하는 것이 이미 증명돼 있다(§5).
+
+독립 구현 하나를 따로 짜서 교차 확인했다. SRM으로 직접 색인하는 쪽인데 vnavmesh 550건 검사에 미해결 0이었다. 검사 대상 수가 다른 것은 서명 타입을 어디까지 포함하느냐가 달라서고, 결론은 같다.
+
+### 시그니처
+
+`tools/asmstr`(새 도구)로 시그니처 문자열을 뽑고 기존 `tools/sig-probe`로 해석했다. 대상 바이너리는 KR `C:\Program Files (x86)\FINAL FANTASY XIV - KOREA\game\ffxiv_dx11.exe`.
+
+| 대상 | UNIQUE | NOT FOUND | AMBIGUOUS |
+|------|--------|-----------|-----------|
+| vnavmesh | 6 | 0 | 0 |
+| FF14Accessibility (대조군) | 1 | 0 | 0 |
+| `cachedSigs\cs.json` 표본 20건 (대조군) | 20 | 0 | 0 |
+
+### 시그니처 문자열은 두 군데에 들어간다
+
+Dalamud 플러그인에서 시그니처가 어셈블리에 박히는 자리가 둘이다.
+
+- `ScanText("...")` 호출 → `#US` 힙에 UTF-16
+- `[Signature("...")]` 특성 → `#Blob` 힙에 UTF-8. 특성 인자는 인터닝이 아니라 직렬화되기 때문이다
+
+vnavmesh는 양쪽을 다 쓴다. `#US`만 읽었으면 절반만 보고 통과시킬 뻔했다.
+
+### 한국 커뮤니티는 vnavmesh를 안 건드린다
+
+`MiqoKR/kr-dalamud-patches`의 catalog에는 Customize+ 하나만 stable로 올라 있고, 패치 대상은 Glamourer·SimpleHeels·BossMod·GatherBuddy·Penumbra·Umbra다. **vnavmesh는 목록에 없다.**
+
+그 패치들은 한국어 캐릭터명·월드 ID 같은 데이터 문제를 고치는 것이라 충돌 지오메트리만 다루는 vnavmesh와 결이 다르다. 다만 이것은 "패치가 필요 없다"는 증거가 아니라 **아무도 안 했다**는 사실일 뿐이다.

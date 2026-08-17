@@ -78,7 +78,52 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 `AutomaticReloading`을 켜 두므로 **이후 재빌드는 파일만 덮어쓰면 게임 재시작 없이 반영된다.**
 
-## 8. 실행 순서
+## 8. vnavmesh 설치
+
+자동 이동 계열 단축키가 이 플러그인을 부른다. 없으면 넘패드3에서 `Auto-walk not available. The vnavmesh plugin is missing or not loaded.`가 들린다(`%APPDATA%\XIVLauncherKR\dalamud-kr-gui.log:6206`, 2026-08-18 00:07:16). 결함이 아니라 미설치다.
+
+**접근성 모드가 요구하는 외부 플러그인은 이것 하나뿐이다.** 업스트림 소스에서 외부 IPC 호출을 전수로 뽑으면 16건이 전부 `vnavmesh.*`다 — `Services/NavmeshIpc.cs:47-62`에 13건, `Services/RouteService.cs:41-46`에 3건. Tolk와 nvdaControllerClient64는 플러그인이 아니라 동봉 DLL이다. 업스트림도 vnavmesh를 optional로 취급한다(`README.en.md:236`).
+
+**재배포하지 않는다.** vnavmesh는 `awgil/ffxiv_navmesh`이고 LICENSE 파일이 없다. KR Dalamud 도구와 같은 취급이라 사용자가 직접 받는 것만 안내한다.
+
+Dalamud 자체 플러그인 설치창을 쓰지 않는 이유는 그 창이 ImGui라 스크린리더에 읽히지 않기 때문이다. 그래서 dev 플러그인 경로로 우회한다. 경로 규약은 업스트림 인스톨러와 같다(`Installer/InstallerService.cs:326`).
+
+**이 절은 게임을 끈 상태에서 한다.**
+
+### 받아서 푼다
+
+출처는 puni.sh 저장소 매니페스트 `https://puni.sh/api/repository/veyn`이고, 업스트림 인스톨러가 읽는 것과 같다(`Installer/InstallerService.cs:36`). `vnavmesh` 항목의 `DownloadLinkInstall`이 zip 주소다.
+
+받은 판은 **1.2.3.13**이다 — DalamudApiLevel 15, ApplicableVersion any.
+
+아래 zip 주소는 2026-08-18에 그 매니페스트에서 꺼낸 것이다. 받아서 푼 결과는 확인했지만 이 한 줄을 그대로 돌려 보지는 않았다(복사용 한 줄):
+
+curl -sSL -o "C:\Users\USER\AppData\Local\Temp\vnavmesh-1.2.3.13.zip" https://puni.sh/api/plugins/download/48/vnavmesh/versions/1.2.3.13/install/latest.zip && 7z x -y -o"C:\Users\USER\AppData\Roaming\XIVLauncherKR\devPlugins\vnavmesh" "C:\Users\USER\AppData\Local\Temp\vnavmesh-1.2.3.13.zip"
+
+버전이 올라가면 매니페스트를 다시 열어 새 `DownloadLinkInstall`을 꺼낸다.
+
+푼 결과는 zip 내용 그대로 **21개 파일**이고 그 안에 `vnavmesh.dll`과 `vnavmesh.json`이 있다.
+
+### 설정에 심는다
+
+§7과 같은 스크립트를 대상만 바꿔 부른다. 한 번만 하면 되고, 게임이 꺼져 있어야 하는 이유도 §7과 같다 — 켜져 있으면 Dalamud가 종료할 때 덮는다.
+
+uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLauncherKR\dalamudConfig.json" "%APPDATA%\XIVLauncherKR\devPlugins\vnavmesh\vnavmesh.dll" vnavmesh
+
+세 조건이 동시에 맞은 것을 확인했다 — `DevMode=true`, `DevPluginSettings[...].StartOnBoot=true`, `DefaultProfile`에 같은 WorkingPluginId(`ed98dbb9-5a32-46ce-ad00-0d8cf35ec5a2`)로 `IsEnabled=true`.
+
+백업 두 개가 남는다.
+
+- `dalamudConfig.json.bak-20260818-pre-vnavmesh` — 시딩 전 원본
+- `dalamudConfig.json.bak-kr-seed` — 스크립트가 만든 것
+
+### 여기까지가 확인된 범위다
+
+파일 배치와 설정 시딩까지다. **게임 안에서 실제로 적재되는지는 아직 확인 못 했다.** 키를 사람이 눌러야 하는데 이 클라이언트에는 키 주입이 통하지 않는다(`docs/environment.md` §5). 확인 방법은 §10에 있다.
+
+게임을 켜지 않고 할 수 있는 사전 검증(어셈블리 참조, 멤버 참조, 시그니처)은 통과했다. 근거는 `docs/environment.md` §7.
+
+## 9. 실행 순서
 
 1. 한국어 런처로 게임 실행 — Win+R에 `"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk"`
 2. 로그인하고 게임 시작
@@ -87,7 +132,7 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 업데이터는 게임을 띄우지 않는다. 돌고 있는 `ffxiv_dx11` 프로세스에 붙을 뿐이다(`inject <pid>`). XIVLauncher는 이 구성에서 쓰지 않는다 — `XIVLauncherKR`은 프로그램이 아니라 폴더 이름이다.
 
-## 9. 성공 확인
+## 10. 성공 확인
 
 **"적용 완료" 알림을 믿으면 안 된다.** 인젝터가 종료 코드 0으로 끝나면 뜨는데, 게임 안에서 실패해도 0으로 끝난 적이 있다.
 
@@ -100,3 +145,18 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 - `[Speak] '...'` — 음성 출력 도달
 
 `dalamudConfig.json`이 72바이트에서 7만 바이트대로 커졌으면 Dalamud가 실제로 돌았다는 뜻이다.
+
+### vnavmesh 적재 확인
+
+같은 로그에서 두 줄을 본다.
+
+- `[LocalPlugin] Finished loading vnavmesh` — Dalamud가 dev 플러그인을 적재하면 찍는 줄이다. FF14Accessibility가 이 형식으로 찍히는 것은 확인했고(`dalamud-kr-gui.log:51`), vnavmesh 쪽은 **아직 못 봤다**
+- `[Nav] Auto-Lauf: vnavmesh antwortet nicht (Plugin installiert und aktiv?)` — 이 경고가 보이면 아직 안 붙은 것이다(`dalamud-kr-gui.log:6206`)
+
+넘패드3을 누르면 모드가 세 경우를 구분해 말해 준다(`Services/AutoWalkService.cs:355-370`). 이게 판정 기준이다.
+
+| 들리는 말 | 뜻 |
+|-----------|-----|
+| `Auto-walk not available. The vnavmesh plugin is missing or not loaded.` | 여전히 안 붙었다 |
+| `Navmesh still loading, N percent.` | **붙었다.** 첫 존 진입 때 길 그물망을 새로 만드느라 몇 분 걸린다 |
+| `Navmesh is not ready yet. Try again shortly.` | 붙었는데 그물망이 아직 없다 |

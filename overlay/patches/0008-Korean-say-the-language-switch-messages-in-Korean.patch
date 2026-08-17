@@ -1,0 +1,81 @@
+From 78c6f63e303dcc52e1fa0e43d3d57631bb8b94e9 Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Tue, 18 Aug 2026 07:56:03 +0900
+Subject: [PATCH] Korean: say the language-switch messages in Korean
+
+First strings to actually move onto Pick(de, en, ko). Small on purpose - this
+is the group that proves the mechanism before 676 lines ride on it.
+
+The language switch is also the one place where answering in the old language
+is useless. Someone who types "/acc lang ko" is asking whether Korean works;
+hearing English back leaves that unanswered.
+
+Six strings: the three language names, the two confirmations, and the usage
+hint. German and English wording is byte-for-byte what it was.
+
+Adds a private Pick shorthand next to IsGerman. Both shapes live side by side
+while the move runs; lines change one feature group at a time.
+
+Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
+Verified: the DE/EN snapshot is unchanged - 676 pairs identical after moving
+these six off the ternary, which is what the snapshot exists to prove
+In-Game: not checked - "/acc lang ko" should now answer in Korean
+---
+ .../Services/AccessibilityStrings.cs          | 28 ++++++++++++-------
+ 1 file changed, 18 insertions(+), 10 deletions(-)
+
+diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
+index 60e05fd..e3cf2b4 100644
+--- a/FF14Accessibility/Services/AccessibilityStrings.cs
++++ b/FF14Accessibility/Services/AccessibilityStrings.cs
+@@ -13,6 +13,12 @@ public static partial class AccessibilityStrings
+     // NOT the OS culture directly. Auto still falls back to the OS culture.
+     private static bool IsGerman => Loc.IsGerman;
+ 
++    // Shorthand for the three-language form. Lines move from
++    // "IsGerman ? de : en" to "Pick(de, en, ko)" one feature group at a time;
++    // both shapes live here side by side until the move is done.
++    private static string Pick(string de, string en, string? ko = null) =>
++        Loc.Pick(de, en, ko);
++
+     public static string TitleScreen => IsGerman ? "Titelbildschirm" : "Title screen";
+     public static string MainMenu => IsGerman ? "Hauptmenü" : "Main menu";
+     public static string Back => IsGerman ? "Zurück" : "Back";
+@@ -72,22 +78,24 @@ public static partial class AccessibilityStrings
+     public static string StateDisabled => IsGerman ? "ausgegraut" : "greyed out";
+ 
+     // ── Sprachumschaltung (/acc lang) ────────────────────────────────
+-    public static string LanguageGerman  => IsGerman ? "Deutsch" : "German";
+-    public static string LanguageEnglish => IsGerman ? "Englisch" : "English";
+-    public static string LanguageKorean  => IsGerman ? "Koreanisch" : "Korean";
++    public static string LanguageGerman  => Pick("Deutsch", "German", "독일어");
++    public static string LanguageEnglish => Pick("Englisch", "English", "영어");
++    public static string LanguageKorean  => Pick("Koreanisch", "Korean", "한국어");
+ 
+     public static string LanguageSet(string language) =>
+-        IsGerman ? $"Sprache auf {language} umgestellt." : $"Language set to {language}.";
++        Pick($"Sprache auf {language} umgestellt.",
++             $"Language set to {language}.",
++             $"언어를 {language}로 바꿨다.");
+ 
+     public static string LanguageAuto(string language) =>
+-        IsGerman
+-            ? $"Sprache folgt jetzt Windows: {language}."
+-            : $"Language now follows Windows: {language}.";
++        Pick($"Sprache folgt jetzt Windows: {language}.",
++             $"Language now follows Windows: {language}.",
++             $"이제 윈도를 따라간다. 지금은 {language}다.");
+ 
+     public static string LanguageUsage =>
+-        IsGerman
+-            ? "Sprache wählen mit: /acc lang de, /acc lang en, /acc lang ko oder /acc lang auto."
+-            : "Choose a language with: /acc lang de, /acc lang en, /acc lang ko or /acc lang auto.";
++        Pick("Sprache wählen mit: /acc lang de, /acc lang en, /acc lang ko oder /acc lang auto.",
++             "Choose a language with: /acc lang de, /acc lang en, /acc lang ko or /acc lang auto.",
++             "언어를 고르려면 /acc lang ko, /acc lang en, /acc lang de, 또는 /acc lang auto를 친다.");
+ 
+     public static string UnknownCommand =>
+         IsGerman ? "Unbekannter Befehl. Tippe /acc help für Hilfe." : "Unknown command. Type /acc help for help.";
+-- 
+2.55.0.windows.3
+

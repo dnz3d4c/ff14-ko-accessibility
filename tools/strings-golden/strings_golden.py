@@ -9,9 +9,12 @@
 `golden/de-en.json`이 그 결과다. 옮긴 뒤에도 독일어·영어 문장이 한 자도
 안 바뀐 것을 이 파일로 증명한다.
 
-**못 읽은 것을 숨기지 않는다.** 722곳 중 단순 삼항이 아닌 것이 몇 개 있고
-(데이터 주도, 중첩 삼항), 그 개수도 같이 기록한다. 개수가 늘면 새 형태가
-생긴 것이니 손으로 본다.
+**못 읽은 것을 숨기지 않는다.** 단순 삼항이 아닌 것(데이터 주도, 중첩 삼항)의
+개수도 같이 기록한다. 개수가 늘면 새 형태가 생긴 것이니 손으로 본다.
+
+지금 41개 중 하나는 진짜 문장이 아니다 - `AccessibilityStrings.Pick` 축약이
+`Loc.Pick(de, en, ko)`로 넘기는 줄이고, 인자가 문자열이 아니라 변수라서
+못 읽는다. 나머지 40개가 실제로 손으로 옮길 자리다(docs/ko-hand-cases.md).
 
 사용법:
     uv run --no-project python tools/strings-golden/strings_golden.py          # 대조
@@ -31,6 +34,11 @@ GOLDEN = Path(__file__).resolve().parent / "golden" / "de-en.json"
 
 MARKER = "IsGerman"
 
+#: 번역하면서 삼항이 이 모양으로 바뀐다. 옮긴 줄도 같은 쌍을 내야 스냅샷이
+#: "문장이 사라졌다"고 하지 않는다. 앞 글자를 보고 PickItem 같은 이름은 거른다.
+PICK = "Pick("
+_IDENT = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+
 
 @dataclass(frozen=True)
 class Pair:
@@ -43,6 +51,54 @@ class Unparsed:
     file: str
     line: int
     snippet: str
+
+
+NEWLINE = '\n'
+
+
+def strip_comments(text: str) -> str:
+    """주석을 같은 길이의 공백으로 지운다.
+
+    주석에 `IsGerman ? de : en` 같은 **예시**를 적어 두면 검사기가 그걸 코드로
+    읽어 미해석 개수를 부풀린다. 개수가 곧 신호라서, 가짜로 늘면 진짜 증가를
+    못 본다.
+
+    길이를 유지하는 이유는 줄 번호와 위치를 안 흔들기 위해서다. 문자열 안의
+    `//`(URL 같은 것)는 주석이 아니므로 문자열도 같이 따라가며 읽는다.
+    """
+    out = list(text)
+    i, n = 0, len(text)
+    while i < n:
+        ch = text[i]
+        if ch == '"':
+            # 문자열은 통째로 건너뛴다 - 안에 //가 있어도 주석이 아니다.
+            i += 1
+            while i < n:
+                if text[i] == chr(92) and i + 1 < n:
+                    i += 2
+                    continue
+                if text[i] == '"' or text[i] == NEWLINE:
+                    i += 1
+                    break
+                i += 1
+            continue
+        if ch == "/" and i + 1 < n and text[i + 1] == "/":
+            while i < n and text[i] != NEWLINE:
+                out[i] = " "
+                i += 1
+            continue
+        if ch == "/" and i + 1 < n and text[i + 1] == "*":
+            while i < n and not (text[i] == "*" and i + 1 < n and text[i + 1] == "/"):
+                if text[i] != NEWLINE:
+                    out[i] = " "
+                i += 1
+            for _ in range(2):
+                if i < n:
+                    out[i] = " "
+                    i += 1
+            continue
+        i += 1
+    return "".join(out)
 
 
 def _read_literal(text: str, i: int) -> tuple[str | None, int]:
@@ -83,8 +139,65 @@ def _skip_space(text: str, i: int) -> int:
     return i
 
 
+def _line_of(text: str, index: int) -> int:
+    return text.count("\n", 0, index) + 1
+
+
+def _extract_pick(text: str, name: str) -> tuple[list[Pair], list[Unparsed]]:
+    """`Pick(독일어, 영어[, 한국어])` 호출에서 쌍을 뽑는다."""
+    pairs: list[Pair] = []
+    missed: list[Unparsed] = []
+
+    start = 0
+    while True:
+        found = text.find(PICK, start)
+        if found < 0:
+            break
+        start = found + len(PICK)
+
+        # `PickItem(` 같은 다른 이름을 거른다. 앞 글자가 식별자면 우리 게 아니다.
+        before = text[found - 1] if found > 0 else ""
+        if before in _IDENT:
+            continue
+
+        i = _skip_space(text, start)
+        de, i = _read_literal(text, i)
+        if de is None:
+            # 선언(`Pick(string de, ...)`)은 호출이 아니다. 첫 인자가 문자열이
+            # 아니면서 타입 이름으로 시작하면 그냥 넘긴다 - 미해석으로 세면
+            # 개수가 영원히 부풀어 있다.
+            if text[i : i + 7] == "string ":
+                continue
+            missed.append(Unparsed(name, _line_of(text, found),
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        i = _skip_space(text, i)
+        if i >= len(text) or text[i] != ",":
+            missed.append(Unparsed(name, _line_of(text, found),
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        i = _skip_space(text, i + 1)
+        en, i = _read_literal(text, i)
+        if en is None:
+            missed.append(Unparsed(name, _line_of(text, found),
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        # 한국어가 뒤에 붙어 있어도 독일어/영어 쌍은 그대로다. 세 번째 인자는 안 본다.
+        pairs.append(Pair(de, en))
+
+    return pairs, missed
+
+
 def extract(text: str, name: str) -> tuple[list[Pair], list[Unparsed]]:
-    """한 파일에서 (독일어, 영어) 쌍과 못 읽은 자리를 뽑는다."""
+    """한 파일에서 (독일어, 영어) 쌍과 못 읽은 자리를 뽑는다.
+
+    두 모양을 읽는다 - 아직 안 옮긴 `IsGerman ? de : en`과, 옮긴
+    `Pick(de, en, ko)`. 둘이 같은 쌍을 내므로 옮기는 동안 스냅샷이 안 흔들린다.
+    """
+    text = strip_comments(text)
     pairs: list[Pair] = []
     missed: list[Unparsed] = []
 
@@ -121,6 +234,10 @@ def extract(text: str, name: str) -> tuple[list[Pair], list[Unparsed]]:
             continue
 
         pairs.append(Pair(de, en))
+
+    pick_pairs, pick_missed = _extract_pick(text, name)
+    pairs.extend(pick_pairs)
+    missed.extend(pick_missed)
 
     return pairs, missed
 

@@ -49,6 +49,8 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 - 거기서 직접 작업하지 않는다. `kr-port` 브랜치에 커밋하고 `git format-patch`로 떼어낸다.
 - 한국 전용 패치는 `overlay/patches/`, 업스트림 기여 대기 변경은 `patches/`. 섞는 커밋은 훅이 거부한다.
+- **붙는 자리는 `upstream.json`의 핀이지 `main`이 아니다.** 핀을 손으로 고치지 않는다 — `run\sync.bat`이 옮긴다.
+- **업스트림은 독일어로 개발된다.** 핀을 옮겼으면 [docs/upstream-changes.md](docs/upstream-changes.md)에 한국어로 남긴다. 안 남기면 훅 C10과 테스트가 막는다. 절차는 [docs/upstream-sync.md](docs/upstream-sync.md).
 
 ## 나머지는 문서가 소유한다
 
@@ -56,4 +58,5 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 - 개발 환경·경로·빌드 명령: `docs/environment.md`
 - 커밋 규칙: `docs/commit-rules.md`
+- 업스트림 동기화: `docs/upstream-sync.md`
 - 포팅 판단 근거: `docs/ko-client-port-feasibility.md`

@@ -39,7 +39,7 @@
 | 한국전용 | 우리만 쓰는 것 | `overlay/` |
 | 검증 | 테스트, 검증기, 골든 파일 | `tests/`, `tools/` |
 | 문서 | 조사·설계 문서 | `docs/`, `README.md` |
-| 벤더 | upstream submodule 포인터 이동 | `vendor` |
+| 벤더 | 업스트림 핀 이동 | `upstream.json`, `patches/*` 재추출 |
 | 도구 | 빌드 설정, 스크립트, 저장소 설비 | `tools/`, 루트 설정 |
 
 ### 2.2 한 커밋에 영역을 섞지 않는다
@@ -74,7 +74,19 @@ Status-Board: 해당 없음 - 오타 수정
 
 이 규칙이 왜 있는가는 §0과 같은 이유다. **현황판이 코드보다 늦으면 며칠 만에 거짓말이 되고, 그 뒤로는 아무도 안 본다.** 비용은 커밋마다 한 줄이다.
 
-### 2.5 본문에 검증 결과를 적는다
+### 2.5 `[벤더]` 커밋은 어디서 어디까지 올렸는지를 밝힌다
+
+```
+Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
+```
+
+이게 없으면 "이 판에서 뭐가 들어왔나"를 되짚을 수 없다. 검사기는 C9다.
+
+**핀(`upstream.json`)을 옮기는 커밋은 [upstream-changes.md](upstream-changes.md)를 같이 건드려야 한다**(C10). 업스트림은 독일어로 개발되므로, 이력을 한국어로 안 남기면 우리 저장소에 무엇이 들어왔는지 **읽을 수 있는 사람이 없다.** 절차는 [upstream-sync.md](upstream-sync.md) §6.
+
+패치를 다시 쓴 경우는 `[벤더]`로 묶지 않는다. 핀 이동만 `[벤더]`고, 다시 쓴 패치는 원래 갈래로 나눈다 — 섞으면 §0의 사고가 그대로 난다.
+
+### 2.6 본문에 검증 결과를 적는다
 
 업스트림 관행이다(빌드 결과를 커밋 본문에 명기). 우리도 따른다.
 
@@ -86,11 +98,11 @@ Status-Board: 해당 없음 - 오타 수정
 
 **"인게임: 안 함"을 숨기지 않는다.** 업스트림 외부 기여자도 매 PR에 미테스트 사실을 자진 명기하는 게 관행이고(`STATUS.md:1380-1381`), 이 프로젝트에서 침묵은 "정상"이 아니라 "고장과 구분 안 됨"이다.
 
-### 2.6 Conventional Commits를 쓰지 않는다
+### 2.7 Conventional Commits를 쓰지 않는다
 
 `feat:` `fix:` `chore:` 접두 금지. 업스트림 이력 140건 중 **0건**이 쓴다. 우리가 쓰면 보낼 커밋을 옮길 때 제목을 다시 써야 한다.
 
-### 2.7 줄바꿈은 LF
+### 2.8 줄바꿈은 LF
 
 `.gitattributes`의 `* text=auto eol=lf`가 강제한다. 업스트림 blob도 전부 LF다(`git ls-files --eol` 153파일 전수 `i/lf`). 업스트림에는 `.gitattributes`가 **없으므로** CRLF로 오염된 PR을 보내면 diff 전체가 바뀐 것처럼 보인다. PR 전에 `git ls-files --eol`로 확인한다.
 
@@ -138,7 +150,7 @@ Status-Board: 해당 없음 - 오타 수정
 
 git config core.hooksPath .githooks && git config commit.template .gitmessage && uv run --no-project --with pytest pytest tools/commit-lint/tests -q
 
-검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C8이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
+검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C10이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
 
 규칙을 고칠 때는 `commit_lint.py`와 이 문서를 같이 고친다. 영역 목록(`AREAS`)과 §2.1 표가 어긋나면 안 된다.
 

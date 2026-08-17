@@ -14,7 +14,9 @@ vendor 클론에서 실행한다. **`patches/`가 먼저다** — 이유는 [pat
 
 cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../patches/*.patch ../../overlay/patches/*.patch
 
-이미 `kr-port` 브랜치가 있으면 `git checkout kr-port`로 충분하다. 두 묶음이 그 순서로 pristine `main`에 깨끗하게 적용되는 것을 확인해 두었다(2026-08-18, 7건).
+이미 `kr-port` 브랜치가 있으면 `git checkout kr-port`로 충분하다.
+
+**붙는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** `main`은 클론한 날짜에 따라 다른 커밋을 가리키므로 기준이 못 된다 — 업스트림이 거의 매일 릴리스를 낸다. 위 명령의 `main`을 핀 커밋으로 바꿔 읽는다. 검사기(`tools/patch-check`)는 이미 핀을 본다. 근거: [docs/upstream-sync.md](../../docs/upstream-sync.md) §2.
 
 ## 목록
 

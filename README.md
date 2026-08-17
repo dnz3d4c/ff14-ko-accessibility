@@ -17,6 +17,8 @@ KR 전용 결함과 "게임과 답이 다른 두 곳"은 정리했고, 설치기
 - **[단축키 한국어 표](docs/keys-ko.md)** — 2026-08-17
 - **[커밋 규칙](docs/commit-rules.md)** — 2026-08-17
 - **[손으로 옮겨야 하는 40곳](docs/ko-hand-cases.md)** — 2026-08-18
+- **[업스트림 동기화](docs/upstream-sync.md)** — 2026-08-18
+- **[업스트림 변경 이력 (한국어)](docs/upstream-changes.md)** — 원문이 독일어라 옮겨 둔다
 
 ### 조사 결론 요약
 
@@ -54,6 +56,8 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 - `tools/sig-probe/` — 게임을 켜지 않고 `ffxiv_dx11.exe`에서 시그니처를 해석하는 검증기. 우리가 박아 넣은 KR 시그니처가 아직 유일하게 잡히는지 테스트가 확인한다
 - `tools/asmref-check/` — 플러그인 어셈블리가 부르는 타입·멤버가 KR이 깐 FFXIVClientStructs에 실제로 있는지 대조하는 도구. 게임을 켜지 않고 돌린다
 - `tools/asmstr/` — 어셈블리에 박힌 시그니처 문자열을 뽑는다. `#US` 힙(`ScanText`)과 `#Blob` 힙(`[Signature]` 특성) 양쪽을 읽고, 뽑은 것은 `sig-probe`로 해석한다
+- `tools/upstream-sync/` — 업스트림이 얼마나 앞서 갔는지 재고, 깨끗할 때 올린다. 변경 이력을 한국어로 남길 자리도 여기가 만든다 ([docs/upstream-sync.md](docs/upstream-sync.md))
+- `upstream.json` — **우리 패치가 어느 판 위에 얹혀 있는지.** `vendor/`가 버전 관리 밖이라 이게 유일한 기록이다
 - `vendor/ff14-accessibility/` — upstream 클론. **버전 관리에서 제외**된다. 직접 손대지 않고 `kr-port` 브랜치에 커밋한 뒤 패치로 떼어낸다. 채택 시 submodule로 전환한다.
 
 아직 없는 것: `overlay/`의 데이터 자산(`ko.json` 등). 한국어화를 시작할 때 생긴다.

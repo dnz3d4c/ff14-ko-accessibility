@@ -12,6 +12,8 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 `patches/`가 앞이다. 업스트림에 병합되면 그 패치는 여기서 사라지고, 나머지는 그대로 붙어야 한다. 뒤에 두면 받아들여진 뒤 우리 패치들이 전부 어긋난다.
 
+**붙는 자리는 `main`이 아니라 `upstream.json`의 핀이다** — 위 명령의 `main`을 핀 커밋으로 바꿔 읽는다. 업스트림을 올리는 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
+
 ## `overlay/`가 아니라 여기에 넣는 기준
 
 셋을 다 만족해야 한다.

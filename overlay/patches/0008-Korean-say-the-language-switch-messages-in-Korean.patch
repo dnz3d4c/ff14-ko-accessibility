@@ -1,7 +1,7 @@
-From d0ee360f2e459ac6e342e9d6e05cc9aa73dbbdb7 Mon Sep 17 00:00:00 2001
+From f3f0f236e2eb055150e96feeb06ae32d3033581e Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 07:56:03 +0900
-Subject: [PATCH] Korean: say the language-switch messages in Korean
+Subject: [PATCH 8/8] Korean: say the language-switch messages in Korean
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -33,7 +33,7 @@ In-Game: not checked - "/acc lang ko" should now answer in Korean
  1 file changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 60e05fd..f1c0eca 100644
+index 9254a0b..b66fc2f 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -13,6 +13,12 @@ public static partial class AccessibilityStrings

@@ -1,7 +1,7 @@
-From cd5a14ce51360d7dde97c3421be86b9b7f1b9929 Mon Sep 17 00:00:00 2001
+From 46f651ae7fb24d78ee517a1e28ea708d19613e0b Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 22:45:58 +0900
-Subject: [PATCH 3/3] Accept the Korean confirm-button label
+Subject: [PATCH 3/8] Accept the Korean confirm-button label
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -33,10 +33,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/FF14Accessibility/Services/UIReaderService.cs b/FF14Accessibility/Services/UIReaderService.cs
-index 0a77eed..079dcb4 100644
+index c9e34fa..df9fa8c 100644
 --- a/FF14Accessibility/Services/UIReaderService.cs
 +++ b/FF14Accessibility/Services/UIReaderService.cs
-@@ -7150,7 +7150,12 @@ public sealed class UIReaderService : IDisposable
+@@ -7163,7 +7163,12 @@ public sealed class UIReaderService : IDisposable
      /// CharaMake*/TitleDCWorldMap so Enter keeps its game meaning elsewhere.
      /// </summary>
      // Confirm-button labels in priority order (German client).

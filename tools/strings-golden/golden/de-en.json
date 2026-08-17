@@ -946,6 +946,10 @@
         "Ability-ready announcements off."
       ],
       [
+        "Für {monster} ist kein Ort bekannt.",
+        "No location known for {monster}."
+      ],
+      [
         "Füße",
         "Feet"
       ],
@@ -1152,6 +1156,18 @@
       [
         "Ja",
         "Yes"
+      ],
+      [
+        "Jagdziele",
+        "Hunting targets"
+      ],
+      [
+        "Jagdziele: {total} offen, keines in diesem Gebiet.",
+        "Hunting targets: {total} open, none in this area."
+      ],
+      [
+        "Jagdziele: {total} offen, {here} in diesem Gebiet.",
+        "Hunting targets: {total} open, {here} in this area."
       ],
       [
         "Job: ",
@@ -1416,6 +1432,10 @@
       [
         "Keine offene Benachrichtigung.",
         "No open notification."
+      ],
+      [
+        "Keine offenen Jagdziele in diesem Rang.",
+        "No open hunting targets in this rank."
       ],
       [
         "Keine passenden Gegenstände im Beutel gefunden.",
@@ -1684,6 +1704,14 @@
       [
         "Raid",
         "raid"
+      ],
+      [
+        "Rang {rank}, alle {total} Einträge erledigt",
+        "Rank {rank}, all {total} entries complete"
+      ],
+      [
+        "Rang {rank}, {done} von {total} Einträgen erledigt",
+        "Rank {rank}, {done} of {total} entries done"
       ],
       [
         "Raum {index}",
@@ -2286,12 +2314,20 @@
         "in the area {zone}."
       ],
       [
+        "in der Nähe",
+        "nearby"
+      ],
+      [
         "in einem anderen Gebiet.",
         "in another area."
       ],
       [
         "kein Weg bekannt",
         "no route known"
+      ],
+      [
+        "lebt in {area}",
+        "lives in {area}"
       ],
       [
         "leer",
@@ -2550,6 +2586,18 @@
         "{level}, wearable"
       ],
       [
+        "{monster} lebt in {area}. Dieses Gebiet ist auf der Karte nicht verzeichnet.",
+        "{monster} lives in {area}. That area is not marked on the map."
+      ],
+      [
+        "{monster} lebt in {zone}. Dorthin führt kein Weg über Gebietsübergänge.",
+        "{monster} lives in {zone}. No route there over zone transitions."
+      ],
+      [
+        "{monster}, {killed} von {required} erlegt",
+        "{monster}, {killed} of {required} killed"
+      ],
+      [
         "{name} bereit, {charges} von {maxCharges} Ladungen.",
         "{name} ready, {charges} of {maxCharges} charges."
       ],
@@ -2712,6 +2760,6 @@
     ]
   },
   "note": "한국어화 전 독일어/영어 스냅샷. 옮긴 뒤에도 이게 그대로여야 한다.",
-  "pairs": 676,
+  "pairs": 688,
   "unparsed": 41
 }

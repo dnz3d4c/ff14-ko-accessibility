@@ -1,8 +1,8 @@
-From 6a48bcdef4d4d4751b4d938c868a7122ff02feed Mon Sep 17 00:00:00 2001
+From de150fb37e25a15ebb7076d5804ec9d39b84e87e Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 23:22:27 +0900
-Subject: [PATCH] Compat: call the game's own IsVisible, and say which path is
- live
+Subject: [PATCH 4/8] Compat: call the game's own IsVisible, and say which path
+ is live
 
 Two answers the game normally gives were coming from somewhere else, and
 nothing said so. NodeVisibilityCompat had a FallbackInstalled flag that no
@@ -427,7 +427,7 @@ index 6b7f505..9ea9a55 100644
      }
  }
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index 1f0da6d..810dce8 100644
+index ace424f..065a6d9 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
 @@ -36,6 +36,9 @@ public sealed class Plugin : IDalamudPlugin
@@ -440,7 +440,7 @@ index 1f0da6d..810dce8 100644
      // IGameConfig steht weiter oben - drei Nutzer, eine Deklaration (Chat-Filter,
      // Bewegungsmodus). PR #6 brachte eine zweite mit, die hier entfallen ist.
      // Loest die Makros in Sheet-Texten so auf, wie das Spiel es tut. Die
-@@ -246,6 +249,11 @@ public sealed class Plugin : IDalamudPlugin
+@@ -247,6 +250,11 @@ public sealed class Plugin : IDalamudPlugin
          // before the first Speak below.
          Loc.Mode = _config.Language;
  
@@ -452,7 +452,7 @@ index 1f0da6d..810dce8 100644
          TolkNative.Initialize(PluginInterface.AssemblyLocation.DirectoryName!);
          _tolk       = new TolkService(Log);
          _beacon       = new BeaconService(_config, _tolk, Log);
-@@ -426,6 +434,11 @@ public sealed class Plugin : IDalamudPlugin
+@@ -428,6 +436,11 @@ public sealed class Plugin : IDalamudPlugin
  
          Log.Info($"FF14 Accessibility Plugin V{PluginVersion} [{PluginVersionTag}] geladen.");
          _tolk.Speak(AccessibilityStrings.VersionReady(PluginVersion));
@@ -464,7 +464,7 @@ index 1f0da6d..810dce8 100644
      }
  
      private void RegisterCommands()
-@@ -436,7 +449,7 @@ public sealed class Plugin : IDalamudPlugin
+@@ -438,7 +451,7 @@ public sealed class Plugin : IDalamudPlugin
          // /acc stop â†’ Sprache stoppen
          CommandManager.AddHandler("/acc", new CommandInfo(OnCommand)
          {
@@ -473,7 +473,7 @@ index 1f0da6d..810dce8 100644
          });
      }
  
-@@ -510,6 +523,13 @@ public sealed class Plugin : IDalamudPlugin
+@@ -512,6 +525,13 @@ public sealed class Plugin : IDalamudPlugin
              case "keys":
                  _keybinds.DumpKeybinds(GetPluginKeys());
                  break;

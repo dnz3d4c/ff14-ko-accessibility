@@ -1,8 +1,8 @@
-From d99d8c508ef41450d9c4dbf291a188d7242cf305 Mon Sep 17 00:00:00 2001
+From 7c295f459d1e41989465f16dc845ac02ed924380 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 00:15:46 +0900
-Subject: [PATCH] Compat: hand the replica back on unload, and stop overstating
- who resolved
+Subject: [PATCH 5/8] Compat: hand the replica back on unload, and stop
+ overstating who resolved
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -163,10 +163,10 @@ index 9ea9a55..1e56bc4 100644
      /// matches none or more than one. More than one is not a near miss, it is a
      /// wrong answer waiting to happen, so it is refused.</summary>
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index 810dce8..41e1970 100644
+index 065a6d9..6fdb31d 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
-@@ -1950,6 +1950,9 @@ public sealed class Plugin : IDalamudPlugin
+@@ -2028,6 +2028,9 @@ public sealed class Plugin : IDalamudPlugin
          _cue.Dispose();
          _vitals.Dispose();
          _tolk.Dispose();

@@ -18,7 +18,11 @@
 - `a8ac7c5` 개체 목록의 사냥 목표에서 Numpad3을 누르면, 그때까지는 서식지 지도 표식까지만 갔다. 살아 있는 개체가 개체 목록에 있으면 이제 그걸 대상으로 잡고 매 프레임 위치를 다시 읽으며 달린다 — 순찰하는 몬스터도 따라간다. 게임이 대상 지정을 거부하면 마지막으로 본 자리로 간다. 목록을 넘길 때 읽는 거리·방향도 지역이 아니라 몬스터 기준으로 바뀌었다
   원문: Release v5.87: Jagdziele laufen direkt zum Monster
 
-우리 쪽: 패치 10건이 그대로 붙는다. 새 안내 문장 없음.
+우리 쪽: 패치 10건이 충돌 없이 다시 붙었다. **새 안내 문장 1개** — 번역 대기.
+
+| 독일어 | 영어 |
+|--------|------|
+| `in der Nähe` | `nearby` |
 
 ## v5.86 — 2026-08-17
 
@@ -31,15 +35,21 @@
 - `70d6ae3` 등급 목록이 "1, 10 중 10"이라고만 말하던 것을 "등급 1, 항목 10개 전부 끝냄"으로 고쳤다. 세는 대상이 처치 수가 아니라 항목 수라는 것을 시트로 검산했다. 개체 목록에 **사냥 목표**(`Jagdziele`, 용어 미확인) 갈래가 새로 생겨, 지금 등급에 남은 몬스터를 사는 지역과 함께 말한다 — 같은 지역이면 거리와 방향으로, 다른 지역이면 지역 이름과 가는 길로. 남은 게 없으면 갈래 자체가 안 나온다
   원문: Release v5.86: Jagdziele im Objekt-Browser, Bestiarium-Raenge benannt
 
-우리 쪽: 패치 10건이 그대로 붙는다. **새 안내 문장 5개** — 번역이 그만큼 밀린다.
+우리 쪽: 패치 10건이 충돌 없이 다시 붙었다. **새 안내 문장 11개** — 번역이 그만큼 밀린다. 새 서비스 파일(`HuntingLogService.cs`)이 하나 생겼고, 우리 패치가 건드리는 파일과 겹치지 않는다.
 
 | 독일어 | 영어 |
 |--------|------|
 | `Jagdziele` | `Hunting targets` |
-| `in der Nähe` | `nearby` |
 | `lebt in {area}` | `lives in {area}` |
 | `Rang {rank}, alle {total} Einträge erledigt` | `Rank {rank}, all {total} entries complete` |
 | `Rang {rank}, {done} von {total} Einträgen erledigt` | `Rank {rank}, {done} of {total} entries done` |
+| `{monster}, {killed} von {required} erlegt` | `{monster}, {killed} of {required} killed` |
+| `Keine offenen Jagdziele in diesem Rang.` | `No open hunting targets in this rank.` |
+| `Jagdziele: {total} offen, {here} in diesem Gebiet.` | `Hunting targets: {total} open, {here} in this area.` |
+| `Jagdziele: {total} offen, keines in diesem Gebiet.` | `Hunting targets: {total} open, none in this area.` |
+| `Für {monster} ist kein Ort bekannt.` | `No location known for {monster}.` |
+| `{monster} lebt in {area}. Dieses Gebiet ist auf der Karte nicht verzeichnet.` | `{monster} lives in {area}. That area is not marked on the map.` |
+| `{monster} lebt in {zone}. Dorthin führt kein Weg über Gebietsübergänge.` | `{monster} lives in {zone}. No route there over zone transitions.` |
 
 ## v5.85 — 2026-08-16
 

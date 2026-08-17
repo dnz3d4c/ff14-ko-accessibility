@@ -1,7 +1,7 @@
-From 5376e45d2982525f4e998b6ea68cdbc6c26d40bf Mon Sep 17 00:00:00 2001
+From 59fde22fdf573a8a461a1e09b8f6d7d4ca5d56db Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:51:52 +0900
-Subject: [PATCH] Titelmenue: die Eintragszahl erst nennen, wenn das Menue
+Subject: [PATCH 1/2] Titelmenue: die Eintragszahl erst nennen, wenn das Menue
  fertig ist
 
 Beim Oeffnen sagte das Hauptmenue eine zu kleine Zahl. Gemessen am
@@ -39,7 +39,7 @@ In-Game: nicht geprueft
  1 file changed, 43 insertions(+), 11 deletions(-)
 
 diff --git a/FF14Accessibility/Services/UIReaderService.cs b/FF14Accessibility/Services/UIReaderService.cs
-index 079dcb4..a52a624 100644
+index 2ab4d94..c9e34fa 100644
 --- a/FF14Accessibility/Services/UIReaderService.cs
 +++ b/FF14Accessibility/Services/UIReaderService.cs
 @@ -95,6 +95,12 @@ public sealed class UIReaderService : IDisposable
@@ -87,7 +87,7 @@ index 079dcb4..a52a624 100644
      }
  
      private unsafe void OnTitleMenuReceive(AddonEvent type, AddonArgs args)
-@@ -7935,11 +7948,30 @@ public sealed class UIReaderService : IDisposable
+@@ -7930,11 +7943,30 @@ public sealed class UIReaderService : IDisposable
          }
  
          var selection = GetTitleMenuSelection(addon);

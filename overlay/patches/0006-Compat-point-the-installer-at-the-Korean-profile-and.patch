@@ -1,8 +1,8 @@
-From ba6f18ee8eba196ae3d6057de03e68a8c9dbe20a Mon Sep 17 00:00:00 2001
+From 53d468117883a2480ca9fb6bfcb85fa5e468177f Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:24:06 +0900
-Subject: [PATCH] Compat: point the installer at the Korean profile and a local
- build
+Subject: [PATCH 6/8] Compat: point the installer at the Korean profile and a
+ local build
 
 The installer is the right shape for this project - Dalamud's own plugin
 window is ImGui and a screen reader cannot read it, so the DevPlugin route

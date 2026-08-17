@@ -1,8 +1,8 @@
-From f333234f666bc6288a0cdc803a3b04cd5330e3bb Mon Sep 17 00:00:00 2001
+From d367d70fa082dcbc7d87412742a54912a7050159 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 07:37:56 +0900
-Subject: [PATCH] Korean: add it as a third language, falling back to English
- until translated
+Subject: [PATCH 7/8] Korean: add it as a third language, falling back to
+ English until translated
 
 Adds Korean to the enum, to the culture table (ko), and to the "/acc lang"
 aliases (ko, korean, koreanisch, and the Korean word itself). One line each -
@@ -87,10 +87,10 @@ index e4e069b..ac59204 100644
      public static LanguageMode? ParseArg(string arg) =>
          Aliases.TryGetValue(arg.Trim(), out var found) ? found : null;
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index 41e1970..4992893 100644
+index 6fdb31d..9bcb253 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
-@@ -649,7 +649,12 @@ public sealed class Plugin : IDalamudPlugin
+@@ -651,7 +651,12 @@ public sealed class Plugin : IDalamudPlugin
          PluginInterface.SavePluginConfig(_config);
  
          // Name the resolved language; "auto" also reports which one Windows picked.
@@ -105,7 +105,7 @@ index 41e1970..4992893 100644
              ? AccessibilityStrings.LanguageAuto(languageName)
              : AccessibilityStrings.LanguageSet(languageName));
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index b9214e8..60e05fd 100644
+index dc577d5..9254a0b 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -74,6 +74,7 @@ public static partial class AccessibilityStrings

@@ -125,10 +125,16 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 ## 9. 실행 순서
 
-1. 한국어 런처로 게임 실행 — Win+R에 `"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk"`
-2. 로그인하고 게임 시작
-3. 업데이터 실행 — `C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
-4. **달라무드 적용**
+**배치가 이 순서를 갖고 있다.** 아래 하나만 실행하면 1~3이 순서대로 나온다.
+
+C:\project\games\ff14-ko-accessibility\run\play.bat
+
+배치가 하는 일은 이렇다.
+
+1. 한국어 런처로 게임 실행 — `%ProgramData%\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk`
+2. 로그인하고 게임 시작 (사람이 한다 — 배치가 여기서 기다린다)
+3. 업데이터 실행 — `%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
+4. **달라무드 적용** (사람이 누른다 — GUI 버튼이라 자동화가 안 된다)
 
 업데이터는 게임을 띄우지 않는다. 돌고 있는 `ffxiv_dx11` 프로세스에 붙을 뿐이다(`inject <pid>`). XIVLauncher는 이 구성에서 쓰지 않는다 — `XIVLauncherKR`은 프로그램이 아니라 폴더 이름이다.
 
@@ -136,13 +142,21 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 **"적용 완료" 알림을 믿으면 안 된다.** 인젝터가 종료 코드 0으로 끝나면 뜨는데, 게임 안에서 실패해도 0으로 끝난 적이 있다.
 
-`%APPDATA%\XIVLauncherKR\dalamud-kr-gui.log`에서 확인한다.
+**손으로 찾지 않는다.** `run\log.bat`이 아래 판정을 대신 한다(`tools/kr-setup/check_log.py`). 로그는 세션을 이어 붙이므로 **마지막 세션만** 봐야 하는데, 그걸 눈으로 하면 앞판의 성공 줄에 속는다.
 
-- `"Language": "Korean"` — KR 언어 패치 작동
-- `Lumina is ready: ...\game\sqpack` — 게임 데이터 판독 가능
-- `Saved cache to ...cachedSigs\<게임버전>.json` — 시그니처 해석 성공
-- `[FF14Accessibility] ... geladen.` — 플러그인 로드
-- `[Speak] '...'` — 음성 출력 도달
+판정 근거는 이렇다.
+
+| 보는 것 | 어디에 있나 | 뜻 |
+|---------|-------------|-----|
+| `"Language": "Korean"` | `dalamud.troubleshooting.json` | KR 언어 패치 작동 |
+| `Lumina is ready: ...\game\sqpack` | `dalamud-kr-gui.log` | 게임 데이터 판독 가능 |
+| `[LocalPlugin] Finished loading FF14Accessibility` | 같은 로그 | 플러그인 로드 |
+| `[LocalPlugin] Finished loading vnavmesh` | 같은 로그 | 자동 이동 가능 |
+| `[Compat] ... Korean signature` | 같은 로그 | 노드 가시성이 게임 함수 |
+| `[Speak] '...'` | 같은 로그 | 음성 출력 도달 |
+| `[Speak] ... Target reached` | 같은 로그 | 자동 이동이 끝까지 갔다 |
+
+**언어 표시만 로그가 아니라 옆의 json에 있다.** 2026-08-18 실측에서 로그 전문의 `"Language"` 문자열이 0건이었다 — 그전까지 이 절이 로그에서 찾으라고 적어 둔 것은 틀린 안내였다.
 
 `dalamudConfig.json`이 72바이트에서 7만 바이트대로 커졌으면 Dalamud가 실제로 돌았다는 뜻이다.
 

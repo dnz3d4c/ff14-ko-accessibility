@@ -29,9 +29,18 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 - **업스트림 소스를 KR 호환 CS로 빌드했을 때 오류가 정확히 1건이었다** — 53,971줄에서 `RaptureGearsetModule.IsItemRegisteredToGearset` 하나. 확장 메서드 shim으로 메웠고(`overlay/patches/0001`), **글로벌 빌드의 바인딩은 바뀌지 않는다**(실증 완료). 지금은 양쪽 다 경고 0 오류 0으로 빌드된다.
 - 게임 `sqpack`이 있으므로 조사 §7의 1순위 미확인 항목(KR Addon 시트 행 ID)을 **게임 실행 없이 Lumina로 확인할 수 있다.**
 
+## 매일 쓰는 것
+
+게임과 모드를 켜는 것부터 로그 판정까지 배치가 갖고 있다. 자세한 건 [run/README.md](run/README.md).
+
+C:\project\games\ff14-ko-accessibility\run\play.bat
+
+남은 일은 전부 **[프로젝트 현황판](docs/status.md)** 에 있다. 뭘 고치기 전에 거기를 먼저 연다.
+
 ## 구조
 
-- `docs/` — 조사·설계 문서
+- `docs/` — 조사·설계 문서. **`status.md`가 남은 일의 단일 원천**
+- `run/` — 실행 배치 (게임·빌드·로그·최초설정)
 - `overlay/patches/` — **한국 전용** 소스 패치. vendor 클론의 `kr-port` 브랜치에서 뽑아낸다
 - `tools/commit-lint/` — 커밋 메시지 검증기 (`.githooks/commit-msg`가 호출)
 - `tools/kr-setup/` — KR 프로필에 dev 플러그인을 심는 스크립트

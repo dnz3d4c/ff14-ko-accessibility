@@ -10,11 +10,11 @@
 
 ## 적용
 
-vendor 클론에서 실행한다.
+vendor 클론에서 실행한다. **`patches/`가 먼저다** — 이유는 [patches/README.md](../../patches/README.md).
 
-cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../overlay/patches/*.patch
+cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../patches/*.patch ../../overlay/patches/*.patch
 
-이미 `kr-port` 브랜치가 있으면 `git checkout kr-port`로 충분하다. 패치는 pristine `main`에 깨끗하게 적용되는 것을 확인해 두었다.
+이미 `kr-port` 브랜치가 있으면 `git checkout kr-port`로 충분하다. 두 묶음이 그 순서로 pristine `main`에 깨끗하게 적용되는 것을 확인해 두었다(2026-08-18, 7건).
 
 ## 목록
 

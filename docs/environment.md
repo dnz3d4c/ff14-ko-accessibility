@@ -162,6 +162,7 @@ DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" 
 2. **확인 버튼 라벨이 독일어 하드코딩** — 조사 §3 계층 3의 1번 항목. 캐릭터 생성을 빠져나갈 수 없었다. `overlay/patches/0003`으로 수정
 3. **KR 프로필 부트스트랩 3종이 없다** — 업데이터가 기존 프로필을 전제한다. `docs/kr-runtime-setup.md`
 4. **키 이름 파서가 `Pos1`(Home)과 `Strg+F`를 모른다** — 바인딩 3개가 죽어 있다. KR 무관, 업스트림 결함
+5. **타이틀 메뉴 항목 수가 경로에 따라 다르다** — 메뉴 전체 안내는 "1 of 5", 화살표 이동은 "1 of 6"이라고 말한다. 2026-08-17 가시성 변경 **전후 로그가 똑같으므로 회귀가 아니다**(`dalamud-kr-gui.old.log`에도 5와 6이 같이 있다). KR 무관 추정, 미조사
 
 ### 알고 받아들인 차이 — 2026-08-17 처리 완료
 
@@ -180,6 +181,18 @@ DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" 
 | id 단위 (기어세트) | 경고로 남는다 | **1회** | 말한다 |
 
 지금 KR에서는 기어세트 한 줄만 기동 때 들린다. 가시성 시그니처가 게임 패치로 깨지면 그때 두 줄이 되고, **사용자는 동작이 바뀐 시점을 귀로 안다.**
+
+### 인게임 확인 (2026-08-17 23:32~23:35)
+
+`dalamud-kr-gui.log` 한 판 전수다.
+
+- `[Compat] AtkResNode::IsVisible resolved by the Korean signature at 0x7FF61438E7E0` — 모듈 베이스 `0x7FF613D30000` + `0x65E7E0`이므로 **오프라인에서 찾은 그 함수가 런타임에도 그대로 잡혔다**
+- 기동 음성 두 줄이 순서대로 나갔다 — 버전 안내 다음에 `Compatibility note: Gearset marks go by item ID.` 하나. `Speak`가 큐에 넣으므로 인사말을 자르지 않는다
+- **로그 전체에 `[ERR]` 0건, 예외 0건.** 패치 0002 이전에는 가시성 호출부 60곳이 전부 예외였다
+- 가시성에 의존하는 기능이 살아 있다 — 타이틀 메뉴 화살표 이동(항목 이름 + 위치), 창 제목·초점 읽기(`소지품`, `시스템`, `트러스트`), 로그아웃 확인 대화상자
+- 종료 시 `dalamud.crashhandler.log`에 남는 `error: 0x6d` + `Terminating target process`는 **이 변경 전 다섯 판에도 같이 있다.** 이 구성의 정상 종료 흔적이지 크래시가 아니다
+
+아직 안 해 본 것: `/acc compat`(온디맨드 보고), Ctrl+F5 노드 덤프, 모드 내 구현으로 내려가는 분기(시그니처가 깨져야 밟힌다).
 
 ## 6. KR 바이너리에서 IsVisible 찾기 (2026-08-17)
 

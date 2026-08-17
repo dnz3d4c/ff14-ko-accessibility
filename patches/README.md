@@ -10,13 +10,13 @@ vendor 클론에서 실행한다. 순서가 중요하다.
 
 cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../patches/*.patch ../../overlay/patches/*.patch
 
-`patches/`가 앞이다. 업스트림에 병합되면 그 패치는 여기서 사라지고, 나머지는 그대로 붙어야 한다. 뒤에 두면 병합 후 오버레이 패치들이 전부 어긋난다.
+`patches/`가 앞이다. 업스트림에 병합되면 그 패치는 여기서 사라지고, 나머지는 그대로 붙어야 한다. 뒤에 두면 받아들여진 뒤 우리 패치들이 전부 어긋난다.
 
-## 오버레이가 아니라 여기에 넣는 기준
+## `overlay/`가 아니라 여기에 넣는 기준
 
 셋을 다 만족해야 한다.
 
-1. **코드에 한국이 안 나온다.** 시그니처 바이트, `XIVLauncherKR`, KR 시트 ID 같은 것이 있으면 오버레이다
+1. **코드에 한국이 안 나온다.** 시그니처 바이트, `XIVLauncherKR`, KR 시트 ID 같은 것이 있으면 `overlay/`로 간다
 2. **다른 클라이언트에서도 고쳐진다.** 독일어·프랑스어·일본어 사용자에게도 이익이어야 한다
 3. **업스트림 결정을 뒤집지 않는다.** 뒤집는다면 그건 먼저 물어볼 일이다([commit-rules.md](../docs/commit-rules.md) §3.6)
 
@@ -38,4 +38,4 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 아직 안 보냈다. 막힌 것은 기술이 아니라 절차다 — 업스트림 PR 언어를 아직 안 물어봤다([commit-rules.md](../docs/commit-rules.md) §5).
 
-PR을 조립할 때는 `[상류]` 커밋의 `Upstream-Files` 트레일러만 모으면 건드릴 파일 목록이 나온다.
+PR을 조립할 때는 `[업스트림]` 커밋의 `Upstream-Files` 트레일러만 모으면 건드릴 파일 목록이 나온다.

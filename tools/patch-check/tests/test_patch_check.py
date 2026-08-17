@@ -14,7 +14,7 @@ import pytest
 
 
 def test_patches가_overlay보다_먼저다(tmp_path: Path):
-    # 순서가 뒤집히면 상류에 병합된 뒤 오버레이가 전부 어긋난다.
+    # 순서가 뒤집히면 업스트림이 받아들인 뒤 우리 패치가 전부 어긋난다.
     (tmp_path / "patches").mkdir()
     (tmp_path / "overlay" / "patches").mkdir(parents=True)
     (tmp_path / "patches" / "0001-up.patch").touch()

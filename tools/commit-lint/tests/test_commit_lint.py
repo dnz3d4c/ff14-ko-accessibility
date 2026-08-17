@@ -28,7 +28,7 @@ def test_알려진_영역은_통과한다():
 
 
 def test_영역_목록_전체가_받아들여진다():
-    for area in ("상류", "오버레이", "검증", "문서", "벤더", "도구"):
+    for area in ("업스트림", "한국전용", "검증", "문서", "벤더", "도구"):
         assert "C1" not in codes(f"[{area}] 무언가 바꿈")
 
 
@@ -65,10 +65,10 @@ def test_제목이_마침표로_끝나면_거부한다():
     assert "C4" in codes("[문서] 보고서를 고쳤다.")
 
 
-# --- C5 상류 커밋 트레일러 -------------------------------------------------
+# --- C5 업스트림 커밋 트레일러 -------------------------------------------------
 
 UPSTREAM_OK = (
-    "[상류] 확인 버튼 라벨을 로케일별 데이터로 분리\n"
+    "[업스트림] 확인 버튼 라벨을 로케일별 데이터로 분리\n"
     "\n"
     "독일어 리터럴이 박혀 있어 다른 클라이언트에서 눌리지 않는다.\n"
     "\n"
@@ -78,26 +78,26 @@ UPSTREAM_OK = (
 )
 
 
-def test_상류_커밋에_트레일러가_다_있으면_통과한다():
+def test_업스트림_커밋에_트레일러가_다_있으면_통과한다():
     assert codes(UPSTREAM_OK, ["patches/0001-confirm-labels.patch"]) == []
 
 
-def test_상류_커밋에_Upstream_Files가_없으면_거부한다():
+def test_업스트림_커밋에_Upstream_Files가_없으면_거부한다():
     msg = UPSTREAM_OK.replace(
         "Upstream-Files: FF14Accessibility/Services/UIReaderService.cs\n", ""
     )
     assert "C5" in codes(msg, ["patches/x.patch"])
 
 
-def test_상류_커밋에_Upstream_Subject가_없으면_거부한다():
+def test_업스트림_커밋에_Upstream_Subject가_없으면_거부한다():
     msg = UPSTREAM_OK.replace(
         "Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen\n", ""
     )
     assert "C5" in codes(msg, ["patches/x.patch"])
 
 
-def test_상류가_아니면_트레일러를_요구하지_않는다():
-    assert "C5" not in codes("[오버레이] 한국어 라벨 집합 초안", ["overlay/ko-labels.json"])
+def test_업스트림이_아니면_트레일러를_요구하지_않는다():
+    assert "C5" not in codes("[한국전용] 한국어 라벨 집합 초안", ["overlay/ko-labels.json"])
 
 
 # --- C6 움라우트 치환 ------------------------------------------------------
@@ -120,14 +120,14 @@ def test_움라우트_검사는_Upstream_Subject에만_적용한다():
 # --- C7 영역 혼합 금지 -----------------------------------------------------
 
 
-def test_상류_커밋이_overlay를_건드리면_거부한다():
+def test_업스트림_커밋이_overlay를_건드리면_거부한다():
     # 섞이는 순간 PR로 떼어낼 수 없다. 이게 이 검증기의 존재 이유다.
     assert "C7" in codes(UPSTREAM_OK, ["patches/x.patch", "overlay/ko.json"])
 
 
-def test_오버레이_커밋이_patches를_건드리면_거부한다():
+def test_한국전용_커밋이_patches를_건드리면_거부한다():
     assert "C7" in codes(
-        "[오버레이] 한국어 문자열 초안", ["overlay/ko.json", "patches/x.patch"]
+        "[한국전용] 한국어 문자열 초안", ["overlay/ko.json", "patches/x.patch"]
     )
 
 
@@ -138,18 +138,18 @@ def test_경로_목록이_비면_혼합_검사를_건너뛴다():
 
 # --- C8 현황판 갱신 --------------------------------------------------------
 #
-# 현황판(docs/status.md)이 남은 일의 단일 원천이다. 코드가 움직였는데 판이
+# 남은 일은 현황판(docs/status.md)만 보면 된다. 코드가 움직였는데 판이
 # 그대로면 판은 며칠 만에 거짓말이 되고, 그 뒤로는 아무도 안 본다. 그래서
 # 판을 같이 건드리거나, 안 건드리는 이유를 한 줄로 밝히게 한다.
 
 
-def test_오버레이_커밋이_현황판을_안_건드리면_거부한다():
-    assert "C8" in codes("[오버레이] 설치기를 KR 경로로", ["overlay/patches/0006.patch"])
+def test_한국전용_커밋이_현황판을_안_건드리면_거부한다():
+    assert "C8" in codes("[한국전용] 설치기를 KR 경로로", ["overlay/patches/0006.patch"])
 
 
 def test_현황판을_같이_건드리면_통과한다():
     assert "C8" not in codes(
-        "[오버레이] 설치기를 KR 경로로",
+        "[한국전용] 설치기를 KR 경로로",
         ["overlay/patches/0006.patch", "docs/status.md"],
     )
 
@@ -176,7 +176,7 @@ def test_벤더_커밋은_현황판을_요구하지_않는다():
 
 def test_경로_목록이_비면_현황판_검사를_건너뛴다():
     # 훅이 인덱스를 못 읽는 상황에서 오탐을 내면 안 된다. C7과 같은 취급.
-    assert "C8" not in codes("[오버레이] 설치기를 KR 경로로", [])
+    assert "C8" not in codes("[한국전용] 설치기를 KR 경로로", [])
 
 
 # --- 주석줄 처리 -----------------------------------------------------------

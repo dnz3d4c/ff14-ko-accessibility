@@ -1,11 +1,11 @@
-"""커밋 메시지 검증기.
+"""커밋 메시지 검사기.
 
-목적은 문체 단속이 아니라 **기여 가능성 보존**이다. 이 저장소의 변경은 두
-종류로 갈린다 - 업스트림에 되돌릴 수 있는 일반화(`[상류]`)와 한국 전용
-오버레이(`[오버레이]`). 둘이 한 커밋에 섞이면 나중에 PR로 떼어낼 수 없고,
-그때는 이력을 다시 쓰는 것 말고 방법이 없다. 그 사고를 커밋 시점에 막는다.
+문체를 단속하려는 게 아니다. 이 저장소의 변경은 두 갈래다 - 원래 플러그인
+만든 사람한테 보낼 수 있는 것(`[업스트림]`)과 우리만 쓰는 것(`[한국전용]`).
+둘이 한 커밋에 섞이면 나중에 보낼 것만 떼어낼 수가 없고, 그때 남는 방법은
+이력을 다시 쓰는 것뿐이다. 그 사고를 커밋할 때 막는다.
 
-규칙 원문과 근거: docs/commit-rules.md
+규칙과 근거: docs/commit-rules.md
 """
 
 from __future__ import annotations
@@ -16,24 +16,24 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-#: 제목 접두로 쓸 수 있는 영역. docs/commit-rules.md 와 같은 목록이어야 한다.
-AREAS = ("상류", "오버레이", "검증", "문서", "벤더", "도구")
+#: 제목 앞에 붙일 수 있는 말. docs/commit-rules.md 표와 같아야 한다.
+AREAS = ("업스트림", "한국전용", "검증", "문서", "벤더", "도구")
 
-#: 영역별로 건드리면 안 되는 경로. 여기 걸리면 커밋을 쪼개야 한다는 뜻이다.
+#: 갈래별로 건드리면 안 되는 경로. 걸리면 커밋을 쪼개라는 뜻이다.
 FORBIDDEN_PATHS = {
-    "상류": ("overlay/",),
-    "오버레이": ("patches/",),
+    "업스트림": ("overlay/",),
+    "한국전용": ("patches/",),
 }
 
-#: `[상류]` 커밋이 반드시 달아야 하는 트레일러.
+#: `[업스트림]` 커밋에 반드시 있어야 하는 줄.
 REQUIRED_UPSTREAM_TRAILERS = ("Upstream-Files", "Upstream-Subject")
 
-#: 현황판을 같이 갱신해야 하는 영역. 코드·설비가 움직이는 쪽만이다.
+#: 현황판을 같이 고쳐야 하는 갈래. 코드나 설비가 움직이는 쪽만이다.
 #: `[문서]`와 `[벤더]`는 뺀다 - 근거 문서를 고치거나 업스트림 포인터를 옮기는
 #: 것 자체는 할 일의 이동이 아니다.
-BOARD_AREAS = ("상류", "오버레이", "검증", "도구")
+BOARD_AREAS = ("업스트림", "한국전용", "검증", "도구")
 
-#: 남은 일의 단일 원천. 규약은 이 파일의 §9.
+#: 남은 일은 여기만 보면 된다.
 BOARD_PATH = "docs/status.md"
 
 #: 현황판을 안 건드리는 이유를 밝히는 트레일러. 값이 비면 면제가 아니다.
@@ -89,7 +89,7 @@ def trailer_value(message: str, key: str) -> str | None:
 
 
 def check(message: str, changed_paths: list[str]) -> list[Violation]:
-    """위반 목록을 돌려준다. 빈 목록이면 통과."""
+    """어긴 것 목록. 비어 있으면 통과."""
     body = strip_comments(message)
     subject = next((line for line in body.splitlines() if line.strip()), "")
 
@@ -100,7 +100,7 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
         violations.append(
             Violation(
                 "C1",
-                f"제목은 영역 접두로 시작해야 한다. 쓸 수 있는 것: "
+                f"제목이 갈래로 시작해야 한다. 쓸 수 있는 것: "
                 f"{', '.join(f'[{a}]' for a in AREAS)}",
             )
         )
@@ -127,7 +127,7 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
     if subject.endswith("."):
         violations.append(Violation("C4", "제목을 마침표로 끝내지 않는다"))
 
-    if area == "상류":
+    if area == "업스트림":
         missing = [
             key
             for key in REQUIRED_UPSTREAM_TRAILERS
@@ -137,8 +137,8 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
             violations.append(
                 Violation(
                     "C5",
-                    f"[상류] 커밋에 트레일러가 빠졌다: {', '.join(missing)}. "
-                    "이게 없으면 나중에 PR을 기계적으로 조립할 수 없다",
+                    f"[업스트림] 커밋에 빠진 줄이 있다: {', '.join(missing)}. "
+                    "이게 없으면 나중에 보낼 것을 모아 만들 수가 없다",
                 )
             )
 
@@ -147,8 +147,8 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
             violations.append(
                 Violation(
                     "C6",
-                    "Upstream-Subject의 움라우트를 ae/oe/ue/ss로 치환해라 "
-                    "(업스트림 커밋 140/140이 치환한다)",
+                    "Upstream-Subject의 움라우트를 ae/oe/ue/ss로 바꿔라 "
+                    "(원래 저장소 커밋 140/140이 그렇게 쓴다)",
                 )
             )
 
@@ -164,7 +164,7 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
                 Violation(
                     "C7",
                     f"[{area}] 커밋이 {', '.join(hits)}를 건드린다. "
-                    "영역을 섞으면 업스트림 PR로 떼어낼 수 없다 - 커밋을 쪼개라",
+                    "섞이면 보낼 것만 떼어낼 수 없다 - 커밋을 쪼개라",
                 )
             )
 
@@ -185,7 +185,7 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
 
 
 def staged_paths(repo_root: Path) -> list[str]:
-    """인덱스에 올라간 경로. 읽을 수 없으면 빈 목록(혼합 검사만 건너뛴다)."""
+    """커밋에 올라간 경로. 못 읽으면 빈 목록(섞임 검사만 건너뛴다)."""
     try:
         result = subprocess.run(
             ["git", "diff", "--cached", "--name-only"],
@@ -212,7 +212,7 @@ def main(argv: list[str]) -> int:
     if not violations:
         return 0
 
-    print("커밋 메시지 규칙 위반 (docs/commit-rules.md):", file=sys.stderr)
+    print("커밋 메시지가 규칙에 안 맞는다 (docs/commit-rules.md):", file=sys.stderr)
     for violation in violations:
         print(f"  {violation}", file=sys.stderr)
     return 1

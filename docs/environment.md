@@ -209,14 +209,39 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 - 가시성에 의존하는 기능이 살아 있다 — 타이틀 메뉴 화살표 이동(항목 이름 + 위치), 창 제목·초점 읽기(`소지품`, `시스템`, `트러스트`), 로그아웃 확인 대화상자
 - 종료 시 `dalamud.crashhandler.log`에 남는 `error: 0x6d` + `Terminating target process`는 **이 변경 전 다섯 판에도 같이 있다.** 이 구성의 정상 종료 흔적이지 크래시가 아니다
 
-아직 안 해 본 것과 하는 방법:
+### 고장 주입 결과 (2026-08-18 00:10~00:12)
 
-| 남은 것 | 어디서 | 어떻게 | 성공 신호 |
-|---------|--------|--------|-----------|
-| `/acc compat` | 인게임 채팅창 (로그인 후) | `/acc compat` 입력 | `Visibility: the game's own function via the Korean signature. Gearset marks: by item ID.` 발화 + 로그에 같은 줄 |
-| Ctrl+F5 노드 덤프 | 인게임, **게임 창이 열려 있는 상태** | Ctrl+F5 (`KeyDumpUI`) | 바탕화면 `FFXIV_UI_Dump.txt` 갱신 + 로그 `[Dump] Gespeichert:`. 실패면 `[Dump] Kein sichtbares Addon` |
-| 모드 내 구현 분기 | 이 저장소 (고장 주입) | `KoreanBodySignature` 첫 바이트를 `48`→`49`로 바꿔 빌드·배치. `AutomaticReloading`이 켜져 있어 게임 중 DLL만 덮으면 재적재된다 | 로그 `did not resolve` + 경고 `using the managed replica`, 기동 음성이 두 줄. 확인 후 `git checkout`으로 되돌리고 재빌드 |
-| 시그니처 중복 거부 분기 | 같은 방법 | 시그니처를 `48 85 C9`만 남겨 빌드 | 로그 `matched N times, expected 1 - refused` |
+시그니처를 일부러 깨서 폴백 분기를 밟았다. 로드 시점에 주소를 0으로 강제하는 한 줄을 임시로 넣어(재적재로는 주소가 남아 붙어서 안 밟힌다) 두 경우를 확인했다.
+
+| 주입 | 로그 | 기동 음성 |
+|------|------|-----------|
+| 0건 매칭 (첫 바이트 변경) | `signature matched 0 times, expected 1 - refused` → `using the managed replica` → `node visibility: Emulated (0x7FFE90291A58)` | **두 줄** — `Element visibility is emulated. Gearset marks go by item ID.` |
+| 39,573건 매칭 (`48 85 C9`만) | `matched 39573 times, expected 1 - refused` → 같은 폴백 | 두 줄 |
+
+**여럿 중 첫 번째를 집지 않는다**는 게 이 두 번째 줄로 실증됐다.
+
+여기서 버그 둘이 나왔고 `overlay/patches/0005`로 고쳤다. `AtkResNode.Addresses`가 ClientStructs 어셈블리의 정적이라 우리가 넣은 주소가 플러그인보다 오래 산다 — 모드 내 구현이 설치된 채 재적재되면 CS가 언로드된 어셈블리의 포인터를 계속 부른다. 반대로 게임 주소를 0으로 되돌리면 **Dalamud 자신의 `DtrBar.FixCollision`이 매 프레임 예외를 던진다**(0.5초 창에 9건). 그래서 폴백 포인터만 회수하고 게임 주소는 둔다. 상세는 `overlay/patches/README.md` 0005 항목.
+
+### 인게임 확인된 나머지
+
+- `/acc compat` → `Visibility: the game's own function via the Korean signature. Gearset marks: by item ID.` (00:05:10)
+- Ctrl+F5 → `22 windows, 383 nodes` 바탕화면 저장 (00:01:45). 이 판정 자체가 노드 가시성을 쓰는 경로다
+- 폴백이 설치된 상태로 게임을 종료해도 언로드가 깨끗했다 (00:13:59 `Tolk entladen` → `Finished unloading`)
+
+### 남은 것 하나
+
+`0005`가 들어간 빌드의 **첫 적재**를 아직 못 봤다. 확인하려고 재적재를 걸었을 때 클라이언트가 이미 종료돼 있었다(00:14:00 `Session has ended.`).
+
+다음 실행 때 `dalamud-kr-gui.log`에서 두 줄만 본다. 게임 안에서 뭘 할 필요 없다 — 적재만 하면 찍힌다.
+
+- `[Compat] AtkResNode::IsVisible resolved by the Korean signature at 0x…` (`already set`이 아니라 이쪽이어야 한다. 새 프로세스라 주소가 비어 있으므로)
+- `DtrBar.FixCollision` 예외 0건
+
+### 검증 도구에 대해 알아낸 것
+
+**게임에 키를 주입하는 방식은 이 클라이언트에서 안 통한다.** `SendInput`으로 스캔코드를 넣고 창이 포그라운드인 것까지 확인했는데(`GetForegroundWindow`가 게임 핸들) `Ctrl+F2`가 로그에 아무 흔적을 남기지 않았다. 게임이 주입된 입력을 걸러내는 것으로 보인다(미확인 추정 — 확인 방법은 다른 주입 API로 같은 키를 넣어 비교). 그래서 **키가 필요한 검증은 사람이 눌러야 한다.** 반면 DLL을 덮어 재적재를 유발하는 경로는 입력이 필요 없어서 자동화된다.
+
+Git Bash에서 `/acc compat` 같은 인자를 넘기면 MSYS 경로 변환이 `C:/Users/.../acc compat`으로 바꿔 버린다. 넘길 때는 `MSYS_NO_PATHCONV=1`을 붙인다.
 
 ## 6. KR 바이너리에서 IsVisible 찾기 (2026-08-17)
 

@@ -1,0 +1,17 @@
+#!/bin/sh
+# 커밋 메시지 규칙 검사. 규칙과 근거: docs/commit-rules.md
+#
+# 검사를 건너뛰지 않고 막는 쪽을 택했다. 이 저장소에서 규칙이 지켜지지 않으면
+# 증상이 커밋 시점에 안 나오고, 업스트림 PR을 조립하려는 몇 달 뒤에 나온다.
+#
+# --no-project: 상위 디렉토리의 pyproject.toml을 상속하지 않게 한다.
+# 워크스페이스 루트(C:\project)의 프로젝트를 물면 uv가 죽는다.
+
+if ! command -v uv >/dev/null 2>&1; then
+	echo "commit-msg 훅: uv를 찾지 못해 커밋 메시지를 검사할 수 없다." >&2
+	echo "  설치: scoop install uv" >&2
+	echo "  검사를 끄려면(권장하지 않음): git config --unset core.hooksPath" >&2
+	exit 1
+fi
+
+exec uv run --no-project python tools/commit-lint/commit_lint.py "$1"

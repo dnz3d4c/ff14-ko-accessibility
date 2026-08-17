@@ -6,3 +6,7 @@ vendor/
 bin/
 obj/
 *.user
+
+# 커밋 검증기 (파이썬)
+__pycache__/
+.pytest_cache/

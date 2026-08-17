@@ -1,0 +1,2713 @@
+{
+  "by_file": {
+    "Compat/CompatReport.cs": [
+      [
+        "Ausrüstungsset-Markierung geht nach Gegenstands-ID.",
+        "Gearset marks go by item ID."
+      ],
+      [
+        "Kompatibilitätshinweis: ",
+        "Compatibility note: "
+      ],
+      [
+        "Sichtbarkeit von Elementen wird nachgebildet.",
+        "Element visibility is emulated."
+      ],
+      [
+        "Sichtbarkeit: {visibility}. Ausrüstungsset-Markierung: {gearset}.",
+        "Visibility: {visibility}. Gearset marks: {gearset}."
+      ],
+      [
+        "Spielfunktion",
+        "the game's own function"
+      ],
+      [
+        "Spielfunktion",
+        "the game's own function"
+      ],
+      [
+        "Spielfunktion über koreanische Signatur",
+        "the game's own function via the Korean signature"
+      ],
+      [
+        "im Mod nachgebildet",
+        "emulated inside the mod"
+      ],
+      [
+        "nach Gegenstands-ID",
+        "by item ID"
+      ]
+    ],
+    "Services/AccessibilityStrings.Chat.cs": [
+      [
+        "Alles",
+        "All"
+      ],
+      [
+        "Ansagen",
+        "Announcements"
+      ],
+      [
+        "Aus",
+        "Off"
+      ],
+      [
+        "Chat",
+        "Chat"
+      ],
+      [
+        "Chat vorlesen (Register nicht lesbar)",
+        "Read chat aloud (tabs unreadable)"
+      ],
+      [
+        "Chat-Kanäle",
+        "Chat channels"
+      ],
+      [
+        "Chat-Register",
+        "Chat tabs"
+      ],
+      [
+        "Das Chatfenster ist nicht erreichbar.",
+        "The chat window cannot be reached."
+      ],
+      [
+        "Dialoge",
+        "Dialogue"
+      ],
+      [
+        "Die Chat-Einstellungen des Spiels sind nicht lesbar. Der Chat läuft in einem Puffer.",
+        "The game's chat settings cannot be read. Chat is going to one buffer."
+      ],
+      [
+        "Einstellungen",
+        "Settings"
+      ],
+      [
+        "Fehlermeldungen",
+        "Error messages"
+      ],
+      [
+        "Fähigkeit bereit",
+        "Ability ready"
+      ],
+      [
+        "Fähigkeit bereit Lautstärke",
+        "Ability ready volume"
+      ],
+      [
+        "Ganze Gruppe vorlesen",
+        "Read whole group aloud"
+      ],
+      [
+        "Gegner wirkt Aktion",
+        "Enemy casting"
+      ],
+      [
+        "Gehhilfe-Beacon",
+        "Walk-guide beacon"
+      ],
+      [
+        "Himmelsrichtung",
+        "Compass heading"
+      ],
+      [
+        "Hinweismeldungen",
+        "Notice messages"
+      ],
+      [
+        "Kartenmarkierung",
+        "Map flag"
+      ],
+      [
+        "Keine Einträge.",
+        "No entries."
+      ],
+      [
+        "Meldungen",
+        "Notices"
+      ],
+      [
+        "Meldungen ohne Spielfilter vorlesen",
+        "Read lines the game cannot filter"
+      ],
+      [
+        "Menü geschlossen.",
+        "Menu closed."
+      ],
+      [
+        "Register vorlesen",
+        "Read tab aloud"
+      ],
+      [
+        "Sammeln",
+        "Gathering"
+      ],
+      [
+        "Steht weiter zum Nachlesen bereit.",
+        "Still available in the history."
+      ],
+      [
+        "Töne",
+        "Sounds"
+      ],
+      [
+        "Wegpunkt- und Ankunftston",
+        "Waypoint and arrival cues"
+      ],
+      [
+        "Ziel-Lebenspunkte",
+        "Target health"
+      ],
+      [
+        "Zielwechsel",
+        "Target changes"
+      ],
+      [
+        "{(int)MathF.Round(volume * 100)} Prozent",
+        "{(int)MathF.Round(volume * 100)} percent"
+      ],
+      [
+        "{name} auf {(int)MathF.Round(volume * 100)} Prozent.",
+        "{name} at {(int)MathF.Round(volume * 100)} percent."
+      ],
+      [
+        "{name} aus.",
+        "{name} off."
+      ],
+      [
+        "{name}, aus",
+        "{name}, off"
+      ],
+      [
+        "{name}, {(int)MathF.Round(volume * 100)} Prozent",
+        "{name}, {(int)MathF.Round(volume * 100)} percent"
+      ],
+      [
+        "{tab}, {buffers} Puffer. {first}, {count}.",
+        "{tab}, {buffers} buffers. {first}, {count}."
+      ]
+    ],
+    "Services/AccessibilityStrings.cs": [
+      [
+        " Achtung, nicht anvisiert.",
+        " Warning, not targeted."
+      ],
+      [
+        " Achtung: in einem Ausrüstungsset gespeichert, nicht verkaufen.",
+        " Careful: saved in a gear set, do not sell."
+      ],
+      [
+        " Das Wegenetz ist hier älter als die Häuser. Mit dem Befehl vnav rebuild neu bauen lassen.",
+        " The navigation mesh here is older than the houses. Rebuild it with the vnav rebuild command."
+      ],
+      [
+        " Das Ziel liegt nahe dem Ätheryt {aetheryteName}. Reise per Aethernet dorthin.",
+        " The destination is near the aetheryte {aetheryteName}. Travel there via the aethernet."
+      ],
+      [
+        " Enter blättert weiter.",
+        " Press Enter to continue."
+      ],
+      [
+        " Enter schließt.",
+        " Press Enter to close."
+      ],
+      [
+        " Erholungsbonus für {percent} Prozent einer Stufe.",
+        " Rested bonus for {percent} percent of a level."
+      ],
+      [
+        " Hoch-Qualität",
+        " high quality"
+      ],
+      [
+        " Im Ruhebereich.",
+        " In a rested area."
+      ],
+      [
+        " Kein Erholungsbonus.",
+        " No rested bonus."
+      ],
+      [
+        " Kein Ruhebereich.",
+        " Not in a rested area."
+      ],
+      [
+        " Nummernblock 3 läuft zum Übergang.",
+        " Numpad 3 walks to the transition."
+      ],
+      [
+        " Seite {current} von {total}.",
+        " Page {current} of {total}."
+      ],
+      [
+        " an {name}",
+        " to {name}"
+      ],
+      [
+        " für {quest}",
+        " for {quest}"
+      ],
+      [
+        " nach {area}",
+        " to {area}"
+      ],
+      [
+        " {empty} Plätze frei.",
+        " {empty} slots free."
+      ],
+      [
+        " {name}, HP {Percent(cur, max)} Prozent.",
+        " {name}, HP {Percent(cur, max)} percent."
+      ],
+      [
+        ", HP {Percent(cur, max)} Prozent",
+        ", HP {Percent(cur, max)} percent"
+      ],
+      [
+        ", Preis {count}",
+        ", price {count}"
+      ],
+      [
+        ", Stufe {level}",
+        ", level {level}"
+      ],
+      [
+        ", Stufe {level}",
+        ", level {level}"
+      ],
+      [
+        ", abwärts",
+        ", down"
+      ],
+      [
+        ", aufwärts",
+        ", up"
+      ],
+      [
+        ", dann ",
+        ", then "
+      ],
+      [
+        ", dann weiter",
+        ", then onward"
+      ],
+      [
+        ", du hast {owned}",
+        ", you have {owned}"
+      ],
+      [
+        ", für {count} {currency}",
+        ", for {count} {currency}"
+      ],
+      [
+        ", im Ausrüstungsset",
+        ", in a gear set"
+      ],
+      [
+        ", keine Einträge",
+        ", no entries"
+      ],
+      [
+        ", lebt in {habitat}",
+        ", lives in {habitat}"
+      ],
+      [
+        ", oder ",
+        ", or "
+      ],
+      [
+        ", schon besucht",
+        ", already visited"
+      ],
+      [
+        ", {-heightDiff:F0} Meter unter dir",
+        ", {-heightDiff:F0} meters below you"
+      ],
+      [
+        ", {heightDiff:F0} Meter über dir",
+        ", {heightDiff:F0} meters above you"
+      ],
+      [
+        ". Enter beginnt.",
+        ". Press Enter to begin."
+      ],
+      [
+        ". Übung: {exercise}",
+        ". Exercise: {exercise}"
+      ],
+      [
+        "Achtung, diese Spur ueberwindet {MetersRemaining(drop)} Hoehe und gilt deshalb nur in Laufrichtung. Fuer den Rueckweg zeichne bitte eine eigene Spur auf.",
+        "Careful: this trail covers {MetersRemaining(drop)} of height, so it only counts in the direction you walked it. Record a separate trail for the way back."
+      ],
+      [
+        "Achtung, nicht anvisiert.",
+        "Warning, not targeted."
+      ],
+      [
+        "Addon {names} nicht offen.",
+        "Addon {names} not open."
+      ],
+      [
+        "Aktionsleiste nicht verfügbar.",
+        "Hotbar not available."
+      ],
+      [
+        "Aktionsleiste {bar} ist leer.",
+        "Hotbar {bar} is empty."
+      ],
+      [
+        "Aktionsleiste {bar}. ",
+        "Hotbar {bar}. "
+      ],
+      [
+        "Aktives Fenster: {name}. {visibleCount} Fenster sichtbar, Liste im Log.",
+        "Active window: {name}. {visibleCount} windows visible, list written to log."
+      ],
+      [
+        "Aktiviere: {text}",
+        "Activating: {text}"
+      ],
+      [
+        "Aktuelle Karte unbekannt, kann Koordinaten nicht bestimmen.",
+        "Current map unknown, cannot determine coordinates."
+      ],
+      [
+        "Aktuelle Karte unbekannt, kann die Stelle nicht merken.",
+        "Current map unknown, cannot remember this spot."
+      ],
+      [
+        "Aktuelle Karte unbekannt, kann nicht umrechnen.",
+        "Current map unknown, cannot convert."
+      ],
+      [
+        "Alle Reittiere.",
+        "All mounts."
+      ],
+      [
+        "Alles",
+        "Everything"
+      ],
+      [
+        "Allgemeine Aktionen, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
+        "General actions, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back."
+      ],
+      [
+        "Allianz",
+        "Alliance"
+      ],
+      [
+        "Allianz",
+        "Alliance"
+      ],
+      [
+        "Anfang des Verlaufs.",
+        "Start of history."
+      ],
+      [
+        "Anfänger-Arena",
+        "Beginner's Arena"
+      ],
+      [
+        "Angekommen, neues Gebiet erreicht.",
+        "Arrived, reached a new area."
+      ],
+      [
+        "Angelbereit.",
+        "Ready to fish."
+      ],
+      [
+        "Angelplatz",
+        "Fishing spot"
+      ],
+      [
+        "Angelplatz {name} hier gemerkt: Karte {mapX:F1}, {mapY:F1}.",
+        "Fishing spot {name} remembered here: map {mapX:F1}, {mapY:F1}."
+      ],
+      [
+        "Angelplätze",
+        "Fishing spots"
+      ],
+      [
+        "Angelplätze: {count} im Gebiet.",
+        "Fishing spots: {count} in this area."
+      ],
+      [
+        "Angezielt.",
+        "Targeted."
+      ],
+      [
+        "Angriff {v}",
+        "physical damage {v}"
+      ],
+      [
+        "Annehmbare Quests",
+        "Available quests"
+      ],
+      [
+        "Ausgerichtet. {distance} geradeaus.",
+        "Aligned. {distance} straight ahead."
+      ],
+      [
+        "Ausgänge ",
+        "exits "
+      ],
+      [
+        "Ausrüstung",
+        "Equipment"
+      ],
+      [
+        "Ausrüstung unverändert. Entweder schon optimal, oder Wechsel gerade nicht möglich.",
+        "Equipment unchanged. Either already optimal, or a change is not possible right now."
+      ],
+      [
+        "Ausrüstung: {parts}.{emptyNote}",
+        "Equipment: {parts}.{emptyNote}"
+      ],
+      [
+        "Ausrüstungsmodul nicht verfügbar.",
+        "Equipment module not available."
+      ],
+      [
+        "Ausrüstungswechsel fehlgeschlagen.",
+        "Equipment change failed."
+      ],
+      [
+        "Ausrüstungswechsel hat nicht geklappt.",
+        "Equipment change did not work."
+      ],
+      [
+        "Ausrüstungswechsel läuft schon.",
+        "Equipment change already in progress."
+      ],
+      [
+        "Auswahl bestätigt: {item}",
+        "Confirmed: {item}"
+      ],
+      [
+        "Auto-Lauf abgebrochen, vnavmesh antwortet nicht.",
+        "Auto-walk aborted, vnavmesh not responding."
+      ],
+      [
+        "Auto-Lauf beendet, noch {MetersRemaining(distance)}.",
+        "Auto-walk ended, {MetersRemaining(distance)} remaining."
+      ],
+      [
+        "Auto-Lauf gestoppt.",
+        "Auto-walk stopped."
+      ],
+      [
+        "Auto-Lauf nicht verfügbar. Das Plugin vnavmesh fehlt oder ist nicht geladen.",
+        "Auto-walk not available. The vnavmesh plugin is missing or not loaded."
+      ],
+      [
+        "Bedarf, Gier oder Passen möglich",
+        "need, greed or pass"
+      ],
+      [
+        "Beet",
+        "Garden bed"
+      ],
+      [
+        "Beginnen-Knopf reagiert nicht.",
+        "Begin button not responding."
+      ],
+      [
+        "Begleiter",
+        "Companion"
+      ],
+      [
+        "Begleiter suchen, Eingabefeld.",
+        "Minion search, text field."
+      ],
+      [
+        "Beine",
+        "Legs"
+      ],
+      [
+        "Belastbar bis {value}",
+        "Durability {value}"
+      ],
+      [
+        "Belastbarkeit {current} von {max}",
+        "Integrity {current} of {max}"
+      ],
+      [
+        "Belegen fehlgeschlagen, die Taste hat sich nicht geändert.",
+        "Assignment failed, the key did not change."
+      ],
+      [
+        "Belegen fehlgeschlagen.",
+        "Assignment failed."
+      ],
+      [
+        "Belohnung: ",
+        "Reward: "
+      ],
+      [
+        "Benachrichtigung aktiviert",
+        "Notification activated"
+      ],
+      [
+        "Benachrichtigung reagiert nicht.",
+        "Notification not responding."
+      ],
+      [
+        "Benachrichtigung. Mit {key} annehmen.",
+        "Notification. Press {key} to accept."
+      ],
+      [
+        "Berechne Weg zu {name}.",
+        "Computing route to {name}."
+      ],
+      [
+        "Beschreibung: {description}",
+        "Description: {description}"
+      ],
+      [
+        "Bestiarium ist nicht geöffnet.",
+        "The bestiary is not open."
+      ],
+      [
+        "Bestiarium, {count} Monster. {rows}",
+        "Bestiary, {count} monsters. {rows}"
+      ],
+      [
+        "Bestiarium-Liste nicht gefunden.",
+        "Bestiary list not found."
+      ],
+      [
+        "Betrag {amount}, {owner} danach {after}.",
+        "Amount {amount}, {owner} then {after}."
+      ],
+      [
+        "Betrag {amount}.",
+        "Amount {amount}."
+      ],
+      [
+        "Beute",
+        "Loot"
+      ],
+      [
+        "Biss!",
+        "Bite!"
+      ],
+      [
+        "Bodenmessung fertig. {hits} Treffer, davon {withoutMesh} ohne Wegenetz.",
+        "Ground probe done. {hits} hits, {withoutMesh} of them without navigation mesh."
+      ],
+      [
+        "Bonus {percent} Prozent",
+        "Bonus {percent} percent"
+      ],
+      [
+        "Brett. Deine Karten {yours}, gegnerische {enemy}.",
+        "Board. Your cards {yours}, enemy {enemy}."
+      ],
+      [
+        "Brüllt",
+        "Yells"
+      ],
+      [
+        "Chance {percent} Prozent",
+        "Chance {percent} percent"
+      ],
+      [
+        "Chat",
+        "Chat"
+      ],
+      [
+        "Chat-Eingabe",
+        "Chat input"
+      ],
+      [
+        "Chat-Eingabe, {channel}",
+        "Chat input, {channel}"
+      ],
+      [
+        "Chatsystem",
+        "Chat system"
+      ],
+      [
+        "Chatsystem {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}. Beide Nachlesen laufen mit, es ist nichts verloren.",
+        "Chat system {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}. Both histories keep recording, nothing was lost."
+      ],
+      [
+        "Chatsystem: {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}",
+        "Chat system: {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}"
+      ],
+      [
+        "Chronik: ",
+        "Chronicle: "
+      ],
+      [
+        "Das bist du selbst.",
+        "That is you."
+      ],
+      [
+        "Datenzentrum wählen.",
+        "Choose a data center."
+      ],
+      [
+        "Datenzentrum wählen. Regionen: {regions}",
+        "Choose a data center. Regions: {regions}"
+      ],
+      [
+        "Deine Hand, {count} Karten.",
+        "Your hand, {count} cards."
+      ],
+      [
+        "Deutsch",
+        "German"
+      ],
+      [
+        "Dialog.",
+        "Dialog."
+      ],
+      [
+        "Dialoge",
+        "Dialogue"
+      ],
+      [
+        "Die Bildbeschreibungen stammen vom Mod, nicht vom Spiel.",
+        "The picture descriptions come from the mod, not from the game."
+      ],
+      [
+        "Die Kollisionsabfrage des Spiels ist nicht erreichbar.",
+        "The game's collision query is unavailable."
+      ],
+      [
+        "Diese Ebene",
+        "This floor"
+      ],
+      [
+        "Diese Nummer gibt es hier nicht.",
+        "No trail with that number here."
+      ],
+      [
+        "Diese Taste gehört zum neuen Chatsystem.",
+        "That key belongs to the new chat system."
+      ],
+      [
+        "Diesen Übergang gibt es nur auf den Unteren Decks.",
+        "This crossing only exists on the Lower Decks."
+      ],
+      [
+        "Du",
+        "You"
+      ],
+      [
+        "Du bist am Zug.",
+        "Your turn."
+      ],
+      [
+        "Du bist schon bei {name}.",
+        "You are already at {name}."
+      ],
+      [
+        "Du brüllst",
+        "You yell"
+      ],
+      [
+        "Du flüsterst",
+        "You tell"
+      ],
+      [
+        "Du rufst",
+        "You shout"
+      ],
+      [
+        "Du sagst",
+        "You say"
+      ],
+      [
+        "Du stehst schon am Wegpunkt.",
+        "You are already at the waypoint."
+      ],
+      [
+        "Du zur Allianz",
+        "You to alliance"
+      ],
+      [
+        "Du zur FC",
+        "You to FC"
+      ],
+      [
+        "Du zur Gruppe",
+        "You to party"
+      ],
+      [
+        "Du zur Gruppe",
+        "You to party"
+      ],
+      [
+        "Dump nur im Dalamud-Log. Datei-Fehler.",
+        "Dump only in the Dalamud log. File error."
+      ],
+      [
+        "Dungeon",
+        "dungeon"
+      ],
+      [
+        "Ebene",
+        "Floor"
+      ],
+      [
+        "Echo",
+        "Echo"
+      ],
+      [
+        "Ein passender Gegenstand: {items[0]}. Auswählen und dann Übergeben drücken.",
+        "One matching item: {items[0]}. Select it, then press Hand Over."
+      ],
+      [
+        "Eingabefeld, leer",
+        "Input field, empty"
+      ],
+      [
+        "Eingabefeld: {typed}",
+        "Input field: {typed}"
+      ],
+      [
+        "Einrichtung",
+        "Furnishing"
+      ],
+      [
+        "Einstellungen gespeichert",
+        "Settings saved"
+      ],
+      [
+        "Einstellungen von {name} geöffnet. Das Fenster ist nicht vorlesbar.",
+        "Opened settings of {name}. The window cannot be read aloud."
+      ],
+      [
+        "Einstellungen von {name} lassen sich nicht öffnen.",
+        "Cannot open settings of {name}."
+      ],
+      [
+        "Emote fehlgeschlagen.",
+        "Emote failed."
+      ],
+      [
+        "Emote nicht verfügbar.",
+        "Emote not available."
+      ],
+      [
+        "Emotes noch nicht bereit.",
+        "Emotes not ready yet."
+      ],
+      [
+        "Empfohlene Ausrüstung angelegt, {changed} Teile gewechselt.",
+        "Recommended equipment applied, {changed} pieces changed."
+      ],
+      [
+        "Ende des Verlaufs.",
+        "End of history."
+      ],
+      [
+        "Englisch",
+        "English"
+      ],
+      [
+        "Enter öffnet das Hauptmenü. Strg+F1 sagt diese Hilfe erneut an.",
+        "Press Enter to open the main menu. Press Ctrl+F1 to hear this help again."
+      ],
+      [
+        "Entnehmen",
+        "Withdraw"
+      ],
+      [
+        "Entwickler-Plugin",
+        "dev plugin"
+      ],
+      [
+        "Erholungsbonus nicht verfügbar.",
+        "Rested bonus not available."
+      ],
+      [
+        "FATEs: {active} aktiv, {preparing} starten gleich.",
+        "FATEs: {active} active, {preparing} starting soon."
+      ],
+      [
+        "FATEs: {active} aktiv.",
+        "FATEs: {active} active."
+      ],
+      [
+        "FC",
+        "FC"
+      ],
+      [
+        "Favoriten.",
+        "Favorites."
+      ],
+      [
+        "Fehler",
+        "Error"
+      ],
+      [
+        "Feld {cell}, {content}",
+        "Cell {cell}, {content}"
+      ],
+      [
+        "Feld {cell}: leer",
+        "Cell {cell}: empty"
+      ],
+      [
+        "Feld {cell}: {owner}, {sides}",
+        "Cell {cell}: {owner}, {sides}"
+      ],
+      [
+        "Fenster-Liste nicht verfügbar.",
+        "Window list not available."
+      ],
+      [
+        "Fertig mit {value}",
+        "Progress needed {value}"
+      ],
+      [
+        "Flächenwarnung an.",
+        "Area warning on."
+      ],
+      [
+        "Flächenwarnung aus.",
+        "Area warning off."
+      ],
+      [
+        "Flüstern",
+        "Tell"
+      ],
+      [
+        "Flüstern an {target} nicht möglich.",
+        "Cannot set tell target {target}."
+      ],
+      [
+        "Flüstert",
+        "Tells"
+      ],
+      [
+        "Flüstert an",
+        "Tells"
+      ],
+      [
+        "Folge {name}.",
+        "Following {name}."
+      ],
+      [
+        "Folgen abgebrochen, vnavmesh antwortet nicht.",
+        "Follow aborted, vnavmesh not responding."
+      ],
+      [
+        "Folgen abgebrochen, vnavmesh nicht verfügbar.",
+        "Follow aborted, vnavmesh not available."
+      ],
+      [
+        "Folgen beendet, Gebiet gewechselt.",
+        "Follow stopped, zone changed."
+      ],
+      [
+        "Folgen beendet.",
+        "Follow stopped."
+      ],
+      [
+        "Form: {shape}",
+        "Shape: {shape}"
+      ],
+      [
+        "Freibrief-Geber: ",
+        "Levequest giver: "
+      ],
+      [
+        "Freibrief-Ziel: ",
+        "Levequest goal: "
+      ],
+      [
+        "Freibriefe",
+        "Levequests"
+      ],
+      [
+        "Freibriefe: {givers} Geber, {goals} Ziele.",
+        "Levequests: {givers} givers, {goals} goals."
+      ],
+      [
+        "Freie Gesellschaft",
+        "Free Company"
+      ],
+      [
+        "Freundesvolk: ",
+        "Beast tribe: "
+      ],
+      [
+        "Fähigkeit-bereit-Ansage an.",
+        "Ability-ready announcements on."
+      ],
+      [
+        "Fähigkeit-bereit-Ansage aus.",
+        "Ability-ready announcements off."
+      ],
+      [
+        "Füße",
+        "Feet"
+      ],
+      [
+        "Gamepad-Kalibrierung. Escape zum Schließen.",
+        "Gamepad calibration. Press Escape to close."
+      ],
+      [
+        "Gefahr",
+        "Hazard"
+      ],
+      [
+        "Gegenstand",
+        "Item effect"
+      ],
+      [
+        "Gegenstand abliefern. Drücke Strg F3 für die passenden Gegenstände, dann auswählen und Übergeben.",
+        "Hand over item. Press Ctrl F3 for the matching items, then select and Hand Over."
+      ],
+      [
+        "Gegenstand {id}",
+        "Item {id}"
+      ],
+      [
+        "Gegenstandsstufe {level}",
+        "item level {level}"
+      ],
+      [
+        "Gegenstände, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
+        "Items, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back."
+      ],
+      [
+        "Gegner",
+        "Enemies"
+      ],
+      [
+        "Gegner wirkt {action}.",
+        "Enemy casts {action}."
+      ],
+      [
+        "Gehhilfe an: {name}.",
+        "Walk guide on: {name}."
+      ],
+      [
+        "Gehhilfe aus.",
+        "Walk guide off."
+      ],
+      [
+        "Gehhilfe beendet.",
+        "Walk guide ended."
+      ],
+      [
+        "Gehhilfe: Ziel verloren.",
+        "Walk guide: target lost."
+      ],
+      [
+        "Gehilfe",
+        "Retainer"
+      ],
+      [
+        "Geschlossen.",
+        "Closed."
+      ],
+      [
+        "Gil-Depot",
+        "Gil storage"
+      ],
+      [
+        "Gil-Stand nicht verfügbar.",
+        "Gil amount not available."
+      ],
+      [
+        "Gruppe",
+        "Party"
+      ],
+      [
+        "Gruppe",
+        "Party"
+      ],
+      [
+        "Gruppe",
+        "Party"
+      ],
+      [
+        "Gürtel",
+        "Waist"
+      ],
+      [
+        "HP {hp} von {hpMax}, MP {Percent(mp, mpMax)} Prozent.",
+        "HP {hp} of {hpMax}, MP {Percent(mp, mpMax)} percent."
+      ],
+      [
+        "HP {hp} von {hpMax}.",
+        "HP {hp} of {hpMax}."
+      ],
+      [
+        "HP, Heilung",
+        "HP, healing"
+      ],
+      [
+        "HP, Schaden",
+        "HP, damage"
+      ],
+      [
+        "HP, kritisch",
+        "HP, critical"
+      ],
+      [
+        "HP: {cur} von {max}.",
+        "HP: {cur} of {max}."
+      ],
+      [
+        "Hals",
+        "Neck"
+      ],
+      [
+        "Handgelenke",
+        "Wrists"
+      ],
+      [
+        "Handkarte {index} von {count}, {sides}",
+        "Hand card {index} of {count}, {sides}"
+      ],
+      [
+        "Handwerker-Notizbuch, {jobAndLevel}",
+        "Crafting log, {jobAndLevel}"
+      ],
+      [
+        "Hauptmenü",
+        "Main menu"
+      ],
+      [
+        "Herstellbar {value}",
+        "Craftable {value}"
+      ],
+      [
+        "Hier endet das Wegenetz, ich nehme {name}.",
+        "The navmesh ends here; taking {name}."
+      ],
+      [
+        "Hier endet der begehbare Weg. Noch {MetersRemaining(distance)} nach {direction}, ich führe ab jetzt in Luftlinie.",
+        "This is where the walkable path ends. {MetersRemaining(distance)} to the {direction}; guiding in a straight line from here."
+      ],
+      [
+        "Himmelsrichtung an.",
+        "Compass heading on."
+      ],
+      [
+        "Himmelsrichtung an. {direction}.",
+        "Compass heading on. {direction}."
+      ],
+      [
+        "Himmelsrichtung aus.",
+        "Compass heading off."
+      ],
+      [
+        "Hinterlegen",
+        "Deposit"
+      ],
+      [
+        "Hände",
+        "Hands"
+      ],
+      [
+        "Händler",
+        "Merchants"
+      ],
+      [
+        "Händler",
+        "merchant"
+      ],
+      [
+        "Hörprobe",
+        "Sample"
+      ],
+      [
+        "Ich komme auf der Spur nicht durch, Lauf beendet.",
+        "I cannot get through on the trail; walk ended."
+      ],
+      [
+        "Ich stecke fest, noch {MetersRemaining(distance)}. Auto-Lauf beendet.",
+        "I'm stuck, {MetersRemaining(distance)} remaining. Auto-walk ended."
+      ],
+      [
+        "Im Beutel {value}",
+        "In bag {value}"
+      ],
+      [
+        "In der Nähe: {joined}",
+        "Nearby: {joined}"
+      ],
+      [
+        "Inhalte",
+        "Duties"
+      ],
+      [
+        "Inventar ist leer.",
+        "Inventory is empty."
+      ],
+      [
+        "Inventar, weiterer Reiter",
+        "Inventory, other tab"
+      ],
+      [
+        "Ja",
+        "Yes"
+      ],
+      [
+        "Job: ",
+        "Job: "
+      ],
+      [
+        "Jobkristall",
+        "Soul Crystal"
+      ],
+      [
+        "Kampf vorbei.",
+        "Combat over."
+      ],
+      [
+        "Kampf-NPC",
+        "Combat NPC"
+      ],
+      [
+        "Kampf.",
+        "Combat."
+      ],
+      [
+        "Kanal {channel} kann noch nicht gesetzt werden.",
+        "Channel {channel} cannot be set yet."
+      ],
+      [
+        "Karte {index}: {sides}",
+        "Card {index}: {sides}"
+      ],
+      [
+        "Kartenspiel",
+        "Card game"
+      ],
+      [
+        "Kartenspiel ist nicht offen.",
+        "Card game is not open."
+      ],
+      [
+        "Kategorie {name}.",
+        "Category {name}."
+      ],
+      [
+        "Kegel",
+        "cone"
+      ],
+      [
+        "Kegel, {fullAngleDeg:0.#} Grad",
+        "cone, {fullAngleDeg:0.#} degrees"
+      ],
+      [
+        "Kein Addon-Name. Beispiel: /acc dump TitleDCWorldMap",
+        "No addon name. Example: /acc dump TitleDCWorldMap"
+      ],
+      [
+        "Kein Angelplatz nah genug. Nächster: {name}, {distance:F0} Meter. Stell dich an die Angelstelle und drück erneut.",
+        "No fishing spot close enough. Nearest: {name}, {distance:F0} meters. Stand at the fishing spot and press again."
+      ],
+      [
+        "Kein Aussehen-Fenster offen. Nur im Schritt Aussehen der Charaktererschaffung.",
+        "No appearance window open. Only during the Appearance step of character creation."
+      ],
+      [
+        "Kein Emote gewählt. Erst durchblättern.",
+        "No emote selected. Browse first."
+      ],
+      [
+        "Kein Fenster fokussiert. {visibleCount} Fenster sichtbar, Liste im Log.",
+        "No window focused. {visibleCount} windows visible, list written to log."
+      ],
+      [
+        "Kein Flüster-Partner zum Antworten.",
+        "No tell partner to answer."
+      ],
+      [
+        "Kein Ok-Knopf gefunden.",
+        "No Ok button found."
+      ],
+      [
+        "Kein Plugin gewählt. Erst durchblättern.",
+        "No plugin selected. Browse first."
+      ],
+      [
+        "Kein Rezept ausgewählt.",
+        "No recipe selected."
+      ],
+      [
+        "Kein Skill gewählt. Erst mit dem Skill-Browser blättern.",
+        "No skill selected. Browse with the skill browser first."
+      ],
+      [
+        "Kein Tiefes Gewölbe.",
+        "Not in a deep dungeon."
+      ],
+      [
+        "Kein Verlosungs-Fenster offen.",
+        "No loot roll window open."
+      ],
+      [
+        "Kein Weg aktiv. Erst ein Ziel wählen.",
+        "No route active. Pick a destination first."
+      ],
+      [
+        "Kein Weg gefunden, führe in Luftlinie.{hint}",
+        "No path found, guiding in a straight line.{hint}"
+      ],
+      [
+        "Kein Weg zu {name} gefunden.{hint}",
+        "No path to {name} found.{hint}"
+      ],
+      [
+        "Kein Wegenetz, führe in Luftlinie.",
+        "No navmesh, guiding in a straight line."
+      ],
+      [
+        "Kein Wegenetz. Das Plugin vnavmesh fehlt oder lädt noch.",
+        "No navmesh. The vnavmesh plugin is missing or still loading."
+      ],
+      [
+        "Kein Ziel anvisiert.",
+        "No target selected."
+      ],
+      [
+        "Kein Ziel gesetzt. Erst mit Bild ab ein Objekt wählen.",
+        "No target set. Select an object with Page Down first."
+      ],
+      [
+        "Kein Ziel gewählt. Erst ein Ziel anvisieren oder im Objekt-Browser auswählen.",
+        "No destination selected. Target something first, or pick it in the object browser."
+      ],
+      [
+        "Kein Ziel zum Folgen. Erst ein Ziel anwählen.",
+        "No target to follow. Select a target first."
+      ],
+      [
+        "Kein Ziel. Erst mit Bild ab ein Objekt wählen.",
+        "No target. Select an object with Page Down first."
+      ],
+      [
+        "Kein aktives Addon für Dump gefunden.",
+        "No active addon found to dump."
+      ],
+      [
+        "Kein aktives Menü.",
+        "No active menu."
+      ],
+      [
+        "Kein begehbarer Punkt am {name} gefunden.",
+        "No walkable point found at {name}."
+      ],
+      [
+        "Kein begehbarer Punkt bei {name} gefunden.",
+        "No walkable point found near {name}."
+      ],
+      [
+        "Kein bekanntes Fenster. {count} sichtbare Fenster gedumpt, Liste im Log.",
+        "No known window. Dumped {count} visible windows, list in the log."
+      ],
+      [
+        "Kein {monster} in der Nähe.",
+        "No {monster} nearby."
+      ],
+      [
+        "Kein {monster} in der Nähe. Lebt in {habitat}.",
+        "No {monster} nearby. Lives in {habitat}."
+      ],
+      [
+        "Keine Angelplätze in diesem Gebiet.",
+        "No fishing spots in this area."
+      ],
+      [
+        "Keine Ausrüstung angelegt.",
+        "No equipment worn."
+      ],
+      [
+        "Keine Einträge",
+        "No entries"
+      ],
+      [
+        "Keine Emotes verfügbar.",
+        "No emotes available."
+      ],
+      [
+        "Keine FATEs in diesem Gebiet.",
+        "No FATEs in this area."
+      ],
+      [
+        "Keine Freibriefe. Erst bei einem Freibrief-Geber annehmen.",
+        "No levequests. Accept one from a levemete first."
+      ],
+      [
+        "Keine Handkarten mehr.",
+        "No hand cards left."
+      ],
+      [
+        "Keine Hilfe verfügbar",
+        "No help available"
+      ],
+      [
+        "Keine Koordinaten in der Zwischenablage gefunden. Erst die Zahlen kopieren, dann die Taste drücken.",
+        "No coordinates found on the clipboard. Copy the numbers first, then press the key."
+      ],
+      [
+        "Keine Monster in dieser Liste.",
+        "No monsters in this list."
+      ],
+      [
+        "Keine Objekte in der Nähe.",
+        "No objects nearby."
+      ],
+      [
+        "Keine Plugins installiert.",
+        "No plugins installed."
+      ],
+      [
+        "Keine Quest-Ziele. Erst eine Quest annehmen.",
+        "No quest goals. Accept a quest first."
+      ],
+      [
+        "Keine Raumdaten.",
+        "No room data."
+      ],
+      [
+        "Keine Sammelpunkte. SP gibt es nur als Sammler.",
+        "No gathering points. GP only exists for gatherers."
+      ],
+      [
+        "Keine Sammelstellen für deinen Beruf in dieser Zone.",
+        "No gathering spots for your job in this area."
+      ],
+      [
+        "Keine Skills gefunden.",
+        "No skills found."
+      ],
+      [
+        "Keine Spuren in diesem Gebiet.",
+        "No trails in this area."
+      ],
+      [
+        "Keine Wegpunkte in diesem Gebiet gefunden.",
+        "No waypoints found in this area."
+      ],
+      [
+        "Keine Ziel-Taste gewählt. Erst die Ziel-Taste wählen.",
+        "No target slot selected. Select the target slot first."
+      ],
+      [
+        "Keine andere Liste verfügbar.",
+        "No other list available."
+      ],
+      [
+        "Keine annehmbaren Quests in der Nähe.",
+        "No available quests nearby."
+      ],
+      [
+        "Keine belegbaren Tasten gefunden.",
+        "No assignable keys found."
+      ],
+      [
+        "Keine benutzbaren Gegenstände in der Tasche.",
+        "No usable items in your bag."
+      ],
+      [
+        "Keine offene Benachrichtigung.",
+        "No open notification."
+      ],
+      [
+        "Keine passenden Gegenstände im Beutel gefunden.",
+        "No matching items found in your bag."
+      ],
+      [
+        "Keine {label} in {range:F0} Metern.",
+        "No {label} within {range:F0} meters."
+      ],
+      [
+        "Keine Ätheryten in diesem Gebiet gefunden.",
+        "No aetherytes found in this area."
+      ],
+      [
+        "Klangtest: Navigations-Ton von vorn, rechts, hinten, dann Wegpunkt und Ankunft, dann HP- und Mana-Töne.",
+        "Sound test: navigation tone from ahead, right, behind, then waypoint and arrival, then HP and mana tones."
+      ],
+      [
+        "Knopf Zufälliges Aussehen nicht gefunden.",
+        "Random appearance button not found."
+      ],
+      [
+        "Knopf Zufälliges Aussehen reagiert nicht.",
+        "Random appearance button not responding."
+      ],
+      [
+        "Koordinaten {mapX:0.0}, {mapY:0.0}",
+        "Coordinates {mapX:0.0}, {mapY:0.0}"
+      ],
+      [
+        "Koordinaten {mapX:0.0}, {mapY:0.0} kopiert.",
+        "Coordinates {mapX:0.0}, {mapY:0.0} copied."
+      ],
+      [
+        "Kopf",
+        "Head"
+      ],
+      [
+        "Kreis",
+        "circle"
+      ],
+      [
+        "Kristall, {needed} benötigt, {owned} im Beutel",
+        "Crystal, {needed} needed, {owned} in bag"
+      ],
+      [
+        "Laden",
+        "shop"
+      ],
+      [
+        "Laufe zu Koordinaten {mapX:0.0}, {mapY:0.0}.",
+        "Walking to coordinates {mapX:0.0}, {mapY:0.0}."
+      ],
+      [
+        "Laufe zu {name}.",
+        "Walking to {name}."
+      ],
+      [
+        "Leer",
+        "Empty"
+      ],
+      [
+        "Leere Liste.",
+        "Empty list."
+      ],
+      [
+        "Lege empfohlene Ausrüstung an.",
+        "Applying recommended equipment."
+      ],
+      [
+        "Leiste {bar}, Slot {slot}",
+        "bar {bar}, slot {slot}"
+      ],
+      [
+        "Leiste {bar}, Taste {key}",
+        "bar {bar}, key {key}"
+      ],
+      [
+        "Leuchten",
+        "Cairns"
+      ],
+      [
+        "Linie",
+        "line"
+      ],
+      [
+        "Magieabwehr {v}",
+        "magic defence {v}"
+      ],
+      [
+        "Magieschaden {v}",
+        "magic damage {v}"
+      ],
+      [
+        "Mana, Aufladung",
+        "Mana, restored"
+      ],
+      [
+        "Mana, Verbrauch",
+        "Mana, spent"
+      ],
+      [
+        "Markierung",
+        "Flag"
+      ],
+      [
+        "Menge {yield}",
+        "Amount {yield}"
+      ],
+      [
+        "Menü, {count} Einträge",
+        "Menu, {count} entries"
+      ],
+      [
+        "Merkmal",
+        "Feature"
+      ],
+      [
+        "NPC",
+        "NPC"
+      ],
+      [
+        "NPCs",
+        "NPCs"
+      ],
+      [
+        "Nebenauftrag: ",
+        "Side quest: "
+      ],
+      [
+        "Nebenhand",
+        "Off hand"
+      ],
+      [
+        "Nein",
+        "No"
+      ],
+      [
+        "Neue Markierung, {distance}, {compass}.",
+        "New flag, {distance}, {compass}."
+      ],
+      [
+        "Neuer Weg: {direction}.",
+        "New route: {direction}."
+      ],
+      [
+        "Nicht eingeloggt.",
+        "Not logged in."
+      ],
+      [
+        "Noch {MetersRemaining(distance)}.",
+        "{MetersRemaining(distance)} remaining."
+      ],
+      [
+        "Noch {seconds} Sekunden zum Beitreten.",
+        "{seconds} seconds left to join."
+      ],
+      [
+        "Norden",
+        "north"
+      ],
+      [
+        "Nächste Ebene",
+        "Next floor"
+      ],
+      [
+        "Objekt",
+        "Object"
+      ],
+      [
+        "Objekte",
+        "Objects"
+      ],
+      [
+        "Ohne Beschriftung",
+        "Unlabelled"
+      ],
+      [
+        "Ohren",
+        "Ears"
+      ],
+      [
+        "Ok",
+        "Ok"
+      ],
+      [
+        "Online-Fenster. {rest}",
+        "Online window. {rest}"
+      ],
+      [
+        "Osten",
+        "east"
+      ],
+      [
+        "Pfeil hoch und runter zum Wechseln, Enter zum Bestätigen, Escape zurück, Strg+F1 für Hilfe.",
+        "Use up and down arrow keys to move, Enter to confirm, Escape to go back, Ctrl+F1 for help."
+      ],
+      [
+        "Pfeile hoch und runter wechseln Option. Links und rechts ändern Wert oder Tab. Enter speichert, Escape verwirft, Strg+F1 für Hilfe.",
+        "Up and down arrows move between options. Left and right change value or tab. Enter saves, Escape discards, Ctrl+F1 for help."
+      ],
+      [
+        "Plugin-Liste nicht verfügbar.",
+        "Plugin list not available."
+      ],
+      [
+        "Position unbekannt.",
+        "Position unknown."
+      ],
+      [
+        "Postkasten",
+        "Mailbox"
+      ],
+      [
+        "Prüfe den Weg zu {target}.",
+        "Checking the route to {target}."
+      ],
+      [
+        "Prüfung",
+        "trial"
+      ],
+      [
+        "Qualität maximal {value}",
+        "Maximum quality {value}"
+      ],
+      [
+        "Quest",
+        "Quest"
+      ],
+      [
+        "Quest aktiv",
+        "Quest active"
+      ],
+      [
+        "Quest verfügbar",
+        "Quest available"
+      ],
+      [
+        "Quest-Gegenstand zum Benutzen: {joined}. Mit Strg und Nummernblock 0 auf die Leiste legen.",
+        "Usable quest item: {joined}. Put it on a bar with Ctrl and Numpad 0."
+      ],
+      [
+        "Quest-Gegenstände, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
+        "Quest items, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back."
+      ],
+      [
+        "Quest-Gegner",
+        "Quest enemies"
+      ],
+      [
+        "Quest-NPCs",
+        "Quest NPCs"
+      ],
+      [
+        "Quest-Objekte",
+        "Quest objects"
+      ],
+      [
+        "Quest-Ziele",
+        "Quest goals"
+      ],
+      [
+        "Raid",
+        "raid"
+      ],
+      [
+        "Raum {index}",
+        "Room {index}"
+      ],
+      [
+        "Reiter gedrückt, aber kein Seitenwechsel erkannt.",
+        "Tab pressed, but no page change detected."
+      ],
+      [
+        "Reiter reagiert nicht.",
+        "Tab not responding."
+      ],
+      [
+        "Reiter {index} von {count}.",
+        "Tab {index} of {count}."
+      ],
+      [
+        "Reittier",
+        "Mount"
+      ],
+      [
+        "Reittier suchen, Eingabefeld.",
+        "Mount search, text field."
+      ],
+      [
+        "Reittiere, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
+        "Mounts, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back."
+      ],
+      [
+        "Ring",
+        "Ring"
+      ],
+      [
+        "Rufen",
+        "Shout"
+      ],
+      [
+        "Ruft",
+        "Shouts"
+      ],
+      [
+        "Ruhebereich verlassen.",
+        "Left the rested area."
+      ],
+      [
+        "Ruhebereich. Erholungsbonus sammelt sich.",
+        "Rested area. Rested bonus is accumulating."
+      ],
+      [
+        "Rumpf",
+        "Body"
+      ],
+      [
+        "Räume",
+        "Rooms"
+      ],
+      [
+        "SP {Percent(cur, max)} Prozent.",
+        "GP {Percent(cur, max)} percent."
+      ],
+      [
+        "Sag Schrägstrich acc trails zum Auflisten, oder Schrägstrich acc trail del und die Nummer zum Löschen.",
+        "Use slash acc trails to list them, or slash acc trail del and the number to delete one."
+      ],
+      [
+        "Sagen",
+        "Say"
+      ],
+      [
+        "Sagt",
+        "Says"
+      ],
+      [
+        "Sammelpunkt",
+        "Gathering node"
+      ],
+      [
+        "Sammelpunkt",
+        "Gathering node"
+      ],
+      [
+        "Sammelpunkte",
+        "Gathering nodes"
+      ],
+      [
+        "Sammelstelle, Stufe {level}",
+        "Gathering spot, level {level}"
+      ],
+      [
+        "Schalter",
+        "switch"
+      ],
+      [
+        "Schatz",
+        "Treasure"
+      ],
+      [
+        "Schließen-Knopf reagiert nicht.",
+        "Close button not responding."
+      ],
+      [
+        "Schlüsselgegenstand {id}",
+        "Key item {id}"
+      ],
+      [
+        "Schlüsselgegenstände: {joined}",
+        "Key items: {joined}"
+      ],
+      [
+        "Schätze",
+        "Treasure"
+      ],
+      [
+        "Seite {page}.",
+        "Page {page}."
+      ],
+      [
+        "Skill-Menü geschlossen.",
+        "Skill menu closed."
+      ],
+      [
+        "Skill-Zuweisung, {count} Skills. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
+        "Skill assignment, {count} skills. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back."
+      ],
+      [
+        "Slot {slot}",
+        "slot {slot}"
+      ],
+      [
+        "Sonde braucht Taste 12 der ersten Leiste frei.",
+        "Probe needs key 12 on the first bar to be free."
+      ],
+      [
+        "Sonde fertig, Ergebnis im Log.",
+        "Probe finished, results in the log."
+      ],
+      [
+        "Sonstiges: ",
+        "Other: "
+      ],
+      [
+        "Spieler",
+        "Player"
+      ],
+      [
+        "Spieler",
+        "Players"
+      ],
+      [
+        "Spielerdaten noch nicht bereit.",
+        "Player data not ready yet."
+      ],
+      [
+        "Sprache auf {language} umgestellt.",
+        "Language set to {language}."
+      ],
+      [
+        "Sprache folgt jetzt Windows: {language}.",
+        "Language now follows Windows: {language}."
+      ],
+      [
+        "Sprache wählen mit: /acc lang de, /acc lang en oder /acc lang auto.",
+        "Choose a language with: /acc lang de, /acc lang en or /acc lang auto."
+      ],
+      [
+        "Spur geloescht: {name}.",
+        "Trail deleted: {name}."
+      ],
+      [
+        "Spur gespeichert: {name}, {MetersRemaining(length)}.",
+        "Trail saved: {name}, {MetersRemaining(length)}."
+      ],
+      [
+        "Spur verworfen, du hast das Gebiet verlassen.",
+        "Trail discarded, you left the area."
+      ],
+      [
+        "Spur wird aufgezeichnet. Lauf die Stelle jetzt ab und drueck die Taste am Ende noch einmal.",
+        "Recording a trail. Walk the stretch now and press the key again at the end."
+      ],
+      [
+        "Spur zu Ende, ich laufe normal weiter.",
+        "End of the trail, continuing normally."
+      ],
+      [
+        "Startqualität {value}",
+        "Starting quality {value}"
+      ],
+      [
+        "Startraum",
+        "starting room"
+      ],
+      [
+        "Stimme",
+        "Voice"
+      ],
+      [
+        "Story: ",
+        "Story: "
+      ],
+      [
+        "Stufe",
+        "Level"
+      ],
+      [
+        "Stufe nicht verfügbar.",
+        "Level not available."
+      ],
+      [
+        "Stufe {level}",
+        "Level {level}"
+      ],
+      [
+        "Stufe {level} erreicht.",
+        "Reached level {level}."
+      ],
+      [
+        "Stufe {level}, ",
+        "Level {level}, "
+      ],
+      [
+        "Stufe {level}, Maximalstufe erreicht.",
+        "Level {level}, maximum level reached."
+      ],
+      [
+        "Stufe {level}. Noch {left} Erfahrungspunkte bis zur nächsten Stufe.",
+        "Level {level}. {left} experience points to the next level."
+      ],
+      [
+        "Suche.",
+        "Search."
+      ],
+      [
+        "System",
+        "System"
+      ],
+      [
+        "System",
+        "System"
+      ],
+      [
+        "Systemeinstellungen",
+        "System Configuration"
+      ],
+      [
+        "Süden",
+        "south"
+      ],
+      [
+        "Tasche {label}",
+        "Bag {label}"
+      ],
+      [
+        "Tasche, {count} Gegenstände: {joined}",
+        "Bag, {count} items: {joined}"
+      ],
+      [
+        "Taste {key}",
+        "key {key}"
+      ],
+      [
+        "Tastenbelegung gespeichert: {boundCount} Aktionen mit Taste, {conflictCount} Konflikte mit Plugin-Tasten. Datei auf dem Desktop, Details im Log.",
+        "Keybinds saved: {boundCount} bound actions, {conflictCount} conflicts with plugin keys. File on desktop, details in log."
+      ],
+      [
+        "Tastenbelegung konnte nicht gelesen werden. Details im Log.",
+        "Could not read keybinds. See log for details."
+      ],
+      [
+        "Tausch",
+        "exchange"
+      ],
+      [
+        "Titelbildschirm",
+        "Title screen"
+      ],
+      [
+        "Ton-Beacon nicht verfügbar.",
+        "Audio beacon not available."
+      ],
+      [
+        "Truhe {name}",
+        "Chest {name}"
+      ],
+      [
+        "UI Dump auf Desktop gespeichert. {addonCount} Fenster, {nodeCount} Nodes.",
+        "UI dump saved to desktop. {addonCount} windows, {nodeCount} nodes."
+      ],
+      [
+        "Unbekannter Befehl. Tippe /acc help für Hilfe.",
+        "Unknown command. Type /acc help for help."
+      ],
+      [
+        "Unbekannter Gegenstand, Icon {iconId}",
+        "Unknown item, icon {iconId}"
+      ],
+      [
+        "Unbenanntes Plugin",
+        "Unnamed plugin"
+      ],
+      [
+        "Unerforscht {index}",
+        "Unexplored {index}"
+      ],
+      [
+        "Verbindung {number}",
+        "Crossing {number}"
+      ],
+      [
+        "Verbot",
+        "Restriction"
+      ],
+      [
+        "Verbündete",
+        "Allies"
+      ],
+      [
+        "Verfolge {name}.",
+        "Tracking {name}."
+      ],
+      [
+        "Verlosungs-Fenster im Fokus. Mit dem Nummernblock auswählen.",
+        "Loot roll window focused. Use the numpad to choose."
+      ],
+      [
+        "Version {version}",
+        "version {version}"
+      ],
+      [
+        "Verteidigung {v}",
+        "defence {v}"
+      ],
+      [
+        "Verzögerung {seconds:0.0} Sekunden",
+        "delay {seconds:0.0} seconds"
+      ],
+      [
+        "Von hier aus führt kein Weg zur Übergangsstelle.",
+        "No route to the crossing point from here."
+      ],
+      [
+        "Vorschau-Modell nicht eindeutig, Aussehen nicht lesbar.",
+        "Preview model not identifiable, appearance cannot be read."
+      ],
+      [
+        "Waffe",
+        "Weapon"
+      ],
+      [
+        "Warten.",
+        "Waiting."
+      ],
+      [
+        "Weg wird berechnet.",
+        "Computing route."
+      ],
+      [
+        "Weg zu {name}, {total:F0} Meter: ",
+        "Route to {name}, {total:F0} meters: "
+      ],
+      [
+        "Weg zu {name}: praktisch am Ziel.",
+        "Route to {name}: practically there."
+      ],
+      [
+        "Wegenetz fertig geladen.",
+        "Navmesh loaded."
+      ],
+      [
+        "Wegenetz ist noch nicht bereit. Gleich nochmal versuchen.",
+        "Navmesh is not ready yet. Try again shortly."
+      ],
+      [
+        "Wegenetz lädt noch, {percent:F0} Prozent. Gleich nochmal versuchen.",
+        "Navmesh still loading, {percent:F0} percent. Try again shortly."
+      ],
+      [
+        "Wegenetz wird geladen.",
+        "Loading navmesh."
+      ],
+      [
+        "Wegenetz {percent} Prozent.",
+        "Navmesh {percent} percent."
+      ],
+      [
+        "Wegenetz-Aufbau abgebrochen.",
+        "Navmesh build aborted."
+      ],
+      [
+        "Wegfindung läuft schon. Gleich nochmal versuchen.",
+        "Pathfinding is already running. Try again shortly."
+      ],
+      [
+        "Wegpunkte",
+        "Waypoints"
+      ],
+      [
+        "Wegpunkte: {count} im Gebiet, davon {exits} Übergänge.",
+        "Waypoints: {count} in this area, {exits} of them exits."
+      ],
+      [
+        "Wegpunkte: {count} im Gebiet.",
+        "Waypoints: {count} in this area."
+      ],
+      [
+        "Weiter komme ich nicht, hier endet der begehbare Weg. Noch {MetersRemaining(distance)} nach {direction}.",
+        "This is as far as the walkable path goes. {MetersRemaining(distance)} to the {direction}."
+      ],
+      [
+        "Weiter-Knopf reagiert nicht.",
+        "Next button not responding."
+      ],
+      [
+        "Westen",
+        "west"
+      ],
+      [
+        "Wohngebiet. Wegenetz wird neu gebaut, damit die Häuser darin stehen.",
+        "Housing ward. Rebuilding the navigation mesh so it includes the houses."
+      ],
+      [
+        "Ziel",
+        "Target"
+      ],
+      [
+        "Ziel HP: {Percent(cur, max)} Prozent.",
+        "Target HP: {Percent(cur, max)} percent."
+      ],
+      [
+        "Ziel erreicht: {name}.",
+        "Target reached: {name}."
+      ],
+      [
+        "Ziel unbekannt",
+        "target unknown"
+      ],
+      [
+        "Ziel {name} nicht gefunden.",
+        "Target {name} not found."
+      ],
+      [
+        "Ziel-{slotLabel}: {current}",
+        "Target {slotLabel}: {current}"
+      ],
+      [
+        "Ziel: ",
+        "Target: "
+      ],
+      [
+        "Ziel: {objectives}. ",
+        "Objective: {objectives}. "
+      ],
+      [
+        "Zielverfolgung beendet.",
+        "Target tracking stopped."
+      ],
+      [
+        "Zu kurz, keine Spur gespeichert.",
+        "Too short, no trail saved."
+      ],
+      [
+        "Zu {target} führt ein durchgehender Weg, {distance:F0} Meter.",
+        "There is a continuous route to {target}, {distance:F0} meters."
+      ],
+      [
+        "Zu {target} führt kein Weg, und in der Nähe gibt es keinen erreichbaren Punkt. Der Zugang liegt weiter weg.",
+        "No route to {target}, and no reachable spot nearby either. The way in is further off."
+      ],
+      [
+        "Zufälliges Aussehen gedrückt.",
+        "Random appearance pressed."
+      ],
+      [
+        "Zugang zu {target}",
+        "way in to {target}"
+      ],
+      [
+        "Zurzeit wird nichts verlost.",
+        "Nothing is being rolled for."
+      ],
+      [
+        "Zurück",
+        "Back"
+      ],
+      [
+        "Zwischenablage konnte nicht beschrieben werden.",
+        "Could not write to the clipboard."
+      ],
+      [
+        "Zwischenablage konnte nicht gelesen werden.",
+        "Could not read the clipboard."
+      ],
+      [
+        "ab Stufe {level}",
+        "from level {level}"
+      ],
+      [
+        "aktiv",
+        "active"
+      ],
+      [
+        "alle geladen",
+        "all loaded"
+      ],
+      [
+        "an",
+        "on"
+      ],
+      [
+        "an",
+        "on"
+      ],
+      [
+        "andere Klasse nötig",
+        "different class required"
+      ],
+      [
+        "aus",
+        "off"
+      ],
+      [
+        "aus",
+        "off"
+      ],
+      [
+        "ausgegraut",
+        "greyed out"
+      ],
+      [
+        "ausgewählt",
+        "selected"
+      ],
+      [
+        "deine",
+        "yours"
+      ],
+      [
+        "direkt neben dir",
+        "right next to you"
+      ],
+      [
+        "du hast Bedarf gewürfelt, {value}",
+        "you rolled need, {value}"
+      ],
+      [
+        "du hast Gier gewürfelt, {value}",
+        "you rolled greed, {value}"
+      ],
+      [
+        "du hast den Gegenstand erhalten",
+        "you were awarded the item"
+      ],
+      [
+        "du hast gepasst",
+        "you passed"
+      ],
+      [
+        "eine Fähigkeit",
+        "an ability"
+      ],
+      [
+        "gegnerische",
+        "enemy"
+      ],
+      [
+        "geladen",
+        "loaded"
+      ],
+      [
+        "geradeaus",
+        "straight ahead"
+      ],
+      [
+        "gesperrt",
+        "banned"
+      ],
+      [
+        "gewohnt, feste Kanäle",
+        "classic, fixed channels"
+      ],
+      [
+        "hat Einstellungen",
+        "has settings"
+      ],
+      [
+        "hier",
+        "you are here"
+      ],
+      [
+        "hinter links",
+        "behind to the left"
+      ],
+      [
+        "hinter rechts",
+        "behind to the right"
+      ],
+      [
+        "im Gebiet {zone}.",
+        "in the area {zone}."
+      ],
+      [
+        "in einem anderen Gebiet.",
+        "in another area."
+      ],
+      [
+        "kein Weg bekannt",
+        "no route known"
+      ],
+      [
+        "leer",
+        "empty"
+      ],
+      [
+        "leerer Platz",
+        "empty slot"
+      ],
+      [
+        "leicht links",
+        "slightly left"
+      ],
+      [
+        "leicht rechts",
+        "slightly right"
+      ],
+      [
+        "linkes Auge",
+        "left eye"
+      ],
+      [
+        "links",
+        "left"
+      ],
+      [
+        "männlich",
+        "male"
+      ],
+      [
+        "neu, Register des Spiels",
+        "new, the game's tabs"
+      ],
+      [
+        "nicht aktiv",
+        "not active"
+      ],
+      [
+        "nicht für dein Volk",
+        "not for your race"
+      ],
+      [
+        "nicht geladen",
+        "not loaded"
+      ],
+      [
+        "nicht verfügbar",
+        "unavailable"
+      ],
+      [
+        "nicht verwendbar",
+        "not usable"
+      ],
+      [
+        "noch {seconds} Sekunden",
+        "{seconds} seconds left"
+      ],
+      [
+        "nur Gier oder Passen möglich",
+        "greed or pass only"
+      ],
+      [
+        "nur Passen möglich",
+        "pass only"
+      ],
+      [
+        "nur für {forWho}",
+        "only for {forWho}"
+      ],
+      [
+        "oben {up}, rechts {right}, unten {down}, links {left}",
+        "top {up}, right {right}, bottom {down}, left {left}"
+      ],
+      [
+        "rar",
+        "rare"
+      ],
+      [
+        "rechtes Auge",
+        "right eye"
+      ],
+      [
+        "rechts",
+        "right"
+      ],
+      [
+        "schon gewürfelt",
+        "already rolled"
+      ],
+      [
+        "unverändert",
+        "unmodified"
+      ],
+      [
+        "veraltet",
+        "outdated"
+      ],
+      [
+        "verborgen",
+        "hidden"
+      ],
+      [
+        "vom Spiel geändert",
+        "changed by the game"
+      ],
+      [
+        "von",
+        "of"
+      ],
+      [
+        "weiblich",
+        "female"
+      ],
+      [
+        "weitere Vergütung",
+        "further reward"
+      ],
+      [
+        "{ObjectKindName(kind)} ohne Namen",
+        "{ObjectKindName(kind)} with no name"
+      ],
+      [
+        "{amount} Erfahrung.",
+        "{amount} experience."
+      ],
+      [
+        "{category}, leer",
+        "{category}, empty"
+      ],
+      [
+        "{category}, leer",
+        "{category}, empty"
+      ],
+      [
+        "{confirm} oder {cancel}? Links und rechts wechseln, Enter wählt aus.",
+        "{confirm} or {cancel}? Left and right to switch, Enter to select."
+      ],
+      [
+        "{count} Angelplätze: {joined}.",
+        "{count} fishing spots: {joined}."
+      ],
+      [
+        "{count} Sammelstellen: {joined}.",
+        "{count} gathering spots: {joined}."
+      ],
+      [
+        "{count} Spuren in diesem Gebiet.",
+        "{count} trails in this area."
+      ],
+      [
+        "{count} Verlosungen. {joined}",
+        "{count} loot rolls. {joined}"
+      ],
+      [
+        "{dc} ausgewählt.",
+        "{dc} selected."
+      ],
+      [
+        "{distance / 1000:F1} Kilometer",
+        "{distance / 1000:F1} kilometers"
+      ],
+      [
+        "{distance:F0} Meter",
+        "{distance:F0} meters"
+      ],
+      [
+        "{distance:F0} Meter",
+        "{distance:F0} meters"
+      ],
+      [
+        "{distance:F0} Meter nach {compass}",
+        "{distance:F0} meters {compass}"
+      ],
+      [
+        "{dutyName}, Stufe {level}",
+        "{dutyName}, level {level}"
+      ],
+      [
+        "{enemy} wirkt {action}.",
+        "{enemy} casts {action}."
+      ],
+      [
+        "{head}{body}Auswahl unbekannt",
+        "{head}{body}selection unknown"
+      ],
+      [
+        "{head}{colour}, Gruppe {group} Ton {shade}",
+        "{head}{colour}, group {group} shade {shade}"
+      ],
+      [
+        "{head}{colour}, {pos}Gruppe {group} Ton {shade}",
+        "{head}{colour}, {pos}group {group} shade {shade}"
+      ],
+      [
+        "{item}, {index} von {count}",
+        "{item}, {index} of {count}"
+      ],
+      [
+        "{label}, Auswahlliste, {value}.",
+        "{label}, dropdown, {value}."
+      ],
+      [
+        "{label}, Registerkarte {index} von {total}",
+        "{label}, tab {index} of {total}"
+      ],
+      [
+        "{label}, Regler, {value}, von {min} bis {max}.",
+        "{label}, slider, {value}, from {min} to {max}."
+      ],
+      [
+        "{label}, Tab {index} von {count}",
+        "{label}, tab {index} of {count}"
+      ],
+      [
+        "{label}, keine Taste",
+        "{label}, no key"
+      ],
+      [
+        "{label}, {count} Einträge",
+        "{label}, {count} entries"
+      ],
+      [
+        "{label}, {value} %",
+        "{label}, {value}%"
+      ],
+      [
+        "{label}, {value} von 100",
+        "{label}, {value} of 100"
+      ],
+      [
+        "{label}, {value} von 100, {low} bis {high}",
+        "{label}, {value} of 100, {low} to {high}"
+      ],
+      [
+        "{label}, {value}, {index} von {count}",
+        "{label}, {value}, {index} of {count}"
+      ],
+      [
+        "{label}: {count} in der Nähe.",
+        "{label}: {count} nearby."
+      ],
+      [
+        "{label}: {here} im Gebiet, {away} in anderen Gebieten.",
+        "{label}: {here} in this area, {away} in other areas."
+      ],
+      [
+        "{label}: {here} im Gebiet.",
+        "{label}: {here} in this area."
+      ],
+      [
+        "{level}, nicht tragbar, {reason}",
+        "{level}, not wearable, {reason}"
+      ],
+      [
+        "{level}, tragbar",
+        "{level}, wearable"
+      ],
+      [
+        "{name} bereit, {charges} von {maxCharges} Ladungen.",
+        "{name} ready, {charges} of {maxCharges} charges."
+      ],
+      [
+        "{name} bereit.",
+        "{name} ready."
+      ],
+      [
+        "{name} hat keine Einstellungen.",
+        "{name} has no settings."
+      ],
+      [
+        "{name} ist weg. Folgen beendet.",
+        "{name} is gone. Follow stopped."
+      ],
+      [
+        "{name} liegt jetzt auf {slotLabel}.",
+        "{name} is now on {slotLabel}."
+      ],
+      [
+        "{name} mal {count}",
+        "{name} times {count}"
+      ],
+      [
+        "{name} mal {quantity}{hqSuffix}",
+        "{name} times {quantity}{hqSuffix}"
+      ],
+      [
+        "{name}, Stufe {level}",
+        "{name}, level {level}"
+      ],
+      [
+        "{name}, Stufe {level}",
+        "{name}, level {level}"
+      ],
+      [
+        "{name}, Stufe {level}, {distance:F0} Meter {compass}",
+        "{name}, level {level}, {distance:F0} meters {compass}"
+      ],
+      [
+        "{name}, {needed} benötigt, {nq} NQ, {hq} HQ",
+        "{name}, {needed} needed, {nq} NQ, {hq} HQ"
+      ],
+      [
+        "{name}, {price} Staatstaler, Besitz {owned}",
+        "{name}, {price} seals, {owned} owned"
+      ],
+      [
+        "{name}: {distance}, {direction}.",
+        "{name}: {distance}, {direction}."
+      ],
+      [
+        "{n} gesperrt",
+        "{n} banned"
+      ],
+      [
+        "{n} nicht geladen",
+        "{n} not loaded"
+      ],
+      [
+        "{n} veraltet",
+        "{n} outdated"
+      ],
+      [
+        "{owner}: derzeit {now}, danach {after}.",
+        "{owner}: currently {now}, then {after}."
+      ],
+      [
+        "{prefix} von {sender}: {message}",
+        "{prefix} from {sender}: {message}"
+      ],
+      [
+        "{qty} mal {name}",
+        "{qty} {name}"
+      ],
+      [
+        "{qty} mal {name}",
+        "{qty} {name}"
+      ],
+      [
+        "{quest} ist in einem anderen Gebiet und ich finde keinen Übergang dorthin.",
+        "{quest} is in another area and I can't find a transition there."
+      ],
+      [
+        "{removed} gelöscht",
+        "{removed} deleted"
+      ],
+      [
+        "{row}, {index} von {total}",
+        "{row}, {index} of {total}"
+      ],
+      [
+        "{selection}, {count} Einträge",
+        "{selection}, {count} entries"
+      ],
+      [
+        "{skillName} gewählt. Ziel-Taste wählen, {count} verfügbar. Nummernblock 8 und 2 blättern, Nummernblock 0 belegt, Nummernblock Komma zurück.",
+        "{skillName} selected. Choose a target key, {count} available. Numpad 8 and 2 to browse, Numpad 0 assigns, Numpad decimal to go back."
+      ],
+      [
+        "{slotLabel}, aktuell {current}, {index} von {count}",
+        "{slotLabel}, currently {current}, {index} of {count}"
+      ],
+      [
+        "{target} ist nicht erreichbar - dorthin führt kein Weg.",
+        "{target} cannot be reached - no route leads there."
+      ],
+      [
+        "{total} Plugins, {state}.",
+        "{total} plugins, {state}."
+      ],
+      [
+        "{type}, Stufe {level}",
+        "{type}, level {level}"
+      ],
+      [
+        "Änderungen verworfen",
+        "Changes discarded"
+      ],
+      [
+        "Ätheryt",
+        "Aetheryte"
+      ],
+      [
+        "Ätheryt",
+        "Aetheryte"
+      ],
+      [
+        "Ätheryten",
+        "Aetherytes"
+      ],
+      [
+        "Ätheryten: {count} im Gebiet.",
+        "Aetherytes: {count} in this area."
+      ],
+      [
+        "Übergang abgebrochen - die Übergangsstelle wurde nicht erreicht.",
+        "Crossing cancelled - the crossing point was not reached."
+      ],
+      [
+        "Übergang nach {name}",
+        "Transition to {name}"
+      ],
+      [
+        "Übergang zu {target}",
+        "crossing to {target}"
+      ],
+      [
+        "Übergangsstelle",
+        "crossing point"
+      ],
+      [
+        "Übergangsstelle erreicht. Überquere die Lücke.",
+        "Crossing point reached. Crossing the gap now."
+      ],
+      [
+        "Übung gestartet.",
+        "Exercise started."
+      ]
+    ]
+  },
+  "note": "한국어화 전 독일어/영어 스냅샷. 옮긴 뒤에도 이게 그대로여야 한다.",
+  "pairs": 675,
+  "unparsed": 41
+}

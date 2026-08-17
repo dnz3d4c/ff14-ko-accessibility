@@ -1,0 +1,204 @@
+"""한국어화 전에 독일어·영어가 뭐라고 말하는지 찍어 둔다.
+
+번역은 `IsGerman ? "독일어" : "영어"` 삼항 **722곳**을 카탈로그로 옮기는
+작업이다(2026-08-18 실측). 기계적이지만 그래서 위험하다 - 옮기다 한 문장을
+떨어뜨리거나 바꿔도 **컴파일은 통과한다.** 독일어 사용자는 그걸 다음 릴리스에
+귀로 알게 된다.
+
+그걸 막으려면 옮기기 **전에** 원본을 찍어 둬야 한다. 이 도구가 그 스냅샷이고,
+`golden/de-en.json`이 그 결과다. 옮긴 뒤에도 독일어·영어 문장이 한 자도
+안 바뀐 것을 이 파일로 증명한다.
+
+**못 읽은 것을 숨기지 않는다.** 722곳 중 단순 삼항이 아닌 것이 몇 개 있고
+(데이터 주도, 중첩 삼항), 그 개수도 같이 기록한다. 개수가 늘면 새 형태가
+생긴 것이니 손으로 본다.
+
+사용법:
+    uv run --no-project python tools/strings-golden/strings_golden.py          # 대조
+    uv run --no-project python tools/strings-golden/strings_golden.py --write  # 갱신
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[2]
+SOURCE_ROOT = REPO / "vendor" / "ff14-accessibility" / "FF14Accessibility"
+GOLDEN = Path(__file__).resolve().parent / "golden" / "de-en.json"
+
+MARKER = "IsGerman"
+
+
+@dataclass(frozen=True)
+class Pair:
+    de: str
+    en: str
+
+
+@dataclass(frozen=True)
+class Unparsed:
+    file: str
+    line: int
+    snippet: str
+
+
+def _read_literal(text: str, i: int) -> tuple[str | None, int]:
+    """`i`에서 시작하는 C# 문자열 리터럴을 읽는다. (내용, 끝위치+1).
+
+    `$` 접두는 삼켜서 없는 것처럼 다룬다 - 보간 자리(`{item}`)는 내용 그대로
+    남긴다. 그게 곧 번역할 때 지켜야 할 자리이기 때문이다.
+
+    축자 문자열(`@"..."`)은 읽지 않는다. 만나면 None을 돌려 미해석으로 센다.
+    """
+    if i < len(text) and text[i] == "$":
+        i += 1
+    if i >= len(text) or text[i] != '"':
+        return None, i
+    if i > 0 and text[i - 1] == "@":
+        return None, i
+
+    i += 1
+    out: list[str] = []
+    while i < len(text):
+        ch = text[i]
+        if ch == "\\" and i + 1 < len(text):
+            out.append(text[i : i + 2])
+            i += 2
+            continue
+        if ch == '"':
+            return "".join(out), i + 1
+        if ch == "\n":
+            return None, i
+        out.append(ch)
+        i += 1
+    return None, i
+
+
+def _skip_space(text: str, i: int) -> int:
+    while i < len(text) and text[i] in " \t\r\n":
+        i += 1
+    return i
+
+
+def extract(text: str, name: str) -> tuple[list[Pair], list[Unparsed]]:
+    """한 파일에서 (독일어, 영어) 쌍과 못 읽은 자리를 뽑는다."""
+    pairs: list[Pair] = []
+    missed: list[Unparsed] = []
+
+    start = 0
+    while True:
+        found = text.find(MARKER, start)
+        if found < 0:
+            break
+        start = found + len(MARKER)
+
+        i = _skip_space(text, start)
+        if i >= len(text) or text[i] != "?":
+            # 삼항이 아니다 - 선언, 주석, `=> Loc.IsGerman` 같은 것.
+            continue
+
+        i = _skip_space(text, i + 1)
+        de, i = _read_literal(text, i)
+        if de is None:
+            missed.append(Unparsed(name, text.count("\n", 0, found) + 1,
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        i = _skip_space(text, i)
+        if i >= len(text) or text[i] != ":":
+            missed.append(Unparsed(name, text.count("\n", 0, found) + 1,
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        i = _skip_space(text, i + 1)
+        en, i = _read_literal(text, i)
+        if en is None:
+            missed.append(Unparsed(name, text.count("\n", 0, found) + 1,
+                                   text[found : found + 60].replace("\n", " ")))
+            continue
+
+        pairs.append(Pair(de, en))
+
+    return pairs, missed
+
+
+def scan(root: Path = SOURCE_ROOT) -> tuple[dict[str, list[list[str]]], list[Unparsed]]:
+    """소스 전체를 훑는다. 파일별로 정렬된 쌍 목록과 미해석 목록."""
+    by_file: dict[str, list[list[str]]] = {}
+    missed: list[Unparsed] = []
+
+    for path in sorted(root.rglob("*.cs")):
+        if "obj" in path.parts or "bin" in path.parts:
+            continue
+        name = path.relative_to(root).as_posix()
+        pairs, file_missed = extract(path.read_text(encoding="utf-8"), name)
+        missed.extend(file_missed)
+        if pairs:
+            # 줄 번호를 안 넣는다. 무관한 편집마다 골든이 흔들리면 아무도 안 본다.
+            by_file[name] = sorted([p.de, p.en] for p in pairs)
+
+    return by_file, missed
+
+
+def build(root: Path = SOURCE_ROOT) -> dict:
+    by_file, missed = scan(root)
+    return {
+        "note": "한국어화 전 독일어/영어 스냅샷. 옮긴 뒤에도 이게 그대로여야 한다.",
+        "pairs": sum(len(v) for v in by_file.values()),
+        "unparsed": len(missed),
+        "by_file": by_file,
+    }
+
+
+def main(argv: list[str]) -> int:
+    if not SOURCE_ROOT.is_dir():
+        print(f"vendor 클론이 없다 - 건너뛴다: {SOURCE_ROOT}")
+        return 0
+
+    current = build()
+    _, missed = scan()
+
+    if "--write" in argv:
+        GOLDEN.parent.mkdir(parents=True, exist_ok=True)
+        GOLDEN.write_text(
+            json.dumps(current, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        print(f"기록: {GOLDEN.relative_to(REPO).as_posix()}")
+        print(f"  쌍 {current['pairs']}개, 미해석 {current['unparsed']}개")
+        if missed:
+            print("\n미해석 - 손으로 옮길 자리다:")
+            for item in missed:
+                print(f"  {item.file}:{item.line}  {item.snippet}")
+        return 0
+
+    if not GOLDEN.is_file():
+        print(f"골든이 없다. 먼저 --write로 만든다: {GOLDEN}", file=sys.stderr)
+        return 2
+
+    golden = json.loads(GOLDEN.read_text(encoding="utf-8"))
+    if golden.get("by_file") == current["by_file"]:
+        print(f"통과 - 독일어/영어 {current['pairs']}개가 스냅샷 그대로다")
+        return 0
+
+    print("독일어/영어 문장이 스냅샷과 다르다:", file=sys.stderr)
+    for name in sorted(set(golden["by_file"]) | set(current["by_file"])):
+        was = golden["by_file"].get(name, [])
+        now = current["by_file"].get(name, [])
+        if was == now:
+            continue
+        print(f"  {name}: {len(was)}개 -> {len(now)}개", file=sys.stderr)
+        for pair in [p for p in was if p not in now][:3]:
+            print(f"    사라짐: {pair[0][:50]}", file=sys.stderr)
+        for pair in [p for p in now if p not in was][:3]:
+            print(f"    새로:   {pair[0][:50]}", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("의도한 변경이면 --write로 갱신하고, 왜 바뀌는지 커밋에 적어라.", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

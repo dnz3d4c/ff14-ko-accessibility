@@ -1,0 +1,34 @@
+#!/bin/sh
+# 커밋 전 검사. 규칙과 근거: docs/commit-rules.md
+#
+# 여기 있는 것은 **빠르고, 다른 데서 안 막히는 것만**이다. 훅이 무거워지거나
+# 이미 막히는 걸 또 막으면 사람이 --no-verify를 쓰게 되고, 그러면 아무것도
+# 안 막는다.
+#
+# 검사하는 것: vendor의 kr-port 커밋 수와 패치 파일 수가 같은가.
+#
+# vendor/는 버전 관리 밖이다. 거기 커밋해 놓고 떼어내지 않으면 **우리 저장소에는
+# 아무 증상도 안 나타난다** - 다음에 클론한 사람이 빌드했을 때 조용히 다른
+# 물건이 나온다. 그걸 여기서 막는다.
+#
+# 여기 없는 것과 이유:
+#   - 배치 인코딩 -> git이 이미 막는다. .gitattributes의 working-tree-encoding=CP949가
+#     CP949로 못 읽는 파일을 `git add`에서 거부한다("fatal: failed to encode").
+#     UTF-8 저장도 BOM도 거기서 걸리는 걸 확인했다(2026-08-18)
+#   - 패치가 실제로 붙는지 -> 임시 워크트리에 git am을 돌리므로 몇 초 걸린다.
+#     `run\check.bat`이 한다
+#
+# --no-project: 상위 디렉토리의 pyproject.toml을 상속하지 않게 한다.
+
+if ! command -v uv >/dev/null 2>&1; then
+	echo "pre-commit 훅: uv를 찾지 못해 검사할 수 없다." >&2
+	echo "  설치: scoop install uv" >&2
+	exit 1
+fi
+
+if ! uv run --no-project python tools/patch-check/patch_check.py --quick >/dev/null 2>&1; then
+	uv run --no-project python tools/patch-check/patch_check.py --quick >&2
+	echo "" >&2
+	echo "고치고 다시 커밋한다. 정말 넘겨야 하면 --no-verify." >&2
+	exit 1
+fi

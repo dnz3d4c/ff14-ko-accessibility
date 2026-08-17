@@ -18,6 +18,16 @@ KR Dalamud 업데이터는 **기존 `%APPDATA%\XIVLauncherKR` 프로필이 있�
 | `DALAMUD_RUNTIME` 환경변수 | "적용 완료"가 뜨는데 실제로는 게임 안에서 CLR이 안 뜸 |
 | dev 플러그인 설정 시딩 | 플러그인이 **조용히** 안 뜸 (오류도 없음) |
 
+## 0. 설치기가 이 절차를 대신한다
+
+아래 §3~§8은 **손으로 하는 경우의 절차**다. 지금은 설치기가 같은 일을 한다 — `run\pack.bat`이 낸 `dist/` 폴더를 옮기고 그 안의 EXE를 실행하면 프로필 부트스트랩부터 vnavmesh 시딩까지 끝난다. KR화한 지점과 근거는 [overlay/patches/README.md](../overlay/patches/README.md) `0006`.
+
+이 문서를 남겨 두는 이유는 둘이다. **설치기가 무엇을 왜 하는지의 근거**이고, 설치기가 막혔을 때 손으로 짚는 순서다.
+
+무엇을 찾았는지만 보려면(설치는 안 한다):
+
+dist\FF14AccessibilityInstaller-KR.exe --check
+
 ## 1. 사전 조건
 
 - 한국어 FFXIV 클라이언트

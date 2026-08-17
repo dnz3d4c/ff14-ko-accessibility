@@ -1,0 +1,39 @@
+# run — 실행 배치
+
+게임·모드·빌드·로그를 매번 손으로 붙여넣지 않기 위한 배치 파일. 탐색기에서 더블클릭하거나 Win+R에 전체 경로를 넣어 실행한다.
+
+## 무엇을 언제 쓰나
+
+| 파일 | 언제 | 게임 상태 |
+|------|------|-----------|
+| `play.bat` | **평소 실행.** 게임 켜고 → 로그인 → Dalamud 붙이기 | 꺼져 있어야 함 |
+| `build.bat` | 소스를 고친 뒤 반영 | 켜져 있어도 됨 |
+| `log.bat` | 이번 판이 정상인지 판정 | 아무 때나 |
+| `setup.bat` | **최초 1회.** 프로필 부트스트랩 + dev 플러그인 시딩 | **꺼져 있어야 함** |
+| `_env.cmd` | 직접 실행하지 않는다. 나머지가 경로를 얻는 곳 | — |
+
+`setup.bat`이 게임을 끈 상태를 요구하는 이유는 Dalamud가 **종료할 때 설정을 저장하기 때문**이다. 켜 놓고 심으면 조용히 덮인다.
+
+## 경로를 박아 넣지 않는다
+
+`_env.cmd`가 전부 환경변수에서 끌어낸다. 특히 **Dalamud hook 폴더는 이름이 버전이라 업데이터가 갱신할 때마다 바뀐다.** `docs/environment.md` §3이 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔 함정이고, `_env.cmd`가 `Hooks` 아래에서 최신을 골라 그 손질을 없앤다.
+
+## 인코딩 — 손대기 전에 읽는다
+
+**배치 파일은 워킹트리에서 CP949다.** UTF-8로 저장하면 cmd가 한글 줄을 잘못 읽어 **주석이 아니라 코드까지 명령으로 실행된다**(2026-08-18 실측: `set "SCOOP=..."`가 `'coop"' is not recognized`로 깨졌다). BOM을 붙이면 첫 줄에서 오류가 난다.
+
+저장소에는 UTF-8로 담긴다. `.gitattributes`의 `working-tree-encoding=CP949`가 체크아웃 때 변환하므로 **diff와 grep은 UTF-8 그대로 된다.**
+
+에디터로 고칠 때는 CP949로 저장한다. UTF-8로 저장했다면 커밋 전에 되돌린다.
+
+uv run --no-project python -c "import pathlib,sys; p=pathlib.Path(sys.argv[1]); p.write_bytes(p.read_bytes().decode('utf-8').encode('cp949'))" run\build.bat
+
+## 왜 dotnet 출력을 영어로 고정하나
+
+`build.bat`이 `DOTNET_CLI_UI_LANGUAGE=en`을 건다. dotnet은 UTF-8로 출력하는데 콘솔은 CP949라 한국어 메시지가 깨져 나온다. **깨진 글자보다 영어가 낫다 — 스크린리더가 읽을 수 있다.**
+
+## log.bat이 판정하는 것
+
+`docs/kr-runtime-setup.md` §10의 판정을 `tools/kr-setup/check_log.py`가 대신 한다. 25만 자에서 다섯 줄을 눈으로 찾지 않기 위한 것이라 로그를 그대로 뱉지 않는다.
+
+**마지막 세션만 본다.** 로그는 세션을 이어 붙이므로 앞판의 성공 줄이 이번 판의 실패를 가린다.

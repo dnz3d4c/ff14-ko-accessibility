@@ -1,0 +1,125 @@
+From 710bb0c624843e4c61b0b6767e0514f7c4b35e2f Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Mon, 17 Aug 2026 20:41:44 +0900
+Subject: [PATCH] Compat shim: keep the gearset mark on ClientStructs 7.51
+
+RaptureGearsetModule.IsItemRegisteredToGearset exists in ClientStructs
+7.55.1.8875 but not in 7.51.0.8667, the version the Korean Dalamud
+distribution pins. Both assemblies were dumped with MetadataLoadContext:
+7.51 has no renamed or equivalent member, the method is simply absent.
+The plugin therefore does not compile against 7.51 at all - a single
+error at InventoryService.cs:199, out of 53971 lines.
+
+The shim is an extension method on purpose. C# considers extension
+methods only when no instance method applies, so a 7.55 build keeps
+calling the game's own function and never references this file, while a
+7.51 build falls back to it. No preprocessor switch and no edit to the
+call site.
+
+Proven rather than assumed: with [Obsolete(error: true)] on the shim the
+7.55 build still succeeds - the extension is never bound - while the
+7.51 build fails with CS0619 at exactly InventoryService.cs:199.
+
+The fallback answers per item id, not per item instance, because
+gearsets store ids only (GearsetItem has ItemId, no container or slot).
+Of two identical pieces it marks both. That is the direction of error
+IsAnyCopyRegisteredToGearset already accepts, for the reason stated
+there: a missing "do not sell" warning costs more than a surplus one.
+
+Build: 0 warnings 0 errors against 7.55.1.8875 and against 7.51.0.8667
+In-game: not tested
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+---
+ FF14Accessibility/Compat/GearsetMarkCompat.cs | 79 +++++++++++++++++++
+ 1 file changed, 79 insertions(+)
+ create mode 100644 FF14Accessibility/Compat/GearsetMarkCompat.cs
+
+diff --git a/FF14Accessibility/Compat/GearsetMarkCompat.cs b/FF14Accessibility/Compat/GearsetMarkCompat.cs
+new file mode 100644
+index 0000000..dddcb50
+--- /dev/null
++++ b/FF14Accessibility/Compat/GearsetMarkCompat.cs
+@@ -0,0 +1,79 @@
++using FFXIVClientStructs.FFXIV.Client.Game;
++using FFXIVClientStructs.FFXIV.Client.UI.Misc;
++
++// Deliberately the ROOT namespace, not FF14Accessibility.Compat: an extension
++// method in an enclosing namespace is in scope without a using directive, so
++// InventoryService.cs needs no edit at all.
++namespace FF14Accessibility;
++
++/// <summary>
++/// Keeps the gearset mark working when the plugin is built against an older
++/// FFXIVClientStructs than upstream uses.
++///
++/// WORKAROUND: RaptureGearsetModule.IsItemRegisteredToGearset(InventoryItem*,
++/// void*, int) exists in ClientStructs 7.55.1.8875 but NOT in 7.51.0.8667,
++/// which is the version the Korean Dalamud distribution pins (verified by
++/// dumping both assemblies with MetadataLoadContext, 2026-08-17). There is no
++/// renamed or equivalent member in 7.51 - the whole method is absent, so the
++/// clean path (call the game's own function) is unavailable at compile time,
++/// not merely at run time.
++///
++/// This is an EXTENSION method, and that is the point: C# only considers
++/// extension methods when no instance method applies. Built against 7.55 the
++/// real game function still wins and this file is dead weight; built against
++/// 7.51 it fills the hole. Neither build needs a compile-time switch and the
++/// call site is untouched.
++///
++/// PRECISION DIFFERS FROM THE GAME'S ANSWER. The game answers per item
++/// INSTANCE - of two identical pieces it can mark one and not the other.
++/// Gearsets only store item ids (RaptureGearsetModule.GearsetEntry.GearsetItem
++/// has ItemId, no container or slot), so the fallback can only answer per ID
++/// and says yes for both copies. That is the same direction of error upstream
++/// already accepts in IsAnyCopyRegisteredToGearset, and for the same reason:
++/// a missing "do not sell" warning costs more than a surplus one.
++/// </summary>
++internal static unsafe class GearsetMarkCompat
++{
++    /// <summary>Gearsets store an HQ piece as id + 1000000; inventory items
++    /// keep the plain id and carry HQ in ItemFlags. Comparing normalised ids
++    /// lets an NQ piece match its HQ entry, which errs towards warning.</summary>
++    private const uint HighQualityOffset = 1_000_000;
++
++    /// <summary>RaptureGearsetModule.Entries is a fixed array of 100.</summary>
++    private const int GearsetSlots = 100;
++
++    /// <summary>
++    /// Whether any saved gearset references this item's id.
++    ///
++    /// The extra parameters of the real 7.55 function (itemRow, equipSlotIndex)
++    /// are not reproduced: the single caller passes neither, and inventing
++    /// values for a function we are not calling would only invite confusion.
++    /// </summary>
++    public static bool IsItemRegisteredToGearset(
++        this ref RaptureGearsetModule module, InventoryItem* item)
++    {
++        if (item == null) return false;
++
++        var wanted = WithoutHighQuality(item->ItemId);
++        if (wanted == 0) return false;
++
++        var entries = module.Entries;
++        for (var id = 0; id < GearsetSlots && id < entries.Length; id++)
++        {
++            // The game's own validity answer rather than a reimplemented one -
++            // gearset ids are not dense, so counting to NumGearsets would skip
++            // the wrong ones.
++            if (!module.IsValidGearset(id)) continue;
++
++            foreach (ref readonly var slot in entries[id].Items)
++            {
++                if (WithoutHighQuality(slot.ItemId) == wanted) return true;
++            }
++        }
++
++        return false;
++    }
++
++    private static uint WithoutHighQuality(uint itemId)
++        => itemId >= HighQualityOffset ? itemId - HighQualityOffset : itemId;
++}
+-- 
+2.55.0.windows.3
+

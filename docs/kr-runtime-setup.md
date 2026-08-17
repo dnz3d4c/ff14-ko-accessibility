@@ -1,0 +1,102 @@
+# KR 실행 환경 구축 절차
+
+- 작성: 2026-08-17
+- 상태: **이 절차 그대로 캐릭터 생성 완료까지 검증됨**
+- 대상: 프로필이 없는 머신에서 KR 클라이언트에 플러그인을 붙이기까지
+
+`docs/environment.md`가 "무엇이 어디 있는가"를 적는다면 이 문서는 "무엇을 어떤 순서로 하는가"를 적는다.
+
+## 이 절차가 왜 따로 필요한가
+
+KR Dalamud 업데이터는 **기존 `%APPDATA%\XIVLauncherKR` 프로필이 있다고 전제한다**(README-KR.txt: "완전히 새 PC에 프로필을 처음 만드는 설치 프로그램은 아닙니다"). 글로벌은 XIVLauncher가 그 프로필을 만들어 주지만 한국어 런처는 그런 일을 하지 않는다.
+
+그래서 **XIVLauncher가 해 주던 일 세 가지를 사람이 대신 해야 한다.** 하나라도 빠지면 아래처럼 실패한다.
+
+| 빠진 것 | 증상 |
+|---------|------|
+| `dalamudConfig.json`, `installedPlugins` | 업데이터가 오류 창을 무한 생성 |
+| `DALAMUD_RUNTIME` 환경변수 | "적용 완료"가 뜨는데 실제로는 게임 안에서 CLR이 안 뜸 |
+| dev 플러그인 설정 시딩 | 플러그인이 **조용히** 안 뜸 (오류도 없음) |
+
+## 1. 사전 조건
+
+- 한국어 FFXIV 클라이언트
+- Microsoft .NET 10 Desktop Runtime x64 (시스템 설치, `C:\Program Files\dotnet`)
+- .NET 10 SDK — 빌드용. 이 머신은 scoop에 있고 PATH가 가리므로 **절대 경로로 부른다**(`docs/environment.md` §2)
+
+## 2. KR Dalamud 업데이터 설치
+
+`MiqoKR/kr-dalamud-updater` 릴리스의 Portable zip을 받아 쓰기 가능한 폴더에 푼다. 재배포하지 않는다(라이선스 미표기).
+
+현재 위치: `%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
+
+## 3. 프로필의 빠진 조각 만들기
+
+업데이터의 사전 검사(`Program.cs`의 `GetMissingParts`)가 여섯 가지를 확인하는데, 새 프로필에는 둘이 없다.
+
+mkdir "%APPDATA%\XIVLauncherKR\installedPlugins" "%APPDATA%\XIVLauncherKR\devPlugins"
+
+그리고 `%APPDATA%\XIVLauncherKR\dalamudConfig.json`에 아래 한 줄만 넣는다. Dalamud가 첫 실행에서 나머지 기본값을 채운다. **BOM 없이 저장한다.**
+
+{"$type":"Dalamud.Configuration.Internal.DalamudConfiguration, Dalamud"}
+
+## 4. `DALAMUD_RUNTIME` 환경변수
+
+`Dalamud.Boot.dll`이 게임 안에서 .NET 런타임을 찾을 때 읽는 변수다(바이너리 문자열로 확인). 글로벌에서는 XIVLauncher가 자기 전용 런타임을 받아 이 값을 넣어 준다. 없으면 Boot 로그에 `Error: Unable to find .NET runtime path`가 찍히고 `Dalamud.Boot::Initialize returned 2147942403`으로 끝난다.
+
+setx DALAMUD_RUNTIME "C:\Program Files\dotnet"
+
+시스템 dotnet이면 충분하다. `Dalamud.runtimeconfig.json`이 `Microsoft.NETCore.App 10.0.0` + `Microsoft.WindowsDesktop.App 10.0.0`에 `rollForward: LatestMinor`를 요구하는데 거기에 10.0.11이 둘 다 있다.
+
+**변수를 넣은 뒤 게임을 새로 켜야 한다.** 프로세스는 시작할 때 환경을 물고 간다.
+
+## 5. Dalamud 내려받기와 KR 패치
+
+게임을 끈 상태에서 업데이터를 실행하고 **Check Update**를 누른다. 공식 stable과 에셋을 받아 KR 호환 패치까지 적용한다.
+
+결과: `addon\Hooks\<버전>\`(KR 패치 마커 3종 + FFXIVClientStructs 7.51.0.8667), `dalamudAssets\<번호>\`
+
+hook 폴더 이름이 버전이라 **업데이트마다 바뀐다.** 빌드용 `DALAMUD_HOME`도 같이 옮겨야 한다.
+
+## 6. 플러그인 빌드와 배치
+
+저장소 루트에서 vendor 클론에 KR 패치를 적용한 뒤 빌드한다(`overlay/patches/README.md` 참조).
+
+빌드 (한 줄):
+
+DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
+
+산출물 `bin/Release/net10.0-windows/FF14Accessibility/latest.zip`을 `%APPDATA%\XIVLauncherKR\devPlugins\FF14Accessibility\`에 푼다.
+
+## 7. dev 플러그인 설정 시딩
+
+**게임을 끈 상태에서** 한 번만 하면 된다. Dalamud는 종료할 때 설정을 저장하므로 켜져 있으면 덮인다.
+
+uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLauncherKR\dalamudConfig.json" "%APPDATA%\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Accessibility.dll" FF14Accessibility
+
+세 조건을 동시에 맞춘다 — `DevMode`, `DevPluginSettings.StartOnBoot`, `DefaultProfile`의 **같은 GUID**로 `IsEnabled`. 근거는 업스트림 `Installer/InstallerService.cs:505-576`이 디컴파일로 확인해 둔 것이고, 하나라도 어긋나면 오류 없이 조용히 안 뜬다.
+
+`AutomaticReloading`을 켜 두므로 **이후 재빌드는 파일만 덮어쓰면 게임 재시작 없이 반영된다.**
+
+## 8. 실행 순서
+
+1. 한국어 런처로 게임 실행 — Win+R에 `"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk"`
+2. 로그인하고 게임 시작
+3. 업데이터 실행 — `C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
+4. **달라무드 적용**
+
+업데이터는 게임을 띄우지 않는다. 돌고 있는 `ffxiv_dx11` 프로세스에 붙을 뿐이다(`inject <pid>`). XIVLauncher는 이 구성에서 쓰지 않는다 — `XIVLauncherKR`은 프로그램이 아니라 폴더 이름이다.
+
+## 9. 성공 확인
+
+**"적용 완료" 알림을 믿으면 안 된다.** 인젝터가 종료 코드 0으로 끝나면 뜨는데, 게임 안에서 실패해도 0으로 끝난 적이 있다.
+
+`%APPDATA%\XIVLauncherKR\dalamud-kr-gui.log`에서 확인한다.
+
+- `"Language": "Korean"` — KR 언어 패치 작동
+- `Lumina is ready: ...\game\sqpack` — 게임 데이터 판독 가능
+- `Saved cache to ...cachedSigs\<게임버전>.json` — 시그니처 해석 성공
+- `[FF14Accessibility] ... geladen.` — 플러그인 로드
+- `[Speak] '...'` — 음성 출력 도달
+
+`dalamudConfig.json`이 72바이트에서 7만 바이트대로 커졌으면 Dalamud가 실제로 돌았다는 뜻이다.

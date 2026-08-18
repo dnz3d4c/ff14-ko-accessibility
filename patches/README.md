@@ -91,7 +91,9 @@ lives in 지평선 가장자리in the area 서부 다날란
 
 ## 보내기
 
-아직 안 보냈다. 보낼 것은 `0003` 하나이고 **제목·본문 초안은 [pr-0003.md](pr-0003.md)에 있다.**
+**`0003`은 보냈다 — [PR #8](https://github.com/derbruedi/ff14-accessibility/pull/8)** (2026-08-18, base `main`, 파일 1개 `+4 -1`). 제목·본문은 [pr-0003.md](pr-0003.md)에 그대로 남아 있다.
+
+fork는 `dnz3d4c/ff14-accessibility`, 브랜치는 `upstream-habitat-separator`다. **병합되면 이 패치는 여기서 사라지고 나머지가 그대로 붙어야 한다** — 그때 `upstream.json` 핀을 옮기고 다시 뽑는다.
 
 **PR은 영어로 쓴다**(2026-08-18 결정, [commit-rules.md](../docs/commit-rules.md) §5). `0003`의 커밋 본문이 이미 영어라 그대로 쓴다.
 

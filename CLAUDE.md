@@ -48,7 +48,8 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 `vendor/ff14-accessibility/`는 업스트림 클론이고 **우리 저장소의 버전 관리 밖**이다.
 
 - 거기서 직접 작업하지 않는다. `kr-port` 브랜치에 커밋하고 `git format-patch`로 떼어낸다.
-- 한국 전용 패치는 `overlay/patches/`, 업스트림 기여 대기 변경은 `patches/`. 섞는 커밋은 훅이 거부한다.
+- 우리만 쓰는 패치는 `overlay/patches/`, 업스트림에 **보낼** 변경만 `patches/`. 섞는 커밋은 훅이 거부한다.
+- **`patches/`에 새로 넣기 전에 [patches/rejected.md](patches/rejected.md)를 먼저 본다.** 기각된 부류를 다시 만들지 않기 위한 목록이다. 기준 다섯을 다 넘겨야 하고([patches/README.md](patches/README.md)), 그중 둘이 특히 자주 걸린다 — **글섭 클라 없이 소스만으로 판정될 것**(우리한테 KR 클라뿐이다)과 **명백한 기존 로직의 오류일 것**(리팩터·구조 개선·"언젠가 편해지는 것"은 만들지 않는다). 못 넘기면 `overlay/`로 간다.
 - **한국어 문장은 패치가 아니라 `overlay/ko/ko.json`에서 고친다.** 마지막 패치(`0008`)는 `tools/ko-apply`가 만드는 생성물이라 손대지 않는다 — 충돌하면 푸는 게 아니라 다시 만든다. 왜인지는 [overlay/patches/README.md](overlay/patches/README.md).
 - **붙는 자리는 `upstream.json`의 핀이지 `main`이 아니다.** 핀을 손으로 고치지 않는다 — `run\sync.bat`이 옮긴다.
 - **업스트림은 독일어로 개발된다.** 핀을 옮겼으면 [docs/upstream-changes.md](docs/upstream-changes.md)에 한국어로 남긴다. 안 남기면 훅 C10과 테스트가 막는다. 절차는 [docs/upstream-sync.md](docs/upstream-sync.md).

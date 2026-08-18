@@ -1,4 +1,4 @@
-From 5889e9abe0ba001fa1682ff17fd3353b2ad5309a Mon Sep 17 00:00:00 2001
+From 2a2dd31704d16932b65346d7585490c887689e08 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 07:37:56 +0900
 Subject: [PATCH 7/9] Korean: add it as a third language, falling back to

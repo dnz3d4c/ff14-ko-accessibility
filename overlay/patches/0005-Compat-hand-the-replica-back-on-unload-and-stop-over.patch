@@ -1,4 +1,4 @@
-From db17931cf2cc774d600299407ca549a108b76e04 Mon Sep 17 00:00:00 2001
+From 958cae95e9e0034cf841cd9163522cccba9b0a44 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 00:15:46 +0900
 Subject: [PATCH 5/9] Compat: hand the replica back on unload, and stop

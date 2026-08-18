@@ -1,4 +1,4 @@
-From c184d4f10f1ddbab2701be98257c5d48aeeed0b9 Mon Sep 17 00:00:00 2001
+From 25c13e82657d42d355d9e3107d981a278ca5daa9 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 21:42:33 +0900
 Subject: [PATCH 2/9] Compat shim: node visibility on the Korean client

@@ -1,4 +1,4 @@
-From 94dd4154e39b84e217d784a317c80b8a65deac46 Mon Sep 17 00:00:00 2001
+From c271c9e99ca1cc6f671a3d7ac0c68f8dfa3a371c Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 23:22:27 +0900
 Subject: [PATCH 4/9] Compat: call the game's own IsVisible, and say which path

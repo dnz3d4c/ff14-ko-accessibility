@@ -5,11 +5,18 @@
 # 이미 막히는 걸 또 막으면 사람이 --no-verify를 쓰게 되고, 그러면 아무것도
 # 안 막는다.
 #
-# 검사하는 것: vendor의 kr-port 커밋 수와 패치 파일 수가 같은가.
+# 검사하는 것 둘.
+#
+# 1) vendor의 kr-port 커밋 수와 패치 파일 수가 같은가.
 #
 # vendor/는 버전 관리 밖이다. 거기 커밋해 놓고 떼어내지 않으면 **우리 저장소에는
 # 아무 증상도 안 나타난다** - 다음에 클론한 사람이 빌드했을 때 조용히 다른
 # 물건이 나온다. 그걸 여기서 막는다.
+#
+# 2) 문서가 인용한 숫자와 현황판의 절끼리 정합.
+#
+# commit-msg의 C8은 현황판을 *건드렸나*만 본다. 그래서 절끼리 어긋난 것도,
+# README가 낡는 것도 안 걸렸다(2026-08-18에 실제로 23곳). 0.1초라 여기 둔다.
 #
 # 여기 없는 것과 이유:
 #   - 배치 인코딩 -> git이 이미 막는다. .gitattributes의 working-tree-encoding=CP949가
@@ -30,5 +37,12 @@ if ! uv run --no-project python tools/patch-check/patch_check.py --quick >/dev/n
 	uv run --no-project python tools/patch-check/patch_check.py --quick >&2
 	echo "" >&2
 	echo "고치고 다시 커밋한다. 정말 넘겨야 하면 --no-verify." >&2
+	exit 1
+fi
+
+if ! uv run --no-project python tools/docs-check/docs_check.py >/dev/null 2>&1; then
+	uv run --no-project python tools/docs-check/docs_check.py >&2
+	echo "" >&2
+	echo "문서를 실제와 맞추고 다시 커밋한다. 정말 넘겨야 하면 --no-verify." >&2
 	exit 1
 fi

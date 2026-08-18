@@ -14,15 +14,19 @@
 사용법:
     uv run --no-project python tools/kr-setup/check_log.py [로그경로]
 
-경로를 안 주면 `%APPDATA%\\XIVLauncherKR\\dalamud-kr-gui.log`를 본다.
+경로를 안 주면 `kr_profile`이 정한 프로필 루트의 `dalamud-kr-gui.log`를 본다.
+루트를 여기서 박지 않는 이유는 그 모듈이 갖는다 - 박아 두면 설치기와 갈리고,
+갈리면 **엉뚱한 판의 로그를 읽고 정상이라고 말한다.**
 """
 
 from __future__ import annotations
 
-import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import kr_profile  # noqa: E402  - 같은 폴더. 배치가 파일 경로로 직접 부른다
 
 #: 세션 경계. Dalamud가 주입될 때마다 찍는다.
 SESSION_START = "Initializing a session.."
@@ -137,8 +141,9 @@ def inspect(text: str, sidecar: str = "") -> Report:
 
 
 def default_log_path() -> Path:
-    appdata = os.environ.get("APPDATA", "")
-    return Path(appdata) / "XIVLauncherKR" / "dalamud-kr-gui.log"
+    # 프로필 루트를 여기서 정하지 않는다. 박아 두면 설치기·배치와 갈리고,
+    # 갈리면 **엉뚱한 판의 로그를 읽고 정상이라고 말한다.** 규칙은 kr_profile이 갖는다.
+    return Path(kr_profile.resolve_root()) / "dalamud-kr-gui.log"
 
 
 def render(report: Report) -> str:

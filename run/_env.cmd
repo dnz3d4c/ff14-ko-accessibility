@@ -7,7 +7,18 @@ rem §3이 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본
 rem 함정이고, 그걸 손으로 고치지 않게 하려고 여기서 자동으로 최신을 고른다.
 
 set "REPO=%~dp0.."
-set "KR_PROFILE=%APPDATA%\XIVLauncherKR"
+
+rem 프로필 루트는 여기서 정하지 않는다. 정하는 곳은 KR Dalamud 업데이터의
+rem 설정(%APPDATA%\KrDalamudUpdater\settings.json 의 ProfileRoot)이고, 그건
+rem 사용자가 바꿀 수 있는 값이다. 박아 두면 설치기와 갈리고, 갈려도 오류가
+rem 안 난다 - 플러그인만 조용히 빠진다. 규칙의 단일 원천은 kr_profile.py다.
+set "KR_PROFILE="
+for /f "delims=" %%P in ('uv run --no-project python "%REPO%\tools\kr-setup\kr_profile.py" 2^>nul') do set "KR_PROFILE=%%P"
+if not defined KR_PROFILE (
+  echo [실패] 프로필 루트를 정하는 데 실패했다.
+  echo   uv가 있고 tools\kr-setup\kr_profile.py가 있는지 본다.
+  exit /b 1
+)
 set "KR_LOG=%KR_PROFILE%\dalamud-kr-gui.log"
 set "KR_CONFIG=%KR_PROFILE%\dalamudConfig.json"
 set "KR_DEVPLUGINS=%KR_PROFILE%\devPlugins"

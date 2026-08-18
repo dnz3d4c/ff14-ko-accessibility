@@ -1,0 +1,40 @@
+From 9c387a5ad3f23f5e1e9ea6c1bdd87f90725e21ee Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Tue, 18 Aug 2026 21:59:40 +0900
+Subject: [PATCH 13/14] Startup: write the compatibility note, do not speak it
+
+The greeting was followed by a second spoken line whenever a compatibility
+fallback was active: "gearset marks go by item ID". That names an internal
+mechanism, and it is the first thing a player hears at every login.
+
+What it guards against is unchanged. The note still goes into the log on
+every start, and "/acc compat" says the full state out loud on demand - the
+reason it exists (a fallback that quietly changes an answer is invisible to
+someone who cannot see the screen) is served by an answer that can be asked
+for, not by an announcement nobody asked for.
+---
+ FF14Accessibility/Plugin.cs | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
+index 9bcb253..cc5029d 100644
+--- a/FF14Accessibility/Plugin.cs
++++ b/FF14Accessibility/Plugin.cs
+@@ -436,11 +436,13 @@ public sealed class Plugin : IDalamudPlugin
+ 
+         Log.Info($"FF14 Accessibility Plugin V{PluginVersion} [{PluginVersionTag}] geladen.");
+         _tolk.Speak(AccessibilityStrings.VersionReady(PluginVersion));
+-        // Speak() queues, so this follows the greeting instead of cutting it off.
+-        // Null unless an answer the game normally gives is now approximated -
+-        // silence about that is indistinguishable from a healthy client.
++        // The compatibility note is written, not spoken. It names an internal
++        // mechanism ("gearset marks go by item ID"), which is a sentence for a
++        // log, not for the first thing a player hears at every login. What it
++        // guards against is still covered: the line below always runs, and
++        // "/acc compat" says the full state out loud on demand.
+         if (CompatReport.StartupNotice is { } notice)
+-            _tolk.Speak(notice);
++            Log.Info($"[Compat] {notice}");
+     }
+ 
+     private void RegisterCommands()

@@ -1,0 +1,42 @@
+From 9bc41ed59848c057b2f6f6e7294ae4787fc9c006 Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Tue, 18 Aug 2026 21:59:41 +0900
+Subject: [PATCH 14/14] Korean build: speak Korean by default
+
+Language was Auto, which follows the Windows UI language. On a Korean client
+that is wrong in exactly one case, and it is a case that happens: a Korean
+player on an English Windows gets English announcements.
+
+This build is only distributed for the Korean client, so the language is
+known here in a way it is not upstream. "/acc lang auto" restores the old
+behaviour, and an existing configuration is untouched - this is the default
+for a fresh install.
+---
+ FF14Accessibility/Configuration.cs | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/FF14Accessibility/Configuration.cs b/FF14Accessibility/Configuration.cs
+index fe24223..3fc6287 100644
+--- a/FF14Accessibility/Configuration.cs
++++ b/FF14Accessibility/Configuration.cs
+@@ -8,11 +8,17 @@ public sealed class Configuration : IPluginConfiguration
+ {
+     public int Version { get; set; } = 2;
+ 
+-    // Sprache aller Mod-Ansagen. Auto = folgt der Windows-Sprache (deutsches
+-    // Windows -> Deutsch, sonst Englisch). Umschaltbar mit "/acc lang de|en|auto".
++    // Sprache aller Mod-Ansagen. Umschaltbar mit "/acc lang de|en|ko|auto".
+     // Spielinhalte (Item-/NPC-Namen, Questtexte) bleiben davon unberuehrt - die
+     // kommen bereits in der Spielsprache vom Spiel. Siehe Loc / AccessibilityStrings.
+-    public LanguageMode Language = LanguageMode.Auto;
++    //
++    // Korean build: fixed to Korean instead of Auto. Auto follows the Windows UI
++    // language, and a Korean player on an English Windows would get English
++    // announcements on a Korean client - the one combination where the default
++    // is wrong for everybody it can happen to. This build is only distributed
++    // for the Korean client, so the language is known here in a way it is not
++    // upstream. "/acc lang auto" restores the upstream behaviour.
++    public LanguageMode Language = LanguageMode.Korean;
+ 
+     // Tastaturbelegung. Standard ab V4.21 kollisionsfrei laut Live-Keybind-Dump
+     // (2026-07-10): N ist der einzige freie Buchstabe, Strg+F1..F12 sind frei.

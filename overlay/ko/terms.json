@@ -1,0 +1,190 @@
+{
+  "note": "게임 한국어판이 실제로 쓰는 낱말. 지어내지 않는다 - 모든 줄에 Addon 시트 행 번호가 붙어 있고, tools/ko-terms가 게임 데이터에서 직접 뽑았다.",
+  "method": "KR 클라이언트 sqpack의 Addon 시트를 Lumina로 읽는다. 게임을 켤 필요가 없다. 다시 뽑기: run\\terms.bat dump tools\\ko-terms\\out",
+  "game_version": "2026.08.05.0000.0000",
+  "dumped": "2026-08-18",
+  "not_found": {
+    "채팅": "게임은 이 낱말을 안 쓴다. Addon 전 행에서 0건 - 로그(로그 필터, 로그창) 또는 대화다",
+    "나침반": "0건. 방위는 '방향'으로만 나온다"
+  },
+  "terms": [
+    {
+      "en": "OK",
+      "ko": "확인",
+      "addon": 1,
+      "row_text": "확인"
+    },
+    {
+      "en": "Cancel",
+      "ko": "취소",
+      "addon": 2,
+      "row_text": "취소"
+    },
+    {
+      "en": "Yes",
+      "ko": "예",
+      "addon": 3,
+      "row_text": "예"
+    },
+    {
+      "en": "No",
+      "ko": "아니오",
+      "addon": 4,
+      "row_text": "아니오"
+    },
+    {
+      "en": "Quest",
+      "ko": "퀘스트",
+      "addon": 450,
+      "row_text": "퀘스트"
+    },
+    {
+      "en": "Inventory",
+      "ko": "소지품",
+      "addon": 520,
+      "row_text": "소지품"
+    },
+    {
+      "en": "Gear",
+      "ko": "장비",
+      "addon": 538,
+      "row_text": "장비"
+    },
+    {
+      "en": "Map",
+      "ko": "지도",
+      "addon": 671,
+      "row_text": "지도"
+    },
+    {
+      "en": "Flag",
+      "ko": "표식",
+      "addon": 770,
+      "row_text": "표식",
+      "note": "지도에 찍는 표시. 3558행 '대상에 표식 설정'도 같은 낱말"
+    },
+    {
+      "en": "Cast",
+      "ko": "시전",
+      "addon": 1032,
+      "row_text": "시전"
+    },
+    {
+      "en": "Tab",
+      "ko": "탭",
+      "addon": 1095,
+      "row_text": "탭 추가",
+      "note": "로그 탭. 1209행 '탭별 로그 필터 설정'이 채팅 맥락"
+    },
+    {
+      "en": "Log filter",
+      "ko": "로그 필터",
+      "addon": 1210,
+      "row_text": "로그 필터"
+    },
+    {
+      "en": "Conversation",
+      "ko": "대화",
+      "addon": 1212,
+      "row_text": "대화",
+      "note": "로그 필터의 갈래 이름. 게임은 이걸 '채팅'이라 안 한다"
+    },
+    {
+      "en": "Battle",
+      "ko": "전투",
+      "addon": 1213,
+      "row_text": "전투",
+      "note": "로그 필터의 갈래 이름"
+    },
+    {
+      "en": "Notice",
+      "ko": "알림",
+      "addon": 1214,
+      "row_text": "알림",
+      "note": "로그 필터의 갈래 이름"
+    },
+    {
+      "en": "Target",
+      "ko": "대상",
+      "addon": 1216,
+      "row_text": "대상"
+    },
+    {
+      "en": "Party",
+      "ko": "파티",
+      "addon": 1228,
+      "row_text": "파티"
+    },
+    {
+      "en": "System message",
+      "ko": "시스템 메시지",
+      "addon": 1913,
+      "row_text": "시스템 메시지"
+    },
+    {
+      "en": "Gathering",
+      "ko": "채집",
+      "addon": 1915,
+      "row_text": "채집 관련 시스템 메시지",
+      "note": "1915행이 '채집 관련 시스템 메시지'"
+    },
+    {
+      "en": "Error message",
+      "ko": "오류 메시지",
+      "addon": 1916,
+      "row_text": "오류 메시지"
+    },
+    {
+      "en": "Aetheryte",
+      "ko": "에테라이트",
+      "addon": 2723,
+      "row_text": "에테라이트 전송망",
+      "note": "2723행이 '에테라이트 전송망'"
+    },
+    {
+      "en": "On",
+      "ko": "켜기",
+      "addon": 3053,
+      "row_text": "켜기"
+    },
+    {
+      "en": "Off",
+      "ko": "끄기",
+      "addon": 3054,
+      "row_text": "끄기"
+    },
+    {
+      "en": "Ability",
+      "ko": "기술",
+      "addon": 3249,
+      "row_text": "기술 시전 속도",
+      "note": "3249행이 '기술 시전 속도'. 기술 목록은 MainCommand 시트에도 있다"
+    },
+    {
+      "en": "Sound",
+      "ko": "소리",
+      "addon": 4011,
+      "row_text": "소리"
+    },
+    {
+      "en": "Volume",
+      "ko": "음량",
+      "addon": 4047,
+      "row_text": "주 음량",
+      "note": "4047행이 '주 음량'"
+    },
+    {
+      "en": "Logout",
+      "ko": "접속 종료",
+      "addon": 9836,
+      "row_text": "접속 종료",
+      "note": "시스템 메뉴에서도 확인됨 (2026-08-18 로그)"
+    },
+    {
+      "en": "HP",
+      "ko": "체력",
+      "addon": 9125,
+      "row_text": "체력"
+    }
+  ]
+}

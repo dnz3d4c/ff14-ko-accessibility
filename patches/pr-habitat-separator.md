@@ -1,11 +1,12 @@
-# PR 초안 — `patches/0003` 서식지와 지역
+# PR — 서식지와 지역이 붙어 읽히던 것
 
-- 작성: 2026-08-18
-- 보낼 곳: `derbruedi/ff14-accessibility` (base `main`)
-- 브랜치: `upstream-habitat-separator` — 업스트림 현재 `main`(`07e0769`) 위에 커밋 하나
+- 보낸 날: 2026-08-18
+- 보낸 곳: [derbruedi/ff14-accessibility PR #8](https://github.com/derbruedi/ff14-accessibility/pull/8) (base `main`)
+- 브랜치: `upstream-habitat-separator` — 업스트림 `07e0769` 위에 커밋 하나
 - 바뀌는 것: `FF14Accessibility/Services/NavigationService.cs` 한 파일, `+4 -1`
+- 우리 쪽 패치: `patches/0001` (시리즈 정리 전에는 `0003`이었다)
 
-**이 문서는 검토용이다.** 아래 §2와 §3이 GitHub에 그대로 올라간다. 한국어는 §4에만 있고 PR에는 안 들어간다.
+**§2와 §3이 GitHub에 올라간 문장 그대로다.** 한국어는 §4에만 있고 PR에는 안 들어갔다.
 
 ## 1. 왜 이 문장들로 썼나
 

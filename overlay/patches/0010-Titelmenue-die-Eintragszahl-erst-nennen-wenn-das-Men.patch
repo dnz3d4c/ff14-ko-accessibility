@@ -1,7 +1,7 @@
-From 15122a6950474f4d64540b5d01d7c90c27ee1370 Mon Sep 17 00:00:00 2001
+From 6346feb4d8e9e8602415c7711982feeb7b116bdc Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:51:52 +0900
-Subject: [PATCH 10/11] Titelmenue: die Eintragszahl erst nennen, wenn das
+Subject: [PATCH 10/14] Titelmenue: die Eintragszahl erst nennen, wenn das
  Menue fertig ist
 
 Beim Oeffnen sagte das Hauptmenue eine zu kleine Zahl. Gemessen am
@@ -39,7 +39,7 @@ In-Game: nicht geprueft
  1 file changed, 43 insertions(+), 11 deletions(-)
 
 diff --git a/FF14Accessibility/Services/UIReaderService.cs b/FF14Accessibility/Services/UIReaderService.cs
-index 72de279..df9fa8c 100644
+index f2b524f..742518a 100644
 --- a/FF14Accessibility/Services/UIReaderService.cs
 +++ b/FF14Accessibility/Services/UIReaderService.cs
 @@ -95,6 +95,12 @@ public sealed class UIReaderService : IDisposable
@@ -55,7 +55,7 @@ index 72de279..df9fa8c 100644
      private ScreenContext _activeScreenContext = ScreenContext.None;
  
      // ConfigSystem state
-@@ -4230,15 +4236,22 @@ public sealed class UIReaderService : IDisposable
+@@ -4298,15 +4304,22 @@ public sealed class UIReaderService : IDisposable
          }
  
          // Men�-Eintr�ge lesen und ansagen
@@ -87,7 +87,7 @@ index 72de279..df9fa8c 100644
      }
  
      private unsafe void OnTitleMenuReceive(AddonEvent type, AddonArgs args)
-@@ -7935,11 +7948,30 @@ public sealed class UIReaderService : IDisposable
+@@ -8234,11 +8247,30 @@ public sealed class UIReaderService : IDisposable
          }
  
          var selection = GetTitleMenuSelection(addon);

@@ -1,7 +1,7 @@
-From d829e30a1eff20864e4926c10d955bfeeab6231a Mon Sep 17 00:00:00 2001
+From 97c81ab46a125d9b30a98ed547743e8939053145 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
-Date: Tue, 18 Aug 2026 13:43:42 +0900
-Subject: [PATCH 08/11] Korean: the mod's own strings, generated from the
+Date: Tue, 18 Aug 2026 22:21:00 +0900
+Subject: [PATCH 08/14] Korean: the mod's own strings, generated from the
  catalogue
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -377,7 +377,7 @@ index f9e0d33..29c3ca8 100644
 +             "기록에는 그대로 남음.");
  }
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 9254a0b..dcddcbd 100644
+index cd4f57d..e7cad65 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -13,84 +13,102 @@ public static partial class AccessibilityStrings
@@ -1396,7 +1396,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>", N entries" plus optional ": &lt;selection&gt;", appended to a tab line.</summary>
      public static string ListEntriesSuffix(int count, string selection) =>
-@@ -748,87 +830,141 @@ public static partial class AccessibilityStrings
+@@ -748,67 +830,105 @@ public static partial class AccessibilityStrings
              : $", {count} entries{(selection.Length > 0 ? $": {selection}" : string.Empty)}";
  
      public static string SocialTabHeader(string label, int index, int total) =>
@@ -1535,6 +1535,11 @@ index 9254a0b..dcddcbd 100644
 +                                                         "무작위 외모 누름.");
  
      // ── Seitenwechsel / Reiter (generisch) ───────────────────────────
+     /// <summary>Konfigurationsseite mit der Anzahl ihrer Einstellungen. Die Zahl
+@@ -823,24 +943,40 @@ public static partial class AccessibilityStrings
+             ? $"{heading}, {count} {(count == 1 ? "Einstellung" : "Einstellungen")}"
+             : $"{heading}, {count} {(count == 1 ? "setting" : "settings")}";
+ 
 -    public static string TabPressedNoPageChange => IsGerman ? "Reiter gedrückt, aber kein Seitenwechsel erkannt." : "Tab pressed, but no page change detected.";
 -    public static string TabNotResponding => IsGerman ? "Reiter reagiert nicht." : "Tab not responding.";
 +    public static string TabPressedNoPageChange => Pick("Reiter gedrückt, aber kein Seitenwechsel erkannt.",
@@ -1585,7 +1590,7 @@ index 9254a0b..dcddcbd 100644
  
      // ── Zusammengesetzte Ansagen (UIReader Etappe 2) ─────────────────
      /// <summary>" item: " / " items: " count label for a gathered/read item list.</summary>
-@@ -838,26 +974,34 @@ public static partial class AccessibilityStrings
+@@ -850,26 +986,34 @@ public static partial class AccessibilityStrings
  
      /// <summary>The word "Level" / "Stufe" - used both standalone and to expand
      /// the game's abbreviated level label.</summary>
@@ -1630,7 +1635,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>One option while stepping through an OPENED drop-down. Names the
      /// stored choice, which a sighted player sees highlighted in the list.</summary>
      public static string DropdownOption(string option, int index, int count, bool selected) =>
-@@ -867,46 +1011,46 @@ public static partial class AccessibilityStrings
+@@ -879,46 +1023,46 @@ public static partial class AccessibilityStrings
      // ── Zur Wegrichtung drehen (Numpad5) ─────────────────────────────
      /// <summary>Spoken after the player was turned towards the guide point.</summary>
      public static string FaceAligned(string distance) =>
@@ -1694,7 +1699,7 @@ index 9254a0b..dcddcbd 100644
  
      // ── Zahl mit ihrer Beschriftung ──────────────────────────────────
      /// <summary>
-@@ -926,13 +1070,13 @@ public static partial class AccessibilityStrings
+@@ -938,13 +1082,13 @@ public static partial class AccessibilityStrings
      // Currency type is only a UI image, so the mod labels amounts by position.
      public static string[] RewardCurrencyLabels =>
          IsGerman ? new[] { "Erfahrung", "Gil" } : new[] { "EXP", "Gil" };
@@ -1711,7 +1716,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>A reward item followed by its description - name first, then the
      /// description, like the ability tooltips (period so the reader pauses).</summary>
      public static string RewardItemWithDescription(string label, string description) =>
-@@ -942,7 +1086,7 @@ public static partial class AccessibilityStrings
+@@ -954,7 +1098,7 @@ public static partial class AccessibilityStrings
      /// dwelled on an inventory item (the name was already announced when the
      /// focus landed) - prefixed so the user knows what is being read.</summary>
      public static string ItemDescription(string description) =>
@@ -1720,7 +1725,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// What a row in an exchange window costs, appended to the item name. The
-@@ -955,49 +1099,61 @@ public static partial class AccessibilityStrings
+@@ -967,49 +1111,61 @@ public static partial class AccessibilityStrings
      /// </summary>
      public static string ShopPrice(uint count, string currency) =>
          currency.Length > 0
@@ -1798,7 +1803,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Bar fill as a whole percent - the same reading a sighted player takes off
-@@ -1020,36 +1176,42 @@ public static partial class AccessibilityStrings
+@@ -1032,36 +1188,42 @@ public static partial class AccessibilityStrings
      /// Das Ziel behaelt den Prozentwert (<see cref="TargetHpSentence"/>) - dort
      /// zeigt das Spiel nie eine Zahl an.</summary>
      public static string HpSentence(uint cur, uint max) =>
@@ -1849,7 +1854,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>", Stufe 12, HP 40 Prozent" - der Anhang fuer eine Zielansage.
      /// Die Stufe kommt aus ICharacter.Level, die HP bleiben prozentual.
-@@ -1057,7 +1219,7 @@ public static partial class AccessibilityStrings
+@@ -1069,7 +1231,7 @@ public static partial class AccessibilityStrings
      public static string TargetLevelHpFragment(byte level, uint cur, uint max)
      {
          var lvl = level > 0
@@ -1858,7 +1863,7 @@ index 9254a0b..dcddcbd 100644
              : string.Empty;
          return max > 0 ? lvl + TargetHpFragment(cur, max) : lvl;
      }
-@@ -1068,69 +1230,86 @@ public static partial class AccessibilityStrings
+@@ -1080,69 +1242,86 @@ public static partial class AccessibilityStrings
      /// irgendwo sieht; das Partyfenster zeichnet daraus "100.00%".</summary>
      public static string VitalStatus(uint hp, uint hpMax, uint mp, uint mpMax, bool hasMp) =>
          hasMp
@@ -1972,7 +1977,7 @@ index 9254a0b..dcddcbd 100644
      // Welche EIGENEN Klassen das Teil tragen koennen - die Frage vorm Verkaufen.
      // Ein- und Mehrzahl getrennt, sonst stolpert die Ansage bei einer Klasse.
      public static string ForYourClasses(string classes, int count) =>
-@@ -1139,76 +1318,112 @@ public static partial class AccessibilityStrings
+@@ -1151,76 +1330,112 @@ public static partial class AccessibilityStrings
              : (count == 1 ? $", for your {classes}" : $", for your classes {classes}");
      // Langform fuer den einzelnen Gegenstand, wo Platz fuer die Warnung ist.
      public static string InGearsetWarning =>
@@ -2130,7 +2135,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>One attribute bonus, e.g. "Stärke plus 4" - name from the sheet.</summary>
      public static string AttributeValue(string name, int v) =>
          IsGerman
-@@ -1231,76 +1446,100 @@ public static partial class AccessibilityStrings
+@@ -1243,76 +1458,100 @@ public static partial class AccessibilityStrings
  
      // Koordinaten-Lauf (Goto/Copy clipboard coords)
      public static string ClipboardUnreadable =>
@@ -2263,7 +2268,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>The full "/acc help" readout: every plugin hotkey and command.
      /// Keys are the current defaults (Page keys, Numpad 3, Plus - kept in sync
-@@ -1379,65 +1618,89 @@ public static partial class AccessibilityStrings
+@@ -1391,65 +1630,89 @@ public static partial class AccessibilityStrings
      //  AutoWalkService - Auto-Lauf, Ziel folgen, Wegenetz-Aufbau
      // ════════════════════════════════════════════════════════════════
      public static string FollowNoTarget =>
@@ -2383,7 +2388,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>
      /// Appended to the stuck message in a housing ward. Names the cause AND the
      /// one-line remedy, because neither is the player's doing: the mesh vnavmesh
-@@ -1450,145 +1713,164 @@ public static partial class AccessibilityStrings
+@@ -1462,145 +1725,164 @@ public static partial class AccessibilityStrings
      /// knows the houses. Says WHY the wait happens - a build starting by itself
      /// would otherwise be an unexplained ten seconds of progress numbers.
      /// </summary>
@@ -2621,7 +2626,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>Target-bar summary: how many slots are filled, plus a warning
      /// when the bar has no keys bound.</summary>
      public static string TargetBarSummary(int bar, int filled, int total, bool anyKey) =>
-@@ -1613,28 +1895,28 @@ public static partial class AccessibilityStrings
+@@ -1625,28 +1907,28 @@ public static partial class AccessibilityStrings
      // ── Skill-Zuweisungs-Menü (modal, Nummernblock) ──
      /// <summary>Spoken when the modal skill menu opens, with the browse hint.</summary>
      public static string SkillMenuOpened(int count) =>
@@ -2662,7 +2667,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>One browsed entry that has nothing but a name: general actions
      /// and mounts. Same shape as the other browse entries so the menu sounds
-@@ -1646,9 +1928,9 @@ public static partial class AccessibilityStrings
+@@ -1658,9 +1940,9 @@ public static partial class AccessibilityStrings
  
      /// <summary>Spoken when the menu switches to the quest-item list.</summary>
      public static string QuestItemMenuOpened(int count) =>
@@ -2675,7 +2680,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>One browsed quest item: name, how many are left, its cast time
      /// and where it already sits. The cast time matters in a fight - three
-@@ -1661,16 +1943,14 @@ public static partial class AccessibilityStrings
+@@ -1673,16 +1955,14 @@ public static partial class AccessibilityStrings
      /// <summary>Spoken when stepping the source list finds nothing else with
      /// entries - the player stays where they are.</summary>
      public static string SkillMenuNoOtherSource =>
@@ -2696,7 +2701,7 @@ index 9254a0b..dcddcbd 100644
  
      // ── Zugang zum Ziel (Aufgangs-Erkennung) ─────────────────────────
      // Wenn das Ziel auf einer Fläche liegt, die im Wegenetz nicht an unserer
-@@ -1679,25 +1959,27 @@ public static partial class AccessibilityStrings
+@@ -1691,25 +1971,27 @@ public static partial class AccessibilityStrings
  
      /// <summary>Approach search: nothing selected to check.</summary>
      public static string ApproachNoTarget =>
@@ -2734,7 +2739,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>Approach search: names the closest reachable spot, how to get
      /// there and how the destination sits relative to it.</summary>
-@@ -1706,8 +1988,12 @@ public static partial class AccessibilityStrings
+@@ -1718,8 +2000,12 @@ public static partial class AccessibilityStrings
      {
          var hoehe = heightDiff switch
          {
@@ -2749,7 +2754,7 @@ index 9254a0b..dcddcbd 100644
              _ => string.Empty,
          };
          return IsGerman
-@@ -1721,63 +2007,63 @@ public static partial class AccessibilityStrings
+@@ -1733,63 +2019,63 @@ public static partial class AccessibilityStrings
  
      /// <summary>Destination name for the walk to the near side of a gap.</summary>
      public static string GapCrossSpotName =>
@@ -2837,7 +2842,7 @@ index 9254a0b..dcddcbd 100644
  
      // Es gab hier drei Ansagen rund um den Fall "Weg endet kurz vorm Ziel"
      // (Umleitung, Restfahrt, Restweg). Der User hat sie am 2026-08-07 direkt
-@@ -1787,59 +2073,63 @@ public static partial class AccessibilityStrings
+@@ -1799,59 +2085,63 @@ public static partial class AccessibilityStrings
  
      /// <summary>Debug probe: the slot it wants to test is not free.</summary>
      public static string ProbeSlotOccupied =>
@@ -2927,7 +2932,7 @@ index 9254a0b..dcddcbd 100644
      /// <summary>One browsed emote: name, chat command (optional), list position.</summary>
      public static string EmoteBrowseEntry(string name, string command, int index, int count) =>
          IsGerman
-@@ -1850,71 +2140,94 @@ public static partial class AccessibilityStrings
+@@ -1862,71 +2152,94 @@ public static partial class AccessibilityStrings
      //  DalamudPluginsService - Plugin-Liste
      // ════════════════════════════════════════════════════════════════
      public static string NoPluginSelected =>
@@ -3054,7 +3059,7 @@ index 9254a0b..dcddcbd 100644
  
      // ════════════════════════════════════════════════════════════════
      //  LootRollService - Beute auswuerfeln (Bedarf / Gier / Passen)
-@@ -1927,21 +2240,23 @@ public static partial class AccessibilityStrings
+@@ -1939,21 +2252,23 @@ public static partial class AccessibilityStrings
  
      /// <summary>Spoken after the roll window was handed the keyboard focus.</summary>
      public static string LootRollFocused =>
@@ -3084,7 +3089,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>One entry of the on-demand readout.</summary>
      public static string LootRollEntry(string name, int count, string options, string ownRoll) =>
-@@ -1968,29 +2283,29 @@ public static partial class AccessibilityStrings
+@@ -1980,29 +2295,29 @@ public static partial class AccessibilityStrings
  
      /// <summary>Seconds left before the roll expires.</summary>
      public static string LootRollRemaining(int seconds) =>
@@ -3124,7 +3129,7 @@ index 9254a0b..dcddcbd 100644
  
      // ════════════════════════════════════════════════════════════════
      //  MessageHistoryService - Nachlese-Kanäle
-@@ -2008,15 +2323,17 @@ public static partial class AccessibilityStrings
+@@ -2020,15 +2335,17 @@ public static partial class AccessibilityStrings
      // wie vorher.
      public static string LegacyChatCategoryName(LegacyChatHistoryService.Category category) => category switch
      {
@@ -3151,7 +3156,7 @@ index 9254a0b..dcddcbd 100644
          _                                              => category.ToString(),
      };
  
-@@ -2024,49 +2341,49 @@ public static partial class AccessibilityStrings
+@@ -2036,49 +2353,49 @@ public static partial class AccessibilityStrings
  
      /// <summary>Menu row that switches between the two chat systems.</summary>
      public static string OptChatSystem =>
@@ -3217,7 +3222,7 @@ index 9254a0b..dcddcbd 100644
  
      // ════════════════════════════════════════════════════════════════
      //  ChatReaderService - gesprochene Kanal-Präfixe
-@@ -2075,54 +2392,56 @@ public static partial class AccessibilityStrings
+@@ -2087,54 +2404,56 @@ public static partial class AccessibilityStrings
      /// <summary>Channel prefix for an incoming chat line ("" = no prefix).</summary>
      public static string ChatPrefix(XivChatType type) => type switch
      {
@@ -3299,7 +3304,7 @@ index 9254a0b..dcddcbd 100644
  
      // ════════════════════════════════════════════════════════════════
      //  UIReaderService - Restpunkte (Benachrichtigung, Countdown)
-@@ -2130,9 +2449,13 @@ public static partial class AccessibilityStrings
+@@ -2142,9 +2461,13 @@ public static partial class AccessibilityStrings
      /// <summary>Notification popup hint; <paramref name="key"/> is the configured
      /// accept hotkey so it stays correct after a rebind.</summary>
      public static string NotificationAccept(string key) =>
@@ -3315,7 +3320,7 @@ index 9254a0b..dcddcbd 100644
  
      // ════════════════════════════════════════════════════════════════
      //  Nachzuegler aus dem Sprach-Audit 2026-08-03
-@@ -2144,14 +2467,16 @@ public static partial class AccessibilityStrings
+@@ -2156,14 +2479,16 @@ public static partial class AccessibilityStrings
  
      // ── Sammel-Fenster (Gathering) ──────────────────────────────────
      public static string GatherChance(string percent) =>
@@ -3337,7 +3342,7 @@ index 9254a0b..dcddcbd 100644
  
      // ── Handwerker-Notizbuch (RecipeNote) ───────────────────────────
      //  Die Werte selbst (Klasse, "Stufe 5", Zahlen) sind GELESENER Client-Text
-@@ -2159,99 +2484,107 @@ public static partial class AccessibilityStrings
+@@ -2171,99 +2496,107 @@ public static partial class AccessibilityStrings
      /// <summary>Spoken once when the crafting log opens: window plus the class
      /// whose recipes are shown ("Handwerker-Notizbuch, Alchemist, Stufe 5").</summary>
      public static string RecipeNoteOpened(string jobAndLevel) =>
@@ -3480,7 +3485,7 @@ index 9254a0b..dcddcbd 100644
  
      // -- Charaktererstellung: Schritt "Aussehen" ---------------------
      // Die Menue-Namen und die Namen der einzelnen Eintraege kommen aus dem
-@@ -2271,7 +2604,9 @@ public static partial class AccessibilityStrings
+@@ -2283,7 +2616,9 @@ public static partial class AccessibilityStrings
          var head = string.IsNullOrEmpty(label) ? string.Empty : label + ", ";
          var body = string.IsNullOrEmpty(name) ? string.Empty : name + ", ";
          if (index <= 0)
@@ -3491,7 +3496,7 @@ index 9254a0b..dcddcbd 100644
          var text = $"{head}{body}" + Counter(index, count);
          return string.IsNullOrEmpty(shape) ? text : $"{text}, {shape}";
      }
-@@ -2286,8 +2621,9 @@ public static partial class AccessibilityStrings
+@@ -2298,8 +2633,9 @@ public static partial class AccessibilityStrings
      /// es informiert.
      /// </summary>
      public static string CharaMakeAuthoredNote =>
@@ -3503,7 +3508,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Was Eintrag 1 eines Typ-0-Form-Menues IST. User: *"every type 1 ... had no
-@@ -2307,7 +2643,7 @@ public static partial class AccessibilityStrings
+@@ -2319,7 +2655,7 @@ public static partial class AccessibilityStrings
      /// bewusst nicht von <see cref="CharaMakeAuthoredNote"/> abgedeckt.
      /// </summary>
      public static string CharaMakeShapeBase =>
@@ -3512,7 +3517,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>Welches Auge eine Farbe betrifft - nur gesprochen, wenn die beiden
      /// sich unterscheiden. Das Spiel hat dafuer keinen eigenen Text: das Lobby-Sheet
-@@ -2315,10 +2651,10 @@ public static partial class AccessibilityStrings
+@@ -2327,10 +2663,10 @@ public static partial class AccessibilityStrings
      /// Fensters. Die Worte sind also mod-eigen, und das ist richtig - einem sehenden
      /// Spieler wird die Trennung ausschliesslich dadurch vermittelt, in welche
      /// Haelfte des Fensters er schaut.</summary>
@@ -3525,7 +3530,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>Eine Farbe OHNE Label und OHNE Position, fuer den Fall dass der
      /// Fokus-Leser die Position schon gesagt hat und dies dahinter eingereiht wird.
-@@ -2326,9 +2662,9 @@ public static partial class AccessibilityStrings
+@@ -2338,9 +2674,9 @@ public static partial class AccessibilityStrings
      public static string CharaMakeColourOnly(string colour, int group, int shade, string eye)
      {
          var head = string.IsNullOrEmpty(eye) ? string.Empty : eye + ", ";
@@ -3538,7 +3543,7 @@ index 9254a0b..dcddcbd 100644
      }
  
      /// <summary>Ein Farbmenue, dessen SCHALTER AUS ist - die Lippenfarbe ohne
-@@ -2352,9 +2688,9 @@ public static partial class AccessibilityStrings
+@@ -2364,9 +2700,9 @@ public static partial class AccessibilityStrings
          if (colour == null)
              return head + Counter(index, count);
          var pos = $"{Counter(index, count)}, ";
@@ -3551,7 +3556,7 @@ index 9254a0b..dcddcbd 100644
      }
  
      /// <summary>Ein 0-100-Schieberegler. Die beiden Endbezeichnungen sind die Worte
-@@ -2365,10 +2701,12 @@ public static partial class AccessibilityStrings
+@@ -2377,10 +2713,12 @@ public static partial class AccessibilityStrings
          // Die Endbezeichnungen fallen weg, sobald der Spieler in EINEM Regler
          // arbeitet: "Klein bis Gross" braucht man einmal, nicht bei jedem Schritt.
          if (string.IsNullOrEmpty(low) || string.IsNullOrEmpty(high))
@@ -3568,7 +3573,7 @@ index 9254a0b..dcddcbd 100644
      }
  
      /// <summary>Ein Schalter der Gesichtsmerkmals-Bitmaske. Die Zahl ist das BIT,
-@@ -2401,7 +2739,7 @@ public static partial class AccessibilityStrings
+@@ -2413,7 +2751,7 @@ public static partial class AccessibilityStrings
      public static string CharaMakeFeatureState(bool on) =>
          IsGerman ? (on ? "an" : "aus") : (on ? "on" : "off");
  
@@ -3577,7 +3582,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>Eine Aussehen-Kategorie, deren aktueller Wert sich nicht als EINE
      /// Position benennen laesst - die Typ-4-Bitmasken-Menues, bei denen das Sheet
-@@ -2409,7 +2747,7 @@ public static partial class AccessibilityStrings
+@@ -2421,7 +2759,7 @@ public static partial class AccessibilityStrings
      /// ehrlich sagen laesst, und der User hat genau danach gefragt: *"the total number
      /// of selections per value is useful information to have"*.</summary>
      public static string CharaMakeCategory(string label, int count) =>
@@ -3586,7 +3591,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Die ZWEITE Achse des Stimmen-Waehlers - die Hoerprobe, die das Spiel abspielt,
-@@ -2427,7 +2765,7 @@ public static partial class AccessibilityStrings
+@@ -2439,7 +2777,7 @@ public static partial class AccessibilityStrings
      /// </summary>
      public static string CharaMakeVoiceSample(string name, int index, int count)
      {
@@ -3595,7 +3600,7 @@ index 9254a0b..dcddcbd 100644
          var lead = string.IsNullOrEmpty(name) ? head : $"{head}, {name}";
          return $"{lead}, {Counter(index, count)}";
      }
-@@ -2440,7 +2778,7 @@ public static partial class AccessibilityStrings
+@@ -2452,7 +2790,7 @@ public static partial class AccessibilityStrings
      /// <summary>Ersatzbezeichnung fuer den Stimmen-Waehler. Normal wird das
      /// Lobby-Label des Spiels benutzt; das hier deckt eine Zeile ohne Stimmen-Menue
      /// ab.</summary>
@@ -3604,7 +3609,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Markiert in der Aussehen-Zusammenfassung einen Wert, den das SPIEL selbst
-@@ -2452,14 +2790,15 @@ public static partial class AccessibilityStrings
+@@ -2464,14 +2802,15 @@ public static partial class AccessibilityStrings
      /// zwar ueber ein Menue, in dem er gar nicht ist.
      /// </summary>
      public static string CharaMakeChangedByGame =>
@@ -3623,7 +3628,7 @@ index 9254a0b..dcddcbd 100644
  
      // ── Tiefes Gewoelbe ─────────────────────────────────────────────
      //
-@@ -2468,22 +2807,22 @@ public static partial class AccessibilityStrings
+@@ -2480,22 +2819,22 @@ public static partial class AccessibilityStrings
      // darum: welche Art von Wirkung eine Zeile ist, wo ein Platz sitzt, ob er leer ist.
  
      /// <summary>Ein ebenenweiter Zustand (DeepDungeonStatus).</summary>
@@ -3652,7 +3657,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Welches Gewoelbe und welche Ebene davon. Beide Hauptwoerter gehoeren dem SPIEL -
-@@ -2504,25 +2843,27 @@ public static partial class AccessibilityStrings
+@@ -2516,25 +2855,27 @@ public static partial class AccessibilityStrings
      /// Taste wird aus Gewohnheit gedrueckt, sobald ein Lauf vorbei ist.
      /// </summary>
      public static string DeepFloorOutside =>
@@ -3687,7 +3692,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>Wie viele Truhen der Director in einen Raum legt, im spieleigenen Wort
      /// fuer eine Truhe.</summary>
-@@ -2531,12 +2872,12 @@ public static partial class AccessibilityStrings
+@@ -2543,12 +2884,12 @@ public static partial class AccessibilityStrings
  
      /// <summary>Wohin ein Raum sich oeffnet, aus seinen eigenen Verbindungs-Flags.</summary>
      public static string DeepRoomExits(System.Collections.Generic.IEnumerable<string> directions) =>
@@ -3705,7 +3710,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Ein aufgedeckter Raum, fuer den es keinen begehbaren Punkt gibt.
-@@ -2548,17 +2889,17 @@ public static partial class AccessibilityStrings
+@@ -2560,17 +2901,17 @@ public static partial class AccessibilityStrings
      /// keine Koordinaten, der einzige begehbare Punkt ist also einer, auf dem es den
      /// Spieler stehen gesehen hat.
      /// </summary>
@@ -3726,7 +3731,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Wo ein Platz in seinem Abschnitt sitzt ("3 von 16"), oder "", wenn der Spieler
-@@ -2575,7 +2916,7 @@ public static partial class AccessibilityStrings
+@@ -2587,7 +2928,7 @@ public static partial class AccessibilityStrings
      public static string DeepGearStrength(string name, int strength) => $"{name} +{strength}";
  
      /// <summary>Ein Platz, den dieses Gewoelbe gar nicht benutzt.</summary>
@@ -3735,7 +3740,7 @@ index 9254a0b..dcddcbd 100644
  
      /// <summary>
      /// Ein Platz, den das Gewoelbe SEHR WOHL benutzt, mit der Anzahl im Besitz -
-@@ -2584,14 +2925,14 @@ public static partial class AccessibilityStrings
+@@ -2596,14 +2937,14 @@ public static partial class AccessibilityStrings
      /// also, WOFUER der Platz ist, bevor er einen besitzt.
      /// </summary>
      public static string DeepSlotCount(string name, int count) =>

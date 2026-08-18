@@ -1,7 +1,7 @@
-From 57b563df97b8efee30a6136504e01575c2e64f7f Mon Sep 17 00:00:00 2001
+From e1e48c7022eb5525e491f6a66bd02c86b3f62f15 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 20:41:44 +0900
-Subject: [PATCH 01/11] Compat shim: keep the gearset mark on ClientStructs
+Subject: [PATCH 01/14] Compat shim: keep the gearset mark on ClientStructs
  7.51
 
 RaptureGearsetModule.IsItemRegisteredToGearset exists in ClientStructs

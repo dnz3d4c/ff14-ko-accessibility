@@ -1,7 +1,7 @@
-From e73f87197b5f280cfb7233905331631711d23c8c Mon Sep 17 00:00:00 2001
+From 7e7c7f2c1e3a5115e2e58f43dfb5dfabca5bbaac Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 17:38:23 +0900
-Subject: [PATCH 07/11] Korean: add it as a third language, falling back to
+Subject: [PATCH 07/14] Korean: add it as a third language, falling back to
  English until translated
 
 IsGerman was a bool, so every caller had exactly two answers available, and
@@ -172,7 +172,7 @@ index 8144bdf..ac59204 100644
 +        Aliases.TryGetValue(arg.Trim(), out var found) ? found : null;
  }
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index 6fdb31d..9bcb253 100644
+index 20c418f..be08ab2 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
 @@ -651,7 +651,12 @@ public sealed class Plugin : IDalamudPlugin
@@ -190,7 +190,7 @@ index 6fdb31d..9bcb253 100644
              ? AccessibilityStrings.LanguageAuto(languageName)
              : AccessibilityStrings.LanguageSet(languageName));
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index dc577d5..9254a0b 100644
+index 3ae2207..cd4f57d 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -74,6 +74,7 @@ public static partial class AccessibilityStrings

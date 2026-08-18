@@ -1,4 +1,4 @@
-From 9c387a5ad3f23f5e1e9ea6c1bdd87f90725e21ee Mon Sep 17 00:00:00 2001
+From 5a2a34e1f68c2958007bc8e85c22034b3caccbdb Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 21:59:40 +0900
 Subject: [PATCH 13/14] Startup: write the compatibility note, do not speak it
@@ -17,7 +17,7 @@ for, not by an announcement nobody asked for.
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index 9bcb253..cc5029d 100644
+index be08ab2..f9de7de 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
 @@ -436,11 +436,13 @@ public sealed class Plugin : IDalamudPlugin
@@ -38,3 +38,6 @@ index 9bcb253..cc5029d 100644
      }
  
      private void RegisterCommands()
+-- 
+2.55.0.windows.3
+

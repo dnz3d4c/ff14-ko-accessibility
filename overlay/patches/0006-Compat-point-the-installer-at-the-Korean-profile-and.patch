@@ -1,7 +1,7 @@
-From c78f3044d8695a0addad7d426d55e0cb86660b74 Mon Sep 17 00:00:00 2001
+From e14e8a2967bcdae0ca79f42185887cc3c93e70e4 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:24:06 +0900
-Subject: [PATCH 06/11] Compat: point the installer at the Korean profile and a
+Subject: [PATCH 06/14] Compat: point the installer at the Korean profile and a
  local build
 
 The installer is the right shape for this project - Dalamud's own plugin

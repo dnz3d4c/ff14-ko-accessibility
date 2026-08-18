@@ -1,7 +1,7 @@
-From ff9441233b17bef167df94e6d9948c31eb76d5fa Mon Sep 17 00:00:00 2001
+From 55e48d2af1a26c27aa0fff39dd003204d53e0926 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 23:22:27 +0900
-Subject: [PATCH 04/11] Compat: call the game's own IsVisible, and say which
+Subject: [PATCH 04/14] Compat: call the game's own IsVisible, and say which
  path is live
 
 Two answers the game normally gives were coming from somewhere else, and
@@ -427,7 +427,7 @@ index 6b7f505..9ea9a55 100644
      }
  }
 diff --git a/FF14Accessibility/Plugin.cs b/FF14Accessibility/Plugin.cs
-index ace424f..065a6d9 100644
+index e27e18a..3b5f59c 100644
 --- a/FF14Accessibility/Plugin.cs
 +++ b/FF14Accessibility/Plugin.cs
 @@ -36,6 +36,9 @@ public sealed class Plugin : IDalamudPlugin

@@ -1,7 +1,7 @@
-From 7080840cfba7604a8ae96ab64ad2fce64d111067 Mon Sep 17 00:00:00 2001
+From 9b6e2e8af772ac22c205aec7ca9ac4ba1e7df93f Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 20:07:19 +0900
-Subject: [PATCH 11/11] Compat: take the profile root from the updater's own
+Subject: [PATCH 11/14] Compat: take the profile root from the updater's own
  setting
 
 The Korean profile root was written down in three places at once - here, in

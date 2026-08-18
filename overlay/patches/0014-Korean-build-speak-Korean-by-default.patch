@@ -1,4 +1,4 @@
-From 9bc41ed59848c057b2f6f6e7294ae4787fc9c006 Mon Sep 17 00:00:00 2001
+From 9ef8a5cc477fc61c497311d38eda3b797eff7529 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 21:59:41 +0900
 Subject: [PATCH 14/14] Korean build: speak Korean by default
@@ -40,3 +40,6 @@ index fe24223..3fc6287 100644
  
      // Tastaturbelegung. Standard ab V4.21 kollisionsfrei laut Live-Keybind-Dump
      // (2026-07-10): N ist der einzige freie Buchstabe, Strg+F1..F12 sind frei.
+-- 
+2.55.0.windows.3
+

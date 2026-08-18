@@ -1,4 +1,4 @@
-From f1b0e8d0864de92bceeee470a9660905523c364e Mon Sep 17 00:00:00 2001
+From 45b75032ffffc81072efa8f7bf64d06bf923b77c Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 21:59:32 +0900
 Subject: [PATCH 12/14] Installer: install as a normal plugin, not a dev plugin
@@ -613,3 +613,6 @@ index 0dc0135..0af1e3e 100644
          ApplicationConfiguration.Initialize();
  
          // Phase 2 des Selbst-Updates: aus %TEMP% gestartet, ersetzt die
+-- 
+2.55.0.windows.3
+

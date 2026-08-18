@@ -1,4 +1,4 @@
-From 0833c2224648fe3018ade86eb416f5555bc15352 Mon Sep 17 00:00:00 2001
+From 2f3e0e21cd8d77f394f6da519f878126a3e45d6a Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 09:26:59 +0900
 Subject: [PATCH] Hunting targets no longer run the habitat into the area name

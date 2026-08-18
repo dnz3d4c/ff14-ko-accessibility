@@ -109,6 +109,18 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 **안 보내는 이유**: 옮겨 간 경로에도 완성 검사가 없어서 다른 클라에서 맞는지 소스만으로 판정이 안 된다. 상세는 [patches/rejected.md](../../patches/rejected.md). **KR에서는 재는 대로 나아졌으므로 우리 것으로 남긴다.**
 
+### 0011 — 프로필 루트를 업데이터 설정에서 읽는다
+
+`0006`이 프로필 루트를 박아 뒀다. 그런데 그 값을 실제로 정하는 건 KR Dalamud 업데이터고, 그쪽 `README-KR.txt`가 **"사용자 설정은 `%APPDATA%\KrDalamudUpdater\settings.json`에 보관됩니다"**라고 적어 뒀다. `ProfileRoot`가 거기 있고 사용자가 바꿀 수 있다.
+
+**갈리면 오류가 안 난다.** 설치기는 옛 폴더에 넣고, 업데이터는 자기 설정대로 다른 폴더를 보고, 거기가 비었으니 **빈 프로필을 새로 만들어 주입한다.** 게임도 Dalamud도 뜨고 플러그인만 빠진다.
+
+그래서 묻는다 — ① `FF14ACC_KR_PROFILE`(우리 탈출구) ② 업데이터 설정의 `ProfileRoot` ③ `%APPDATA%\XIVLauncherKR`(업데이터 기본값과 같은 값).
+
+**읽기만 한다.** 남의 설정 파일에 **쓰는** 것이 §4-3이 막는 것이고, 문서에 적힌 사용자 설정을 읽는 것은 거기 해당하지 않는다. 오히려 **박아 두는 쪽이 결합이 더 세다** — 박으면 "그쪽 기본값이 안 바뀐다"와 "사용자가 안 고친다" 둘 다에 걸어야 하는데, 읽으면 앞의 하나만 남고 그마저 폴백이 받는다.
+
+같은 규칙을 `run/_env.cmd`와 `tools/kr-setup/check_log.py`도 쓴다. 원천은 `tools/kr-setup/kr_profile.py`이고, 셋이 갈라지면 테스트가 빨개진다.
+
 ## 한국어 패치는 생성물이다
 
 **마지막 패치(`0008`)만 다르다.** 나머지는 손으로 쓴 diff고, 이건 `overlay/ko/ko.json`에서 기계가 만든다.

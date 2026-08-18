@@ -1,7 +1,7 @@
 From 15122a6950474f4d64540b5d01d7c90c27ee1370 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:51:52 +0900
-Subject: [PATCH 10/10] Titelmenue: die Eintragszahl erst nennen, wenn das
+Subject: [PATCH 10/11] Titelmenue: die Eintragszahl erst nennen, wenn das
  Menue fertig ist
 
 Beim Oeffnen sagte das Hauptmenue eine zu kleine Zahl. Gemessen am

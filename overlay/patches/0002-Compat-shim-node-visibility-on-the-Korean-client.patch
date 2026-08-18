@@ -1,7 +1,7 @@
 From b78f383762aa36297f3e139fbd059089f637b5c0 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 21:42:33 +0900
-Subject: [PATCH 02/10] Compat shim: node visibility on the Korean client
+Subject: [PATCH 02/11] Compat shim: node visibility on the Korean client
 
 ClientStructs declares AtkResNode.IsVisible() as a pure game call with the
 signature E8 ?? ?? ?? ?? 3C 01 75 7F and no managed body. That pattern is

@@ -1,7 +1,7 @@
 From e73f87197b5f280cfb7233905331631711d23c8c Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 17:38:23 +0900
-Subject: [PATCH 07/10] Korean: add it as a third language, falling back to
+Subject: [PATCH 07/11] Korean: add it as a third language, falling back to
  English until translated
 
 IsGerman was a bool, so every caller had exactly two answers available, and

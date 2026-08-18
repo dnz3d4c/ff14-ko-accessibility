@@ -1,7 +1,7 @@
 From db79d1c7a7ad7206548245a564c506cee33c9755 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 22:45:58 +0900
-Subject: [PATCH 03/10] Accept the Korean confirm-button label
+Subject: [PATCH 03/11] Accept the Korean confirm-button label
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

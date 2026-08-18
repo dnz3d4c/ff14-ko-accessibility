@@ -1,7 +1,7 @@
 From f9fa45a24e70bb3b854ad45caf81e623c76d4753 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 00:15:46 +0900
-Subject: [PATCH 05/10] Compat: hand the replica back on unload, and stop
+Subject: [PATCH 05/11] Compat: hand the replica back on unload, and stop
  overstating who resolved
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8

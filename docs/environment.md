@@ -65,7 +65,9 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | `addon\Hooks` | 388MB | Dalamud 런타임 |
 | `dalamudAssets` | 70MB | Dalamud |
 | `devPlugins\vnavmesh` | 5.5MB의 대부분 | 남의 플러그인 |
-| `devPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
+| `installedPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
+
+우리 것이 `installedPlugins`에 있는 이유는 [kr-runtime-setup.md](kr-runtime-setup.md) §7이 갖는다. 개발 중에는 `devPlugins`에 놓이고, 그 둘은 **동시에 있으면 안 된다.**
 
 ### 바꿀 수 있다. 우리가 따라간다 (2026-08-18)
 
@@ -209,7 +211,7 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 | 8 | KR에 영어 시트 존재 | **해소 — 없다** | `run\terms.bat langs`가 sqpack에서 읽어 낸 언어는 한국어 하나뿐이다(Addon 19,592행). 영어·일본어·독일어·프랑스어 전부 0. 그래서 용어를 "영어로 찾아 한국어를 읽는" 방식이 로컬에서는 안 되고, 행 번호로 짚어야 한다 (`tools/ko-terms/README.md`) |
 | 9 | UI 노드 ID/휴리스틱 | **부분 해소, 결함 1건 발견** | 아래 참조 |
 | 10 | 채팅 채널 ID | **미확인** | 인게임 대화 미시도 |
-| 11 | 커스텀 저장소 로드 | **해당 없음** | devPlugins 경로를 쓴다 |
+| 11 | 커스텀 저장소 로드 | **해당 없음** | 설치기가 파일을 직접 놓는다. 저장소를 등록하지 않아도 정식 플러그인으로 뜬다 |
 | 12 | Tolk→NVDA 한글 전달 | **해소** | 한국어 UI 텍스트가 NVDA로 발화됨 |
 
 ### 실기에서 새로 발견한 것

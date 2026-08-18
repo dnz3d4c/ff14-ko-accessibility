@@ -16,7 +16,7 @@ KR Dalamud 업데이터는 **기존 `%APPDATA%\XIVLauncherKR` 프로필이 있�
 |---------|------|
 | `dalamudConfig.json`, `installedPlugins` | 업데이터가 오류 창을 무한 생성 |
 | `DALAMUD_RUNTIME` 환경변수 | "적용 완료"가 뜨는데 실제로는 게임 안에서 CLR이 안 뜸 |
-| dev 플러그인 설정 시딩 | 플러그인이 **조용히** 안 뜸 (오류도 없음) |
+| 플러그인 설정 시딩 (§7) | 플러그인이 **조용히** 안 뜸 (오류도 없음) |
 
 ## 0. 설치기가 이 절차를 대신한다
 
@@ -76,17 +76,42 @@ hook 폴더 이름이 버전이라 **업데이트마다 바뀐다.** 빌드용 `
 
 DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
 
-산출물 `bin/Release/net10.0-windows/FF14Accessibility/latest.zip`을 `%APPDATA%\XIVLauncherKR\devPlugins\FF14Accessibility\`에 푼다.
+산출물은 `bin/Release/net10.0-windows/FF14Accessibility/latest.zip`이다. 어디에 푸는지는 다음 절이 가른다.
 
-## 7. dev 플러그인 설정 시딩
+## 7. 어디에 놓고 무엇을 심나 — 경로가 둘이다
 
-**게임을 끈 상태에서** 한 번만 하면 된다. Dalamud는 종료할 때 설정을 저장하므로 켜져 있으면 덮인다.
+**배포와 개발이 서로 다른 자리를 쓴다.** 둘 다 되지만 **동시에 있으면 안 된다** — Dalamud는 한 번의 기동에서 정식 플러그인과 dev 플러그인을 같이 훑기 때문에, 두 사본이 같은 명령(`/acc`)과 같은 단축키를 두 번 등록한다.
+
+| | 정식 (사용자가 받는 것) | 개발 (이 저장소에서 고칠 때) |
+|---|---|---|
+| 놓는 곳 | `installedPlugins\FF14Accessibility\<버전>\` | `devPlugins\FF14Accessibility\` |
+| 누가 | 설치기 (`dist\FF14AccessibilityInstaller-KR.exe`) | `run\build.bat` |
+| Dalamud가 뭐라고 부르나 | 보통 플러그인 | 개발용 플러그인 |
+| 고친 것 반영 | 게임 재시작 | **파일만 덮으면 몇 초 안에 다시 적재** |
+
+`run\build.bat`은 정식 설치본을 먼저 지우고, 설치기는 dev 사본을 먼저 지운다. 그래서 마지막에 돌린 쪽이 그 머신의 상태다.
+
+### 정식 경로에서 적재를 가르는 것 셋
+
+Dalamud 소스(`PluginManager`·`LocalPlugin`)에서 확인한 것이고, **어긋나면 오류가 아니라 침묵이다.**
+
+- **버전 폴더 이름이 버전으로 파싱돼야 한다.** `CleanupPlugins`가 아닌 폴더를 지운다 — 플러그인이 조용히 사라진다
+- **매니페스트에 `InstalledFromUrl`이 있어야 한다.** 어느 저장소와도 안 맞으면 `LocalPlugin.IsOrphaned`가 참이 되고, 고아는 적재를 건너뛴다. `OFFICIAL`(`SpecialPluginSource.MainRepo`)이면 제3자 매니페스트가 아니게 되어 기본 저장소가 받아 준다. **커스텀 저장소를 등록하지 않아도 되는 이유가 이것이다**
+- **프로필 항목이 매니페스트와 같은 `WorkingPluginId`를 가져야 한다.** 설치기가 양쪽을 같이 심고, 갱신할 때도 같은 값을 물려준다 — 안 그러면 프로필에 죽은 항목이 쌓인다
+
+### 개발 경로 시딩
+
+**게임을 끈 상태에서** 한 번만 하면 된다. Dalamud는 종료할 때 설정을 저장하므로 켜져 있으면 덮인다. (`run\build.bat`이 매번 부르지만, 이미 심겨 있으면 아무것도 쓰지 않는다.)
 
 uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLauncherKR\dalamudConfig.json" "%APPDATA%\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Accessibility.dll" FF14Accessibility
 
-세 조건을 동시에 맞춘다 — `DevMode`, `DevPluginSettings.StartOnBoot`, `DefaultProfile`의 **같은 GUID**로 `IsEnabled`. 근거는 업스트림 `Installer/InstallerService.cs:505-576`이 디컴파일로 확인해 둔 것이고, 하나라도 어긋나면 오류 없이 조용히 안 뜬다.
+세 조건을 동시에 맞춘다 — `DevMode`, `DevPluginSettings.StartOnBoot`, `DefaultProfile`의 **같은 GUID**로 `IsEnabled`. 근거는 업스트림 `Installer/InstallerService.cs`가 디컴파일로 확인해 둔 것이고, 하나라도 어긋나면 오류 없이 조용히 안 뜬다.
 
 `AutomaticReloading`을 켜 두므로 **이후 재빌드는 파일만 덮어쓰면 게임 재시작 없이 반영된다.**
+
+### 어느 쪽으로 떴는지 보는 법
+
+`run\log.bat`이 말해 준다(`적재 경로: 정식 플러그인 / 개발용 플러그인`). 둘 다 뜨면 **실패로 세고** 걷어내라고 한다. Dalamud 로그의 원문은 `Loading plugin FF14Accessibility`와 `Loading dev plugin FF14Accessibility`다.
 
 ## 8. vnavmesh — 설치기가 갖는다
 
@@ -96,7 +121,7 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 ### 손으로 깔지 않는다
 
-**업스트림 방식을 그대로 따른다** — 설치기가 puni.sh 매니페스트(`https://puni.sh/api/repository/veyn`)에서 최신 판을 받고, `devPluginsnavmeshnavmesh.json`의 버전과 비교해 새 것일 때만 덮는다(`Installer/InstallerService.cs:278-300`).
+**업스트림 방식을 그대로 따른다** — 설치기가 puni.sh 매니페스트(`https://puni.sh/api/repository/veyn`)에서 최신 판을 받고, `devPlugins\vnavmesh\vnavmesh.json`의 버전과 비교해 새 것일 때만 덮는다(`Installer/InstallerService.cs:278-300`).
 
 **손으로 받아 심으면 그 버전에 묶여 갱신이 멈춘다.** 그래서 `run\setup.bat`은 vnavmesh를 건드리지 않는다. 설치기를 쓴다.
 
@@ -110,7 +135,7 @@ vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud
 
 ### Dalamud 플러그인 창을 왜 안 쓰나
 
-그 창이 ImGui라 스크린리더에 읽히지 않는다. 그래서 dev 플러그인 경로로 우회한다 — 업스트림이 설치기를 만든 이유가 그거고, 경로 규약도 같다(`Installer/InstallerService.cs:279`).
+그 창이 ImGui라 스크린리더에 읽히지 않는다. 그래서 설치기가 파일을 직접 놓는다 — 업스트림이 설치기를 만든 이유가 그거다. vnavmesh는 남의 플러그인이라 dev 경로에 그대로 둔다. 정식 경로로 옮기려면 그쪽 저장소를 **사용자의 Dalamud 설정에 등록**해야 하고, 그건 §4-3이 막는 "남의 설정에 쓰는" 쪽에 가깝다.
 
 ### 이 머신에 깔린 판
 
@@ -148,6 +173,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 | `"Language": "Korean"` | `dalamud.troubleshooting.json` | KR 언어 패치 작동 |
 | `Lumina is ready: ...\game\sqpack` | `dalamud-kr-gui.log` | 게임 데이터 판독 가능 |
 | `[LocalPlugin] Finished loading FF14Accessibility` | 같은 로그 | 플러그인 로드 |
+| `[PluginManager] Loading plugin FF14Accessibility` | 같은 로그 | 정식 경로로 떴다 (`dev plugin`이면 개발 경로, §7) |
 | `[LocalPlugin] Finished loading vnavmesh` | 같은 로그 | 자동 이동 가능 |
 | `[Compat] ... Korean signature` | 같은 로그 | 노드 가시성이 게임 함수 |
 | `[Speak] '...'` | 같은 로그 | 음성 출력 도달 |

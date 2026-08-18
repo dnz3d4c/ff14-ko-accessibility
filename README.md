@@ -71,7 +71,8 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 
 KR 검증 (전부 게임을 켜지 않고 돈다):
 
-- `kr-setup/` — KR 프로필에 dev 플러그인을 심고, 로그를 기계로 판정한다
+- `kr-setup/` — 개발용 배포를 KR 프로필 설정에 심고, 로그를 기계로 판정한다
+- `pack-check/` — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지 잰다. 설치기를 버리는 프로필에 대고 실제로 돌려 본다 (`run\pack.bat` 3단계)
 - `cs-api-diff/` — 두 FFXIVClientStructs 어셈블리의 API 차이. `sigs` 인자를 주면 시그니처 문자열과 필드 오프셋을 뽑는다
 - `sig-probe/` — `ffxiv_dx11.exe`에서 시그니처를 해석한다. 우리가 박아 넣은 KR 시그니처가 아직 유일하게 잡히는지 테스트가 확인한다
 - `asmref-check/` — 플러그인 어셈블리가 부르는 타입·멤버가 KR이 깐 FFXIVClientStructs에 실제로 있는지 대조한다

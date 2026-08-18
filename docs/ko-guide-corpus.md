@@ -60,7 +60,7 @@
 | 무엇 | 어디 | 성격 |
 |------|------|------|
 | 문서 대장 | `tools/ko-guide/corpus.json` | 무엇을 어디서 받았나 + 원문에서 센 통계 |
-| 인용 대장 | `overlay/ko/guide-quotes.json` | **우리가 실제로 인용한 문장.** 지금 12줄이다 |
+| 인용 대장 | `overlay/ko/guide-quotes.json` | **우리가 실제로 인용한 문장.** 지금 17줄이다 |
 | 규칙 | `.claude/skills/ko-user-guide/SKILL.md` | 그 인용에서 뽑은 형식 규약 |
 
 ## 5. 무엇이 검사되나

@@ -13,6 +13,7 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 | 문서 | 무엇을 갖는가 |
 |------|---------------|
 | **[프로젝트 현황판](docs/status.md)** | **남은 일의 기준.** 다른 문서는 근거만 갖는다 |
+| **[한국어 README](overlay/ko/README.ko.md)** | **사용자가 읽는 문서.** 설치·실행·키·명령어·문제 해결 |
 | [한국 클라이언트 포팅 타당성 조사](docs/ko-client-port-feasibility.md) | 착수 전 조사. **당시 표현 그대로 동결**했다 |
 | [개발 환경 실측과 설치 결과](docs/environment.md) | 경로·버전·빌드 함정 |
 | [KR 실행 환경 구축 절차](docs/kr-runtime-setup.md) | 손으로 세울 때의 절차. 설치기가 이걸 대신한다 |
@@ -45,7 +46,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 - `vendor/ff14-accessibility/` — upstream 클론. **버전 관리에서 제외**된다. 직접 손대지 않고 `kr-port` 브랜치에 커밋한 뒤 패치로 떼어낸다. 채택 시 submodule로 전환한다
 - `patches/` — **업스트림에 보낼** 변경. `overlay/`보다 **먼저** 적용된다. 기각된 후보는 [rejected.md](patches/rejected.md)에 남고 다시 만들지 않는다
 - `overlay/patches/` — **한국 전용** 소스 패치
-- `overlay/ko/` — 한국어의 원본. `ko.json`이 `(독일어, 영어) → 한국어` 표이고, `terms.json`이 게임 한국어판에서 뽑은 용어 대장, `guide-quotes.json`이 공식 가이드에서 인용한 문장 대장이다. **소스는 여기서 생성된다**
+- `overlay/ko/` — 한국어의 원본. `ko.json`이 `(독일어, 영어) → 한국어` 표이고, `terms.json`이 게임 한국어판에서 뽑은 용어 대장, `guide-quotes.json`이 공식 가이드에서 인용한 문장 대장, `README.ko.md`가 사용자에게 주는 문서다. **소스는 여기서 생성된다**
 - `upstream.json` — **우리 패치가 어느 판 위에 얹혀 있는지.** `vendor/`가 버전 관리 밖이라 이게 유일한 기록이다
 
 ### 도구 (`tools/`)

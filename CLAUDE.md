@@ -49,6 +49,14 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 새로 확정한 실행 대상은 여기에 즉시 추가한다.
 
+## 사용자 문서를 쓸 때 [필수]
+
+사용자가 읽는 문서(가이드·설치 안내·사용법·도움말)는 **파판14 공식 가이드의 형식과 문체**를 따른다. 규칙 전체는 [ko-user-guide 스킬](.claude/skills/ko-user-guide/SKILL.md)이 갖고, 여기 셋만 남긴다.
+
+- **말투를 헷갈리지 마라.** TTS로 나가는 모드 문장은 명사형·해라체([ko-localization](.claude/skills/ko-localization/SKILL.md)), 사람이 읽는 문서는 습니다체다. 같은 저장소 안에서 반대다.
+- **이름은 지어내지 않는다.** 화면에 뜨는 낱말은 `overlay/ko/terms.json`이 먼저고, 메뉴 경로·기능 이름은 `run\guide.bat find <낱말>`로 공식 가이드에서 찾는다. 둘 다 없으면 **못 찾았다고 적고 묻는다.**
+- **공식 가이드가 눈에 기대는 자리는 안 베낀다.** 위치(`우측의`)·색(`파란색일 경우`)·마우스 전용 조작·그림 참조는 그대로 옮기면 안 된다. 이름과 경로, 상태 이름, 키보드·명령어 경로로 바꾼다. 어디가 그런 자리인지는 `run\guide.bat scan`이 센다.
+
 ## vendor 취급 [필수]
 
 `vendor/ff14-accessibility/`는 업스트림 클론이고 **우리 저장소의 버전 관리 밖**이다.
@@ -65,6 +73,7 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 여기에 베끼지 않는다. 어긋나면 문서가 맞다.
 
 - 개발 환경·경로·빌드 명령: `docs/environment.md`
+- 공식 가이드 코퍼스(무엇을 받아 뒀고 어떻게 찾나): `docs/ko-guide-corpus.md`
 - 커밋 규칙: `docs/commit-rules.md`
 - 업스트림 동기화: `docs/upstream-sync.md`
 - 포팅 판단 근거: `docs/ko-client-port-feasibility.md`

@@ -45,7 +45,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 - `vendor/ff14-accessibility/` — upstream 클론. **버전 관리에서 제외**된다. 직접 손대지 않고 `kr-port` 브랜치에 커밋한 뒤 패치로 떼어낸다. 채택 시 submodule로 전환한다
 - `patches/` — **업스트림에 보낼** 변경. `overlay/`보다 **먼저** 적용된다. 기각된 후보는 [rejected.md](patches/rejected.md)에 남고 다시 만들지 않는다
 - `overlay/patches/` — **한국 전용** 소스 패치
-- `overlay/ko/` — 한국어의 원본. `ko.json`이 `(독일어, 영어) → 한국어` 표이고, `terms.json`이 게임 한국어판에서 뽑은 용어 대장이다. **소스는 여기서 생성된다**
+- `overlay/ko/` — 한국어의 원본. `ko.json`이 `(독일어, 영어) → 한국어` 표이고, `terms.json`이 게임 한국어판에서 뽑은 용어 대장, `guide-quotes.json`이 공식 가이드에서 인용한 문장 대장이다. **소스는 여기서 생성된다**
 - `upstream.json` — **우리 패치가 어느 판 위에 얹혀 있는지.** `vendor/`가 버전 관리 밖이라 이게 유일한 기록이다
 
 ### 도구 (`tools/`)
@@ -56,6 +56,10 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 - `ko-terms/` — 게임을 켜지 않고 KR `sqpack`의 Addon 시트를 Lumina로 읽는다. 용어 대장의 출처
 - `ko-words/` — 번역이 **실제로 쓴** 낱말을 전부 모아 게임 덤프와 대조한다. 대장에 적는 것을 잊어도 잡힌다
 - `strings-golden/` — 한국어화 전 독일어·영어 688쌍 스냅샷. 옮기다 건드리면 빨개진다
+
+사용자 문서:
+
+- `ko-guide/` — 파판14 **공식 가이드**를 받아 두고 우리가 베낄 형식을 뽑는다. 문체 규약과 "눈으로 읽는 자리"의 근거가 여기서 나온다. 원문은 저장소 밖이다 ([코퍼스 안내](docs/ko-guide-corpus.md), [스킬](.claude/skills/ko-user-guide/SKILL.md))
 
 저장소 규율:
 

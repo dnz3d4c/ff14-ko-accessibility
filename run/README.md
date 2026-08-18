@@ -10,6 +10,7 @@
 | `build.bat` | 소스를 고친 뒤 반영 | 켜져 있어도 됨 |
 | `log.bat` | 이번 판이 정상인지 판정 | 아무 때나 |
 | `sync.bat` | 업스트림이 앞서 갔는지 보고, 깨끗하면 올린다 | 아무 때나 |
+| `terms.bat` | 게임이 쓰는 한국어 낱말 찾기 (sqpack 직독) | **꺼져 있어도 됨** |
 | `setup.bat` | **최초 1회.** 프로필 부트스트랩 + dev 플러그인 시딩 | **꺼져 있어야 함** |
 | `pack.bat` | 남에게 줄 배포 폴더 만들기 | 아무 때나 |
 | `_env.cmd` | 직접 실행하지 않는다. 나머지가 경로를 얻는 곳 | — |
@@ -29,6 +30,10 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 `setup.bat`과 설치기 EXE는 **같은 일을 한다.** 이 저장소 안에서 개발하며 쓸 때는 `setup.bat`이 빠르고, 남에게 주거나 다른 PC에 옮길 때는 `pack.bat`이 낸 `dist/`를 통째로 건넨다.
 
 `setup.bat`이 게임을 끈 상태를 요구하는 이유는 Dalamud가 **종료할 때 설정을 저장하기 때문**이다. 켜 놓고 심으면 조용히 덮인다.
+
+`terms.bat`은 게임을 안 켜고 `game\sqpack`을 직접 읽는다. 그래서 한국어화 중에 "게임이 이걸 뭐라고 부르지"가 막힐 때 사용자를 기다릴 필요가 없다. 자세한 것은 [tools/ko-terms/README.md](../tools/ko-terms/README.md).
+
+    run\terms.bat dump tools\ko-terms\out
 
 ## 경로를 박아 넣지 않는다
 

@@ -13,3 +13,8 @@ __pycache__/
 
 # 배포 산출물 (run\pack.bat이 만든다). 162MB EXE라 저장소에 넣지 않는다.
 dist/
+
+# 게임 데이터 덤프 (run\terms.bat이 만든다). 스퀘어에닉스의 텍스트를 통째로
+# 재배포하지 않는다 - 우리가 실제로 쓰는 낱말만 출처와 함께 overlay/ko/terms.json에
+# 남긴다. 다시 뽑는 명령은 그 파일의 method에 적혀 있다.
+tools/ko-terms/out/

@@ -1,6 +1,6 @@
-From 6754a663931b2624aaf7673a492fb3368f654901 Mon Sep 17 00:00:00 2001
+From 8534232d26d0e96f8c03ecbc936cb9b28ce3146d Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
-Date: Tue, 18 Aug 2026 07:56:03 +0900
+Date: Tue, 18 Aug 2026 13:33:33 +0900
 Subject: [PATCH 8/9] Korean: the mod's own strings, generated from the
  catalogue
 MIME-Version: 1.0
@@ -33,9 +33,30 @@ number for each). A few that guessing would have got wrong:
 
 - The game has no word "채팅" - zero hits across all 19,592 Addon rows. It
   says 로그 for the log and 대화 for conversation
-- Echo is 혼잿말, and the loot-roll trio is 선입찰 / 입찰 / 포기 (Addon 390-392)
+- Echo is 혼잣말, and the loot-roll trio is 선입찰 / 입찰 / 포기 (Addon 390-392)
 - The Hunting Log is 토벌수첩 and a hunting target is 토벌 대상 (1880, 8425)
-- Minions are 꼬마 친구, retainers 집사, the companion chocobo 버디
+- Minions are 꼬마 친구 (4902) and retainers 집사 (532)
+
+A review pass over all 686 sites moved 37 of them. What it caught, and why the
+first pass could not:
+
+- Words that are not the client's. The game's inventory is 소지품 (520); 가방
+  is the chocobo saddlebag (880-892). The Hand Over button is 건네주기 (88).
+  The mailbox is 편지함 (1807), the Hall of the Novice 초보자의 집 (8614)
+- ObjectKind.Companion is the minion, not the chocobo buddy - upstream itself
+  says "Begleiter" for the minion guide's search box, and Dalamud documents
+  the kind as "a companion (minion)". It said 버디, which is the chocobo
+- 방위, 손패 and 장판 have zero hits in the whole sheet - the last is player
+  slang. They are now 방향 안내, 카드 and 범위
+- The catalogue's HP row pointed at 9125, which is the chocobo racing stat
+  block. The client's own label is row 232, "HP" - the word 체력 there is a
+  chocobo attribute, and one site had already picked it up
+
+The catalogue that was supposed to prevent guessing had 28 rows while the
+translation used more than twice that many game words. The words were right -
+the equipment slots match Addon 738-751 one for one - but the evidence was not
+written down, and evidence that is not written down cannot be told apart from a
+guess. It now holds 101 rows.
 
 Two sites are left in the ternary on purpose.
 
@@ -58,11 +79,8 @@ German and English wording is byte-for-byte what it was. The tool only appends a
 third argument; it never reads or rewrites the first two.
 
 Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
-Verified: DE/EN snapshot unchanged - 688 pairs identical after moving 82 sites
-off the ternary, which is what the snapshot exists to prove. Round trip checked:
-regenerating from the parent commit reproduces this tree exactly
-In-Game: not checked - the chat group needs listening. The language switch was
-confirmed earlier and is unchanged here
+Verified: DE/EN snapshot unchanged - 688 pairs; ko-apply round trip green
+In-Game: not checked
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
@@ -132,7 +150,7 @@ index bfc2270..d0e133a 100644
      }
  }
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.Chat.cs b/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
-index f9e0d33..dd4e189 100644
+index f9e0d33..29c3ca8 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
 @@ -26,15 +26,15 @@ public static partial class AccessibilityStrings
@@ -184,7 +202,7 @@ index f9e0d33..dd4e189 100644
 -            ? (IsGerman ? $"{name} aus." : $"{name} off.")
 -            : (IsGerman ? $"{name} auf {(int)MathF.Round(volume * 100)} Prozent."
 -                        : $"{name} at {(int)MathF.Round(volume * 100)} percent.");
-+            ? (Pick($"{name} aus.", $"{name} off.", $"{name} 꺼짐."))
++            ? (Pick($"{name} aus.", $"{name} off.", $"{name} 꺼짐으로 변경됨."))
 +            : (Pick($"{name} auf {(int)MathF.Round(volume * 100)} Prozent.",
 +                    $"{name} at {(int)MathF.Round(volume * 100)} percent.",
 +                    $"{name} {(int)MathF.Round(volume * 100)} 퍼센트로 변경됨."));
@@ -214,9 +232,9 @@ index f9e0d33..dd4e189 100644
 +    public static string OptSkillReadyVolume => Pick("Fähigkeit bereit Lautstärke",
 +                                                     "Ability ready volume",
 +                                                     "기술 준비됨 음량");
-+    public static string OptHeading => Pick("Himmelsrichtung", "Compass heading", "방위");
++    public static string OptHeading => Pick("Himmelsrichtung", "Compass heading", "방향 안내");
 +    public static string OptTargetChanges => Pick("Zielwechsel", "Target changes", "대상 변경");
-+    public static string OptTargetHp => Pick("Ziel-Lebenspunkte", "Target health", "대상 체력");
++    public static string OptTargetHp => Pick("Ziel-Lebenspunkte", "Target health", "대상 HP");
 +    public static string OptEnemyCast => Pick("Gegner wirkt Aktion", "Enemy casting", "적 기술 시전");
 +    public static string OptMapFlag => Pick("Kartenmarkierung", "Map flag", "지도 표식");
 +    public static string OptErrorToasts => Pick("Fehlermeldungen", "Error messages", "오류 메시지");
@@ -359,7 +377,7 @@ index f9e0d33..dd4e189 100644
 +             "기록에는 그대로 남음.");
  }
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 9254a0b..008e7e2 100644
+index 9254a0b..085476d 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -13,84 +13,102 @@ public static partial class AccessibilityStrings
@@ -587,13 +605,13 @@ index 9254a0b..008e7e2 100644
      /// <summary>One board cell (1-based), either empty or holding a card.</summary>
      public static string BoardCellEmpty(int cell) =>
 -        IsGerman ? $"Feld {cell}: leer" : $"Cell {cell}: empty";
-+        Pick($"Feld {cell}: leer", $"Cell {cell}: empty", $"{cell}칸: 비어 있음");
++        Pick($"Feld {cell}: leer", $"Cell {cell}: empty", $"칸 {cell}: 비어 있음");
  
      public static string BoardCellCard(int cell, string owner, string sides) =>
 -        IsGerman ? $"Feld {cell}: {owner}, {sides}" : $"Cell {cell}: {owner}, {sides}";
 +        Pick($"Feld {cell}: {owner}, {sides}",
 +             $"Cell {cell}: {owner}, {sides}",
-+             $"{cell}칸: {owner}, {sides}");
++             $"칸 {cell}: {owner}, {sides}");
  
      /// <summary>One hand card (1-based).</summary>
      public static string HandCard(int index, string sides) =>
@@ -603,13 +621,13 @@ index 9254a0b..008e7e2 100644
      /// <summary>Focus announcement for a single card (board cell or hand card).</summary>
      public static string FocusBoardCell(int cell, string content) =>
 -        IsGerman ? $"Feld {cell}, {content}" : $"Cell {cell}, {content}";
-+        Pick($"Feld {cell}, {content}", $"Cell {cell}, {content}", $"{cell}칸, {content}");
++        Pick($"Feld {cell}, {content}", $"Cell {cell}, {content}", $"칸 {cell}, {content}");
  
      public static string FocusHandCard(int index, int count, string sides) =>
 -        IsGerman ? $"Handkarte {index} von {count}, {sides}" : $"Hand card {index} of {count}, {sides}";
 +        Pick($"Handkarte {index} von {count}, {sides}",
 +             $"Hand card {index} of {count}, {sides}",
-+             $"손패 {count} 중 {index}, {sides}");
++             $"카드 {count} 중 {index}, {sides}");
  
      public static string CardGameNotOpen =>
 -        IsGerman ? "Kartenspiel ist nicht offen." : "Card game is not open.";
@@ -625,11 +643,11 @@ index 9254a0b..008e7e2 100644
  
      public static string HandIntro(int count) =>
 -        IsGerman ? $"Deine Hand, {count} Karten." : $"Your hand, {count} cards.";
-+        Pick($"Deine Hand, {count} Karten.", $"Your hand, {count} cards.", $"내 손패, {count}장.");
++        Pick($"Deine Hand, {count} Karten.", $"Your hand, {count} cards.", $"내 카드 {count}장.");
  
      public static string HandEmpty =>
 -        IsGerman ? "Keine Handkarten mehr." : "No hand cards left.";
-+        Pick("Keine Handkarten mehr.", "No hand cards left.", "손패 없음.");
++        Pick("Keine Handkarten mehr.", "No hand cards left.", "남은 카드 없음.");
  
      // HYPOTHESE (in-game zu verifizieren): TurnState NormalMove/MaskedMove = du bist
      // am Zug, Waiting = Gegner/warten. Der Rohwert wird zusaetzlich geloggt.
@@ -711,7 +729,7 @@ index 9254a0b..008e7e2 100644
 -            : $"{name}, level {level}, {distance:F0} meters {compass}";
 +        Pick($"{name}, Stufe {level}, {distance:F0} Meter {compass}",
 +             $"{name}, level {level}, {distance:F0} meters {compass}",
-+             $"{name}, 레벨 {level}, {distance:F0}미터 {compass}");
++             $"{name}, 레벨 {level}, {compass} 방향 {distance:F0}미터");
  
      /// <summary>Relative-to-heading direction word for a signed angle in degrees
      /// (negative = left, 0 = ahead). The spoken steering cue.</summary>
@@ -957,7 +975,7 @@ index 9254a0b..008e7e2 100644
 -                : $"No location known for {monster}.");
 +            ? (Pick($"{monster} lebt in {area}. Dieses Gebiet ist auf der Karte nicht verzeichnet.",
 +                    $"{monster} lives in {area}. That area is not marked on the map.",
-+                    $"{monster}, {area}에 서식. 이 지역은 지도에 없음."))
++                    $"{monster}, {area}에 서식. 그 지역은 지도에 없음."))
 +            : (Pick($"Für {monster} ist kein Ort bekannt.",
 +                    $"No location known for {monster}.",
 +                    $"{monster}의 위치를 모름."));
@@ -1134,7 +1152,7 @@ index 9254a0b..008e7e2 100644
 +        ObjectKind.Pc             => Pick("Spieler", "Player", "플레이어"),
 +        ObjectKind.BattleNpc      => Pick("Kampf-NPC", "Combat NPC", "전투 NPC"),
 +        ObjectKind.EventNpc       => Pick("NPC", "NPC", "NPC"),
-+        ObjectKind.Treasure       => Pick("Schatz", "Treasure", "보물"),
++        ObjectKind.Treasure       => Pick("Schatz", "Treasure", "보물상자"),
 +        ObjectKind.Aetheryte      => Pick("Ätheryt", "Aetheryte", "에테라이트"),
 +        ObjectKind.GatheringPoint => Pick("Sammelpunkt", "Gathering node", "채집 지점"),
 +        ObjectKind.EventObj       => Pick("Objekt", "Object", "사물"),
@@ -1147,7 +1165,7 @@ index 9254a0b..008e7e2 100644
 -        ObjectKind.Retainer       => IsGerman ? "Gehilfe"     : "Retainer",
 -        ObjectKind.Mount          => IsGerman ? "Reittier"    : "Mount",
 +        ObjectKind.HousingEventObject => Pick("Einrichtung", "Furnishing", "가구"),
-+        ObjectKind.Companion      => Pick("Begleiter", "Companion", "버디"),
++        ObjectKind.Companion      => Pick("Begleiter", "Companion", "꼬마 친구"),
 +        ObjectKind.Retainer       => Pick("Gehilfe", "Retainer", "집사"),
 +        ObjectKind.Mount          => Pick("Reittier", "Mount", "탈것"),
          _                         => kind.ToString(),
@@ -1172,7 +1190,7 @@ index 9254a0b..008e7e2 100644
 -    public static string GardenBed => IsGerman ? "Beet"        : "Garden bed";
 -    public static string MailBox   => IsGerman ? "Postkasten"  : "Mailbox";
 +    public static string GardenBed => Pick("Beet", "Garden bed", "밭");
-+    public static string MailBox   => Pick("Postkasten", "Mailbox", "우편함");
++    public static string MailBox   => Pick("Postkasten", "Mailbox", "편지함");
  
      /// <summary>
      /// Appended to an object's name to say which quest it serves: "Zielort für
@@ -1268,10 +1286,10 @@ index 9254a0b..008e7e2 100644
 +                                                        $"레벨 {level}, ");
 +    public static string InArea(string zone)    => Pick($"im Gebiet {zone}.",
 +                                                        $"in the area {zone}.",
-+                                                        $"{zone} 지역에.");
++                                                        $"{zone} 지역.");
 +    public static string InAnotherArea       => Pick("in einem anderen Gebiet.",
 +                                                     "in another area.",
-+                                                     "다른 지역에.");
++                                                     "다른 지역.");
 +    public static string NumpadWalksToTransition => Pick(" Nummernblock 3 läuft zum Übergang.",
 +                                                         " Numpad 3 walks to the transition.",
 +                                                         " 숫자패드 3을 누르면 통로로 간다.");
@@ -1478,7 +1496,7 @@ index 9254a0b..008e7e2 100644
 -        : "Hand over item. Press Ctrl F3 for the matching items, then select and Hand Over.";
 +    public static string DeliveryOpen => Pick("Gegenstand abliefern. Drücke Strg F3 für die passenden Gegenstände, dann auswählen und Übergeben.",
 +                                              "Hand over item. Press Ctrl F3 for the matching items, then select and Hand Over.",
-+                                              "아이템 건네기. 컨트롤 F3을 누르면 맞는 아이템이 나온다. 고른 다음 건네기를 누른다.");
++                                              "아이템 건네주기. 컨트롤 F3을 누르면 맞는 아이템이 나온다. 고른 다음 건네주기를 누른다.");
      public static string DeliveryItems(IReadOnlyList<string> items) => items.Count switch
      {
 -        0 => IsGerman ? "Keine passenden Gegenstände im Beutel gefunden." : "No matching items found in your bag.",
@@ -1487,10 +1505,10 @@ index 9254a0b..008e7e2 100644
 -                : $"One matching item: {items[0]}. Select it, then press Hand Over.",
 +        0 => Pick("Keine passenden Gegenstände im Beutel gefunden.",
 +                  "No matching items found in your bag.",
-+                  "가방에 맞는 아이템 없음."),
++                  "소지품에 맞는 아이템 없음."),
 +        1 => Pick($"Ein passender Gegenstand: {items[0]}. Auswählen und dann Übergeben drücken.",
 +                  $"One matching item: {items[0]}. Select it, then press Hand Over.",
-+                  $"맞는 아이템 하나: {items[0]}. 고른 다음 건네기를 누른다."),
++                  $"맞는 아이템 하나: {items[0]}. 고른 다음 건네주기를 누른다."),
          _ => IsGerman
                  ? $"{items.Count} passende Gegenstände: {string.Join(", ", items)}. Auswählen und dann Übergeben drücken."
                  : $"{items.Count} matching items: {string.Join(", ", items)}. Select one, then press Hand Over.",
@@ -1724,7 +1742,7 @@ index 9254a0b..008e7e2 100644
      /// the game's own tab number ("1".."4").</summary>
      public static string InventoryTab(string label) =>
 -        IsGerman ? $"Tasche {label}" : $"Bag {label}";
-+        Pick($"Tasche {label}", $"Bag {label}", $"가방 {label}");
++        Pick($"Tasche {label}", $"Bag {label}", $"소지품 {label}");
      /// <summary>Fallback for an inventory tab the game leaves unlabeled - so the
      /// user still hears that focus reached a tab, without inventing a number.</summary>
      public static string InventoryTabOther =>
@@ -1741,7 +1759,7 @@ index 9254a0b..008e7e2 100644
      // ── Anfaenger-Arena (BeginnersMansionProblem) ────────────────────
      // "Beginner's Arena" is the EN content name; verify against an EN dump (Teil 2).
 -    public static string ArenaTitle => IsGerman ? "Anfänger-Arena" : "Beginner's Arena";
-+    public static string ArenaTitle => Pick("Anfänger-Arena", "Beginner's Arena", "초보자 훈련장");
++    public static string ArenaTitle => Pick("Anfänger-Arena", "Beginner's Arena", "초보자의 집");
      public static string ArenaExercise(string exercise) =>
 -        IsGerman ? $". Übung: {exercise}" : $". Exercise: {exercise}";
 -    public static string ArenaEnterBegins => IsGerman ? ". Enter beginnt." : ". Press Enter to begin.";
@@ -1773,10 +1791,10 @@ index 9254a0b..008e7e2 100644
 +    public static string CombatEnd => Pick("Kampf vorbei.", "Combat over.", "전투 끝.");
 +    public static string AoeWarningOn  => Pick("Flächenwarnung an.",
 +                                               "Area warning on.",
-+                                               "장판 경고 켜짐.");
++                                               "범위 경고 켜짐.");
 +    public static string AoeWarningOff => Pick("Flächenwarnung aus.",
 +                                               "Area warning off.",
-+                                               "장판 경고 꺼짐.");
++                                               "범위 경고 꺼짐.");
  
      /// <summary>
      /// Bar fill as a whole percent - the same reading a sighted player takes off
@@ -1918,7 +1936,7 @@ index 9254a0b..008e7e2 100644
 -        IsGerman ? "Ruhebereich. Erholungsbonus sammelt sich." : "Rested area. Rested bonus is accumulating.";
 +        Pick("Ruhebereich. Erholungsbonus sammelt sich.",
 +             "Rested area. Rested bonus is accumulating.",
-+             "휴식 구역. 휴식 보너스가 쌓인다.");
++             "휴식 구역. 휴식 보너스 쌓이는 중.");
      public static string RestedAreaLeft =>
 -        IsGerman ? "Ruhebereich verlassen." : "Left the rested area.";
 +        Pick("Ruhebereich verlassen.", "Left the rested area.", "휴식 구역을 벗어남.");
@@ -1936,7 +1954,7 @@ index 9254a0b..008e7e2 100644
 -            : $" Rested bonus for {percent} percent of a level.";
 +        Pick($" Erholungsbonus für {percent} Prozent einer Stufe.",
 +             $" Rested bonus for {percent} percent of a level.",
-+             $" 휴식 보너스가 한 레벨의 {percent} 퍼센트만큼.");
++             $" 휴식 보너스, 한 레벨의 {percent} 퍼센트.");
      public static string RestedBonusEmpty =>
 -        IsGerman ? " Kein Erholungsbonus." : " No rested bonus.";
 +        Pick(" Kein Erholungsbonus.", " No rested bonus.", " 휴식 보너스 없음.");
@@ -2180,11 +2198,11 @@ index 9254a0b..008e7e2 100644
 -            : (IsGerman ? "Himmelsrichtung an." : "Compass heading on.");
 +            ? (Pick($"Himmelsrichtung an. {direction}.",
 +                    $"Compass heading on. {direction}.",
-+                    $"방위 켜짐. {direction}."))
-+            : (Pick("Himmelsrichtung an.", "Compass heading on.", "방위 켜짐."));
++                    $"방향 안내 켜짐. {direction}."))
++            : (Pick("Himmelsrichtung an.", "Compass heading on.", "방향 안내 켜짐."));
      public static string HeadingOff =>
 -        IsGerman ? "Himmelsrichtung aus." : "Compass heading off.";
-+        Pick("Himmelsrichtung aus.", "Compass heading off.", "방위 꺼짐.");
++        Pick("Himmelsrichtung aus.", "Compass heading off.", "방향 안내 꺼짐.");
  
      /// <summary>Spoken at the start of "/acc soundtest" (audition the cue sounds).</summary>
      public static string SoundTestRunning =>
@@ -2548,20 +2566,20 @@ index 9254a0b..008e7e2 100644
 +        Pick("Aktionsleiste nicht verfügbar.", "Hotbar not available.", "단축바를 쓸 수 없음.");
      public static string HotbarEmpty(int bar) =>
 -        IsGerman ? $"Aktionsleiste {bar} ist leer." : $"Hotbar {bar} is empty.";
-+        Pick($"Aktionsleiste {bar} ist leer.", $"Hotbar {bar} is empty.", $"단축바 {bar}, 비어 있음.");
++        Pick($"Aktionsleiste {bar} ist leer.", $"Hotbar {bar} is empty.", $"{bar}번 단축바, 비어 있음.");
      public static string HotbarPrefix(int bar) =>
 -        IsGerman ? $"Aktionsleiste {bar}. " : $"Hotbar {bar}. ";
-+        Pick($"Aktionsleiste {bar}. ", $"Hotbar {bar}. ", $"단축바 {bar}. ");
++        Pick($"Aktionsleiste {bar}. ", $"Hotbar {bar}. ", $"{bar}번 단축바. ");
      /// <summary>Slot label: main bar is "key X", other bars name bar+slot/key.</summary>
      public static string SlotMainKey(string key) =>
 -        IsGerman ? $"Taste {key}" : $"key {key}";
 +        Pick($"Taste {key}", $"key {key}", $"{key} 키");
      public static string SlotBarKey(int bar, string key) =>
 -        IsGerman ? $"Leiste {bar}, Taste {key}" : $"bar {bar}, key {key}";
-+        Pick($"Leiste {bar}, Taste {key}", $"bar {bar}, key {key}", $"단축바 {bar}, {key} 키");
++        Pick($"Leiste {bar}, Taste {key}", $"bar {bar}, key {key}", $"{bar}번 단축바, {key} 키");
      public static string SlotBarSlot(int bar, int slot) =>
 -        IsGerman ? $"Leiste {bar}, Slot {slot}" : $"bar {bar}, slot {slot}";
-+        Pick($"Leiste {bar}, Slot {slot}", $"bar {bar}, slot {slot}", $"단축바 {bar}, {slot}번 칸");
++        Pick($"Leiste {bar}, Slot {slot}", $"bar {bar}, slot {slot}", $"{bar}번 단축바, {slot}번 칸");
      public static string TargetSlotCurrent(string slotLabel, string current) =>
 -        IsGerman ? $"Ziel-{slotLabel}: {current}" : $"Target {slotLabel}: {current}";
 +        Pick($"Ziel-{slotLabel}: {current}",
@@ -2844,7 +2862,7 @@ index 9254a0b..008e7e2 100644
 -            : "No usable items in your bag.";
 +        Pick("Keine benutzbaren Gegenstände in der Tasche.",
 +             "No usable items in your bag.",
-+             "가방에 쓸 수 있는 아이템 없음.");
++             "소지품에 쓸 수 있는 아이템 없음.");
      /// <summary>Spoken after a skill is chosen: now pick the target key.</summary>
      public static string SkillMenuPickTarget(string skillName, int count) =>
 -        IsGerman
@@ -2878,7 +2896,7 @@ index 9254a0b..008e7e2 100644
 -            : $"{name} ready, {charges} of {maxCharges} charges.";
 +        Pick($"{name} bereit, {charges} von {maxCharges} Ladungen.",
 +             $"{name} ready, {charges} of {maxCharges} charges.",
-+             $"{name} 준비됨. 충전 {maxCharges} 중 {charges}.");
++             $"{name} 준비됨, 충전 {maxCharges} 중 {charges}.");
      public static string SkillReadyAnnounceOn =>
 -        IsGerman ? "Fähigkeit-bereit-Ansage an." : "Ability-ready announcements on.";
 +        Pick("Fähigkeit-bereit-Ansage an.", "Ability-ready announcements on.", "기술 준비됨 안내 켜짐.");
@@ -2995,7 +3013,7 @@ index 9254a0b..008e7e2 100644
 -                 : $"Fishing spot {name} remembered here: map {mapX:F1}, {mapY:F1}.";
 +        Pick($"Angelplatz {name} hier gemerkt: Karte {mapX:F1}, {mapY:F1}.",
 +             $"Fishing spot {name} remembered here: map {mapX:F1}, {mapY:F1}.",
-+             $"낚시터 {name} 기억함. 지도 {mapX:F1}, {mapY:F1}.");
++             $"낚시터 {name} 여기 기억함: 지도 {mapX:F1}, {mapY:F1}.");
  
      // ════════════════════════════════════════════════════════════════
      //  GatheringService
@@ -3014,7 +3032,7 @@ index 9254a0b..008e7e2 100644
 +        Pick("Inventar ist leer.", "Inventory is empty.", "소지품이 비어 있음.");
      public static string GilUnavailable =>
 -        IsGerman ? "Gil-Stand nicht verfügbar." : "Gil amount not available.";
-+        Pick("Gil-Stand nicht verfügbar.", "Gil amount not available.", "길 잔액을 알 수 없음.");
++        Pick("Gil-Stand nicht verfügbar.", "Gil amount not available.", "소지금을 알 수 없음.");
      public static string KeyItemsLabel(string joined) =>
 -        IsGerman ? $"Schlüsselgegenstände: {joined}" : $"Key items: {joined}";
 +        Pick($"Schlüsselgegenstände: {joined}", $"Key items: {joined}", $"중요 아이템: {joined}");
@@ -3022,7 +3040,7 @@ index 9254a0b..008e7e2 100644
 -        IsGerman ? $"Tasche, {count} Gegenstände: {joined}" : $"Bag, {count} items: {joined}";
 +        Pick($"Tasche, {count} Gegenstände: {joined}",
 +             $"Bag, {count} items: {joined}",
-+             $"가방, 아이템 {count}개: {joined}");
++             $"소지품, 아이템 {count}개: {joined}");
      /// <summary>A stacked item: "&lt;name&gt; times &lt;count&gt;" plus an optional
      /// HQ suffix. Single items are announced by the caller without this frame.</summary>
      public static string ItemStack(string name, int quantity, string hqSuffix) =>
@@ -3288,7 +3306,7 @@ index 9254a0b..008e7e2 100644
 -        IsGerman ? $"Benachrichtigung. Mit {key} annehmen." : $"Notification. Press {key} to accept.";
 +        Pick($"Benachrichtigung. Mit {key} annehmen.",
 +             $"Notification. Press {key} to accept.",
-+             $"알림. {key}로 수락한다.");
++             $"알림. {key} 눌러 수락한다.");
      public static string SecondsToJoin(int seconds) =>
 -        IsGerman ? $"Noch {seconds} Sekunden zum Beitreten." : $"{seconds} seconds left to join.";
 +        Pick($"Noch {seconds} Sekunden zum Beitreten.",
@@ -3356,7 +3374,7 @@ index 9254a0b..008e7e2 100644
      /// <summary>How many of the RESULT item the player already owns.</summary>
      public static string RecipeInBag(string value) =>
 -        IsGerman ? $"Im Beutel {value}" : $"In bag {value}";
-+        Pick($"Im Beutel {value}", $"In bag {value}", $"가방에 {value}");
++        Pick($"Im Beutel {value}", $"In bag {value}", $"소지품에 {value}");
      /// <summary>One material line. NQ and HQ are always both named (user decision
      /// 2026-08-08): HQ material raises starting quality, so a silent zero would
      /// hide a real choice.</summary>
@@ -3374,7 +3392,7 @@ index 9254a0b..008e7e2 100644
 -                 : $"Crystal, {needed} needed, {owned} in bag";
 +        Pick($"Kristall, {needed} benötigt, {owned} im Beutel",
 +             $"Crystal, {needed} needed, {owned} in bag",
-+             $"크리스탈, {needed} 필요, 가방에 {owned}");
++             $"크리스탈, {needed} 필요, 소지품에 {owned}");
      /// <summary>Said instead of the values when no recipe is selected yet.</summary>
      public static string RecipeNoSelection =>
 -        IsGerman ? "Kein Rezept ausgewählt." : "No recipe selected.";
@@ -3647,7 +3665,7 @@ index 9254a0b..008e7e2 100644
  
      /// <summary>Kategorie-Bezeichnung fuer die Truhen einer Ebene.</summary>
 -    public static string DeepCategoryTreasure => IsGerman ? "Schätze" : "Treasure";
-+    public static string DeepCategoryTreasure => Pick("Schätze", "Treasure", "보물");
++    public static string DeepCategoryTreasure => Pick("Schätze", "Treasure", "보물상자");
  
      /// <summary>Kategorie-Bezeichnung fuer die beiden Leuchten.</summary>
 -    public static string DeepCategoryCairns => IsGerman ? "Leuchten" : "Cairns";
@@ -3698,7 +3716,7 @@ index 9254a0b..008e7e2 100644
      /// Ziel und NICHTS darueber, was darin ist.</summary>
      public static string DeepRoomUnexplored(int index) =>
 -        IsGerman ? $"Unerforscht {index}" : $"Unexplored {index}";
-+        Pick($"Unerforscht {index}", $"Unexplored {index}", $"미탐색 {index}");
++        Pick($"Unerforscht {index}", $"Unexplored {index}", $"미탐색 {index}번");
  
      /// <summary>Gesagt, wenn die Raumliste abgefragt wird und die Ebene keine hergibt -
      /// ausserhalb eines Gewoelbes, oder solange den Raumdaten nicht zu trauen ist.</summary>

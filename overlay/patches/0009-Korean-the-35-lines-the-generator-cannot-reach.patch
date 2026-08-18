@@ -1,4 +1,4 @@
-From e6656223679ec964217ef88f309ac095cf2ed2e1 Mon Sep 17 00:00:00 2001
+From e8dec02d0b4e7187ab93d76d5dc61ebbf16ca2e5 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 12:29:15 +0900
 Subject: [PATCH 9/9] Korean: the 35 lines the generator cannot reach
@@ -35,6 +35,17 @@ Game words come from the Korean client's Addon sheet, not from guesswork.
 Materia is 마테리아 (Addon 481) - the project's own notes had written 머티리어,
 which the game does not use anywhere.
 
+The review pass moved three of these lines.
+
+- DCSelected said 월드 for the worlds under a data centre. That word has zero
+  hits in the whole Addon sheet; the client says 서버 (12626, "고향 서버가 속한
+  데이터 센터")
+- RequestItems told the user to press 건네기. The button is 건네주기 (88, 362,
+  1750). A button name that does not match the screen is a dead end for someone
+  who cannot see it
+- TargetBarSummary read "대상 단축바 2". The game's own key-settings screen says
+  "1번 단축바 1번 칸" (13195), so the number goes in front
+
 Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
 Verified: DE/EN snapshot unchanged - 688 pairs. HelpFull fragment count equal
 across the three languages
@@ -47,7 +58,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
  2 files changed, 123 insertions(+), 35 deletions(-)
 
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.Chat.cs b/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
-index dd4e189..ae86512 100644
+index 29c3ca8..7660040 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
 @@ -38,13 +38,15 @@ public static partial class AccessibilityStrings
@@ -69,7 +80,7 @@ index dd4e189..ae86512 100644
      /// <summary>Eine Lautstärke-Zeile: "Beacon, 35 Prozent" oder "Beacon, aus".</summary>
      public static string OptionVolume(string name, float volume) =>
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 008e7e2..7922868 100644
+index 085476d..f55f9f0 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -118,7 +118,8 @@ public static partial class AccessibilityStrings
@@ -136,7 +147,7 @@ index 008e7e2..7922868 100644
          worlds.Count > 0
 -            ? (IsGerman
 +            ? (Loc.IsKorean
-+                ? $"{dc} 선택됨. 월드: {string.Join(", ", worlds)}. 확인 버튼을 누르면 확정된다."
++                ? $"{dc} 선택됨. 서버: {string.Join(", ", worlds)}. 확인 버튼을 누르면 확정된다."
 +                : IsGerman
                  ? $"{dc} ausgewählt. Welten: {string.Join(", ", worlds)}. Zum Bestätigen den Ok-Knopf drücken."
                  : $"{dc} selected. Worlds: {string.Join(", ", worlds)}. Press the Ok button to confirm.")
@@ -154,10 +165,10 @@ index 008e7e2..7922868 100644
 @@ -911,7 +927,9 @@ public static partial class AccessibilityStrings
          1 => Pick($"Ein passender Gegenstand: {items[0]}. Auswählen und dann Übergeben drücken.",
                    $"One matching item: {items[0]}. Select it, then press Hand Over.",
-                   $"맞는 아이템 하나: {items[0]}. 고른 다음 건네기를 누른다."),
+                   $"맞는 아이템 하나: {items[0]}. 고른 다음 건네주기를 누른다."),
 -        _ => IsGerman
 +        _ => Loc.IsKorean
-+                ? $"맞는 아이템 {items.Count}개: {string.Join(", ", items)}. 하나 고른 다음 건네기를 누른다."
++                ? $"맞는 아이템 {items.Count}개: {string.Join(", ", items)}. 하나 고른 다음 건네주기를 누른다."
 +                : IsGerman
                  ? $"{items.Count} passende Gegenstände: {string.Join(", ", items)}. Auswählen und dann Übergeben drücken."
                  : $"{items.Count} matching items: {string.Join(", ", items)}. Select one, then press Hand Over.",
@@ -298,7 +309,7 @@ index 008e7e2..7922868 100644
      /// when the bar has no keys bound.</summary>
      public static string TargetBarSummary(int bar, int filled, int total, bool anyKey) =>
 -        IsGerman
-+        Loc.IsKorean ? $"대상 단축바 {bar}, {total}칸 중 {filled}칸 채움{(anyKey ? "" : ", 키가 배정되지 않음")}."
++        Loc.IsKorean ? $"{bar}번 대상 단축바, {total}칸 중 {filled}칸 채움{(anyKey ? "" : ", 키가 배정되지 않음")}."
 +        : IsGerman
              ? $"Ziel-Leiste {bar}, {filled} von {total} belegt{(anyKey ? "" : ", keine Tasten zugewiesen")}."
              : $"Target bar {bar}, {filled} of {total} filled{(anyKey ? "" : ", no keys assigned")}.";

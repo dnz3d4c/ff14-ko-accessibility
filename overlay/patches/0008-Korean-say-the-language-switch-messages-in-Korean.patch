@@ -1,4 +1,4 @@
-From e7eb5a3d98d874245fafb47699965cc8aa3edaa4 Mon Sep 17 00:00:00 2001
+From 55a331a0f6867d58624e61bb1f8bed02e75c4b7a Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 07:56:03 +0900
 Subject: [PATCH 8/8] Korean: say the language-switch messages in Korean
@@ -6,50 +6,65 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-First strings to actually move onto Pick(de, en, ko). Small on purpose - this
-is the group that proves the mechanism before 676 lines ride on it.
+Generated, not written. The Korean here comes from overlay/ko/ko.json through
+tools/ko-apply; this C# is output. Do not hand-edit it, and do not resolve
+conflicts in it - drop the commit and run the tool again against the new tree.
+
+That is the point of the commit. Korean has to land on 688 lines of a file
+upstream touches in nearly every release, and upstream released seven times in
+eight days. A hand-written diff of that size would have to be re-merged by hand
+on that cadence, by someone reading the diff with a screen reader. Regenerating
+is deterministic; merging is not. The failure mode becomes "N strings in the
+catalogue are no longer in the source", which names the sentence that moved.
+
+Six strings, on purpose: the three language names, the two confirmations, and
+the usage hint. Small enough to prove the mechanism before 682 more ride on it.
 
 The language switch is also the one place where answering in the old language
 is useless. Someone who types "/acc lang ko" is asking whether Korean works;
 hearing English back leaves that unanswered.
-
-Six strings: the three language names, the two confirmations, and the usage
-hint. German and English wording is byte-for-byte what it was.
 
 The two confirmations end in a noun form ("언어가 한국어로 변경됨"), not a
 plain-verb sentence. That is the house style for short announcements: a screen
 reader speaks these, and a narrated sentence reads like a diary entry rather
 than a status line. The usage hint is help text and stays a full sentence.
 
-Adds a private Pick shorthand next to IsGerman. Both shapes live side by side
-while the move runs; lines change one feature group at a time.
+The Pick shorthand next to IsGerman is generated too, and is declared once for
+the whole partial class - AccessibilityStrings.Chat.cs calls it without
+declaring it, so writing it per file would declare the member twice.
+
+German and English wording is byte-for-byte what it was. The tool only appends
+a third argument; it never reads or rewrites the first two.
 
 Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
-Verified: the DE/EN snapshot is unchanged - 676 pairs identical after moving
-these six off the ternary, which is what the snapshot exists to prove
-In-Game: not checked - "/acc lang ko" should now answer in Korean
+Verified: DE/EN snapshot unchanged - 688 pairs identical after moving these six
+off the ternary, which is what the snapshot exists to prove. Round trip checked:
+regenerating from the parent commit reproduces this tree exactly
+In-Game: confirmed - "/acc lang ko" answers in Korean, and the noun-form wording
+here is what came back from listening to it
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
- .../Services/AccessibilityStrings.cs          | 28 ++++++++++++-------
- 1 file changed, 18 insertions(+), 10 deletions(-)
+ .../Services/AccessibilityStrings.cs          | 27 ++++++++++++-------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 9254a0b..b66fc2f 100644
+index 9254a0b..8df7a28 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
-@@ -13,6 +13,12 @@ public static partial class AccessibilityStrings
+@@ -13,6 +13,11 @@ public static partial class AccessibilityStrings
      // NOT the OS culture directly. Auto still falls back to the OS culture.
      private static bool IsGerman => Loc.IsGerman;
  
-+    // Shorthand for the three-language form. Lines move from
-+    // "IsGerman ? de : en" to "Pick(de, en, ko)" one feature group at a time;
-+    // both shapes live here side by side until the move is done.
++    // Three-language form. Generated from overlay/ko/ko.json by tools/ko-apply -
++    // do not hand-edit the Korean in this file, the catalogue is the original.
 +    private static string Pick(string de, string en, string? ko = null) =>
 +        Loc.Pick(de, en, ko);
 +
      public static string TitleScreen => IsGerman ? "Titelbildschirm" : "Title screen";
      public static string MainMenu => IsGerman ? "Hauptmenü" : "Main menu";
      public static string Back => IsGerman ? "Zurück" : "Back";
-@@ -72,22 +78,24 @@ public static partial class AccessibilityStrings
+@@ -72,22 +77,24 @@ public static partial class AccessibilityStrings
      public static string StateDisabled => IsGerman ? "ausgegraut" : "greyed out";
  
      // ── Sprachumschaltung (/acc lang) ────────────────────────────────

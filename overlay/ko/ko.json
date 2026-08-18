@@ -1,0 +1,37 @@
+{
+  "note": "모드 안내 문장의 한국어. 이 파일이 원본이고 C# 소스는 생성물이다 - 소스를 손으로 고치지 마라. 반영: tools/ko-apply. 문체와 용어 기준: .claude/skills/ko-localization.",
+  "key": "(de, en) 쌍이 키다. 둘 다 쓰는 이유는 같은 독일어 낱말이 문장마다 다른 영어를 갖기 때문이다. 값은 C# 리터럴 안에 들어갈 내용 그대로 - 큰따옴표는 백슬래시로 escape한다.",
+  "slots": "{name} 같은 보간 자리는 이름을 바꾸지 않는다. 순서는 한국어 어순대로 바꿔도 되지만 자리 집합이 영어와 같아야 하고, 다르면 ko-apply가 거부한다.",
+  "strings": [
+    {
+      "de": "Deutsch",
+      "en": "German",
+      "ko": "독일어"
+    },
+    {
+      "de": "Englisch",
+      "en": "English",
+      "ko": "영어"
+    },
+    {
+      "de": "Koreanisch",
+      "en": "Korean",
+      "ko": "한국어"
+    },
+    {
+      "de": "Sprache auf {language} umgestellt.",
+      "en": "Language set to {language}.",
+      "ko": "언어가 {language}로 변경됨."
+    },
+    {
+      "de": "Sprache folgt jetzt Windows: {language}.",
+      "en": "Language now follows Windows: {language}.",
+      "ko": "언어가 윈도 설정을 따르도록 변경됨. 현재 {language}."
+    },
+    {
+      "de": "Sprache wählen mit: /acc lang de, /acc lang en, /acc lang ko oder /acc lang auto.",
+      "en": "Choose a language with: /acc lang de, /acc lang en, /acc lang ko or /acc lang auto.",
+      "ko": "언어를 고르려면 /acc lang ko, /acc lang en, /acc lang de, /acc lang auto 중 하나를 입력한다."
+    }
+  ]
+}

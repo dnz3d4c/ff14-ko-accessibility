@@ -4,9 +4,169 @@
   "slots": "{name} 같은 보간 자리는 이름을 바꾸지 않는다. 순서는 한국어 어순대로 바꿔도 되지만 자리 집합이 영어와 같아야 하고, 다르면 ko-apply가 거부한다.",
   "strings": [
     {
+      "de": " an {name}",
+      "en": " to {name}",
+      "ko": " {name}에게"
+    },
+    {
+      "de": "Alles",
+      "en": "All",
+      "ko": "전체"
+    },
+    {
+      "de": "Allianz",
+      "en": "Alliance",
+      "ko": "연합 파티"
+    },
+    {
+      "de": "Anfang des Verlaufs.",
+      "en": "Start of history.",
+      "ko": "기록 처음."
+    },
+    {
+      "de": "Ansagen",
+      "en": "Announcements",
+      "ko": "안내"
+    },
+    {
+      "de": "Aus",
+      "en": "Off",
+      "ko": "꺼짐"
+    },
+    {
+      "de": "Beute",
+      "en": "Loot",
+      "ko": "전리품"
+    },
+    {
+      "de": "Brüllt",
+      "en": "Yells",
+      "ko": "떠들기"
+    },
+    {
+      "de": "Chat",
+      "en": "Chat",
+      "ko": "로그"
+    },
+    {
+      "de": "Chat vorlesen (Register nicht lesbar)",
+      "en": "Read chat aloud (tabs unreadable)",
+      "ko": "로그 읽어 주기 (탭을 읽을 수 없음)"
+    },
+    {
+      "de": "Chat-Eingabe",
+      "en": "Chat input",
+      "ko": "대화 입력란"
+    },
+    {
+      "de": "Chat-Eingabe, {channel}",
+      "en": "Chat input, {channel}",
+      "ko": "대화 입력란, {channel}"
+    },
+    {
+      "de": "Chat-Kanäle",
+      "en": "Chat channels",
+      "ko": "로그 채널"
+    },
+    {
+      "de": "Chat-Register",
+      "en": "Chat tabs",
+      "ko": "로그 탭"
+    },
+    {
+      "de": "Chatsystem",
+      "en": "Chat system",
+      "ko": "로그 시스템"
+    },
+    {
+      "de": "Chatsystem {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}. Beide Nachlesen laufen mit, es ist nichts verloren.",
+      "en": "Chat system {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}. Both histories keep recording, nothing was lost.",
+      "ko": "로그 시스템 {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}. 두 기록 다 계속 쌓이고, 잃은 것 없음."
+    },
+    {
+      "de": "Chatsystem: {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}",
+      "en": "Chat system: {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}",
+      "ko": "로그 시스템: {(legacy ? ChatSystemLegacyName : ChatSystemNewName)}"
+    },
+    {
+      "de": "Das Chatfenster ist nicht erreichbar.",
+      "en": "The chat window cannot be reached.",
+      "ko": "로그창에 접근할 수 없음."
+    },
+    {
       "de": "Deutsch",
       "en": "German",
       "ko": "독일어"
+    },
+    {
+      "de": "Dialoge",
+      "en": "Dialogue",
+      "ko": "대화"
+    },
+    {
+      "de": "Die Chat-Einstellungen des Spiels sind nicht lesbar. Der Chat läuft in einem Puffer.",
+      "en": "The game's chat settings cannot be read. Chat is going to one buffer.",
+      "ko": "게임의 로그 필터 설정을 읽을 수 없음. 로그가 버퍼 하나로 모임."
+    },
+    {
+      "de": "Diese Taste gehört zum neuen Chatsystem.",
+      "en": "That key belongs to the new chat system.",
+      "ko": "이 키는 신규 로그 시스템 것임."
+    },
+    {
+      "de": "Du",
+      "en": "You",
+      "ko": "내가"
+    },
+    {
+      "de": "Du brüllst",
+      "en": "You yell",
+      "ko": "내가 떠들기"
+    },
+    {
+      "de": "Du flüsterst",
+      "en": "You tell",
+      "ko": "내가 귓속말"
+    },
+    {
+      "de": "Du rufst",
+      "en": "You shout",
+      "ko": "내가 외치기"
+    },
+    {
+      "de": "Du sagst",
+      "en": "You say",
+      "ko": "내가 말하기"
+    },
+    {
+      "de": "Du zur Allianz",
+      "en": "You to alliance",
+      "ko": "내가 연합 파티에"
+    },
+    {
+      "de": "Du zur FC",
+      "en": "You to FC",
+      "ko": "내가 자유부대에"
+    },
+    {
+      "de": "Du zur Gruppe",
+      "en": "You to party",
+      "ko": "내가 파티에"
+    },
+    {
+      "de": "Echo",
+      "en": "Echo",
+      "ko": "혼잣말"
+    },
+    {
+      "de": "Einstellungen",
+      "en": "Settings",
+      "ko": "설정"
+    },
+    {
+      "de": "Ende des Verlaufs.",
+      "en": "End of history.",
+      "ko": "기록 끝."
     },
     {
       "de": "Englisch",
@@ -14,9 +174,139 @@
       "ko": "영어"
     },
     {
+      "de": "FC",
+      "en": "FC",
+      "ko": "자유부대"
+    },
+    {
+      "de": "Fehler",
+      "en": "Error",
+      "ko": "오류"
+    },
+    {
+      "de": "Fehlermeldungen",
+      "en": "Error messages",
+      "ko": "오류 메시지"
+    },
+    {
+      "de": "Flüstern",
+      "en": "Tell",
+      "ko": "귓속말"
+    },
+    {
+      "de": "Flüstert",
+      "en": "Tells",
+      "ko": "귓속말"
+    },
+    {
+      "de": "Flüstert an",
+      "en": "Tells",
+      "ko": "귓속말"
+    },
+    {
+      "de": "Freie Gesellschaft",
+      "en": "Free Company",
+      "ko": "자유부대"
+    },
+    {
+      "de": "Fähigkeit bereit",
+      "en": "Ability ready",
+      "ko": "기술 준비됨"
+    },
+    {
+      "de": "Fähigkeit bereit Lautstärke",
+      "en": "Ability ready volume",
+      "ko": "기술 준비됨 음량"
+    },
+    {
+      "de": "Ganze Gruppe vorlesen",
+      "en": "Read whole group aloud",
+      "ko": "그룹 전체 읽어 주기"
+    },
+    {
+      "de": "Gegner wirkt Aktion",
+      "en": "Enemy casting",
+      "ko": "적 기술 시전"
+    },
+    {
+      "de": "Gehhilfe-Beacon",
+      "en": "Walk-guide beacon",
+      "ko": "길안내 신호음"
+    },
+    {
+      "de": "Gruppe",
+      "en": "Party",
+      "ko": "파티"
+    },
+    {
+      "de": "Himmelsrichtung",
+      "en": "Compass heading",
+      "ko": "방위"
+    },
+    {
+      "de": "Hinweismeldungen",
+      "en": "Notice messages",
+      "ko": "알림 메시지"
+    },
+    {
+      "de": "Kartenmarkierung",
+      "en": "Map flag",
+      "ko": "지도 표식"
+    },
+    {
+      "de": "Keine Einträge.",
+      "en": "No entries.",
+      "ko": "항목 없음."
+    },
+    {
       "de": "Koreanisch",
       "en": "Korean",
       "ko": "한국어"
+    },
+    {
+      "de": "Meldungen",
+      "en": "Notices",
+      "ko": "알림"
+    },
+    {
+      "de": "Meldungen ohne Spielfilter vorlesen",
+      "en": "Read lines the game cannot filter",
+      "ko": "게임이 거를 수 없는 줄 읽어 주기"
+    },
+    {
+      "de": "Menü geschlossen.",
+      "en": "Menu closed.",
+      "ko": "메뉴 닫힘."
+    },
+    {
+      "de": "Register vorlesen",
+      "en": "Read tab aloud",
+      "ko": "탭 읽어 주기"
+    },
+    {
+      "de": "Rufen",
+      "en": "Shout",
+      "ko": "외치기"
+    },
+    {
+      "de": "Ruft",
+      "en": "Shouts",
+      "ko": "외치기"
+    },
+    {
+      "de": "Sagen",
+      "en": "Say",
+      "ko": "말하기"
+    },
+    {
+      "de": "Sagt",
+      "en": "Says",
+      "ko": "말하기"
+    },
+    {
+      "de": "Sammeln",
+      "en": "Gathering",
+      "ko": "채집"
     },
     {
       "de": "Sprache auf {language} umgestellt.",
@@ -32,6 +322,86 @@
       "de": "Sprache wählen mit: /acc lang de, /acc lang en, /acc lang ko oder /acc lang auto.",
       "en": "Choose a language with: /acc lang de, /acc lang en, /acc lang ko or /acc lang auto.",
       "ko": "언어를 고르려면 /acc lang ko, /acc lang en, /acc lang de, /acc lang auto 중 하나를 입력한다."
+    },
+    {
+      "de": "Steht weiter zum Nachlesen bereit.",
+      "en": "Still available in the history.",
+      "ko": "기록에는 그대로 남음."
+    },
+    {
+      "de": "System",
+      "en": "System",
+      "ko": "시스템"
+    },
+    {
+      "de": "Töne",
+      "en": "Sounds",
+      "ko": "소리"
+    },
+    {
+      "de": "Wegpunkt- und Ankunftston",
+      "en": "Waypoint and arrival cues",
+      "ko": "경유지와 도착 알림음"
+    },
+    {
+      "de": "Ziel-Lebenspunkte",
+      "en": "Target health",
+      "ko": "대상 체력"
+    },
+    {
+      "de": "Zielwechsel",
+      "en": "Target changes",
+      "ko": "대상 변경"
+    },
+    {
+      "de": "gewohnt, feste Kanäle",
+      "en": "classic, fixed channels",
+      "ko": "기존, 고정 채널"
+    },
+    {
+      "de": "neu, Register des Spiels",
+      "en": "new, the game's tabs",
+      "ko": "신규, 게임 탭"
+    },
+    {
+      "de": "{(int)MathF.Round(volume * 100)} Prozent",
+      "en": "{(int)MathF.Round(volume * 100)} percent",
+      "ko": "{(int)MathF.Round(volume * 100)} 퍼센트"
+    },
+    {
+      "de": "{category}, leer",
+      "en": "{category}, empty",
+      "ko": "{category}, 비어 있음"
+    },
+    {
+      "de": "{name} auf {(int)MathF.Round(volume * 100)} Prozent.",
+      "en": "{name} at {(int)MathF.Round(volume * 100)} percent.",
+      "ko": "{name} {(int)MathF.Round(volume * 100)} 퍼센트로 변경됨."
+    },
+    {
+      "de": "{name} aus.",
+      "en": "{name} off.",
+      "ko": "{name} 꺼짐."
+    },
+    {
+      "de": "{name}, aus",
+      "en": "{name}, off",
+      "ko": "{name}, 꺼짐"
+    },
+    {
+      "de": "{name}, {(int)MathF.Round(volume * 100)} Prozent",
+      "en": "{name}, {(int)MathF.Round(volume * 100)} percent",
+      "ko": "{name}, {(int)MathF.Round(volume * 100)} 퍼센트"
+    },
+    {
+      "de": "{prefix} von {sender}: {message}",
+      "en": "{prefix} from {sender}: {message}",
+      "ko": "{sender} {prefix}: {message}"
+    },
+    {
+      "de": "{tab}, {buffers} Puffer. {first}, {count}.",
+      "en": "{tab}, {buffers} buffers. {first}, {count}.",
+      "ko": "{tab}, 버퍼 {buffers}개. {first}, {count}."
     }
   ]
 }

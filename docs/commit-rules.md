@@ -156,6 +156,7 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 
 ## 5. 아직 정하지 않은 것
 
-- **업스트림 PR의 언어** — `Upstream-Subject`는 영어로 적기로 정했다(§3.1). **PR로 보낼 때의 언어는 아직 미정**이고, 첫 PR 직전에 업스트림에 질의한다. 트레일러가 영어라고 PR도 영어라는 뜻은 아니다.
+- ~~업스트림 PR의 언어~~ — **영어로 정해졌다**(2026-08-18, 사용자 결정). 트레일러(`Upstream-Subject`, §3.1)도 PR 제목·본문도 영어다. 업스트림에 묻지 않는다.
+- **무엇을 PR로 보낼 것인가** — 디렉토리 기준(`patches/` vs `overlay/`)보다 좁다. 기준 둘이 더 있고 못 넘기면 **패치를 만들지 않는다**: ① 글섭 클라 없이 소스만 읽어 판정될 것 ② 명백한 기존 로직의 오류일 것(리팩터·구조 개선 금지). 원천은 [patches/README.md](../patches/README.md).
 - **fork 저장소를 언제 만들 것인가** — 기여 계획이 확정되기 전에는 `patches/`에 파일로 쌓는다(쌓아만 두는 게 아니라 로컬에도 적용된다 — [patches/README.md](../patches/README.md)). `[업스트림]` 커밋의 `Upstream-Files`/`Upstream-Subject`가 그때 그대로 PR 재료가 된다.
 - **AGPL-3.0 LICENSE 파일 추가 시점** — 코드가 들어오는 시점(현재는 문서·도구뿐).

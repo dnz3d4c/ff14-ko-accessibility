@@ -83,6 +83,17 @@ KR 검증 (전부 게임을 켜지 않고 돈다):
 - `docs/` — 조사·설계 문서. **`status.md`가 남은 일의 기준**
 - `run/` — 실행 배치 (게임·빌드·로그·동기화·최초설정·배포)
 - `.claude/skills/` — 프로젝트 스킬. 한국어화 규칙은 `ko-localization`이 갖는다
+- `.claude/commands/` — 동기화 절차를 순서로 고정한 커맨드. `/ff_help`가 목록을 낸다
+
+### 커맨드 (`/ff_`)
+
+배치가 **한 가지 일**을 한다면, 커맨드는 **그 일들을 어떤 순서로 엮고 어디서 멈출지**를 갖는다. 절차는 `docs/`에 다 적혀 있는데 읽고 순서대로 실행하는 것은 매번 사람이 했고, 그 자리를 메운다.
+
+- `/ff_help` — 목록. 손으로 적지 않고 `.claude/commands/`에서 만든다
+- `/ff_sync check | up <태그> | notes | patches` — **위에서 오는 것.** 원본 모드 따라잡기
+- `/ff_env check | dalamud | vnavmesh | game` — **아래에서 오는 것.** KR 달라무드·vnavmesh·게임 패치
+
+**아래가 위보다 먼저다** ([upstream-sync.md](docs/upstream-sync.md) §9). 그리고 각 커맨드는 `## 멈추는 조건`을 갖는다 — 사람이 정할 것이 섞여 들어오면 커밋하지 않고 멈춘다.
 
 ## 클론 직후 한 번
 

@@ -183,11 +183,16 @@ def test_문자열_안의_슬래시두개는_주석이_아니다():
     assert pairs(src) == [("http://a.de/x", "http://a.com/x")]
 
 
-def test_미해석_41개_중_하나는_축약_정의다():
-    # 진짜 손으로 옮길 자리는 40개다. 나머지 하나는 Pick 축약이 Loc.Pick으로
-    # 넘기는 줄이라 문장이 아니다. 이걸 적어 두지 않으면 다음 사람이 41개를
+def test_미해석_42개_중_하나는_축약_정의다():
+    # 진짜 손으로 옮길 자리는 41개다. 나머지 하나는 Pick 축약이 Loc.Pick으로
+    # 넘기는 줄이라 문장이 아니다. 이걸 적어 두지 않으면 다음 사람이 42개를
     # 다 뒤진다.
+    #
+    # **이 수를 여기 박아 두는 것이 목적이다.** 골든의 `pairs`는 이 모양을 아예
+    # 못 세므로, 업스트림이 보간 안에 갈림길을 품은 문장을 더해도 스냅샷은
+    # 초록으로 통과한다 - v5.88의 `ConfigPageWithCount`가 실제로 그랬다.
+    # 여기가 빨개지는 것만이 "손으로 옮길 자리가 늘었다"는 신호다.
     _, now = strings_golden.scan()
     forwarding = [u for u in now if u.snippet.startswith("Pick(de, en, ko)")]
     assert len(forwarding) == 1
-    assert len(now) - len(forwarding) == 40
+    assert len(now) - len(forwarding) == 41

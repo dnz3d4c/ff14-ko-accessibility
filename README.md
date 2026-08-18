@@ -19,7 +19,7 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 | [KR 실행 환경 구축 절차](docs/kr-runtime-setup.md) | 손으로 세울 때의 절차. 설치기가 이걸 대신한다 |
 | [단축키 한국어 표](docs/keys-ko.md) | 독일어 키 이름 대응과 KR에서 겹치는 키 |
 | [커밋 규칙](docs/commit-rules.md) | 갈래·트레일러와 검사기가 막는 것 |
-| [손으로 옮긴 35곳](docs/ko-hand-cases.md) | 생성기가 못 읽는 문장 모양과 조심할 것 |
+| [손으로 옮긴 36곳](docs/ko-hand-cases.md) | 생성기가 못 읽는 문장 모양과 조심할 것 |
 | [한국어 전수 검수](docs/ko-review-2026-08-18.md) | 50곳을 고친 기록과 대장을 못 믿게 된 이유 |
 | [업스트림 동기화](docs/upstream-sync.md) | 핀을 옮기는 절차 |
 | [업스트림 변경 이력 (한국어)](docs/upstream-changes.md) | 원문이 독일어라 옮겨 둔다 |

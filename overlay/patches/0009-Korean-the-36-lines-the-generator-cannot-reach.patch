@@ -1,7 +1,7 @@
-From 6c5a2573ba929dba060d28b84b37324e22b4ad51 Mon Sep 17 00:00:00 2001
+From 65457eff8469ee7f59f38fdcc829ed6bd9c7480c Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 12:29:15 +0900
-Subject: [PATCH 09/11] Korean: the 35 lines the generator cannot reach
+Subject: [PATCH 09/14] Korean: the 36 lines the generator cannot reach
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -46,6 +46,12 @@ The review pass moved three of these lines.
 - TargetBarSummary read "대상 단축바 2". The game's own key-settings screen says
   "1번 단축바 1번 칸" (13195), so the number goes in front
 
+v5.88 added the 36th: ConfigPageWithCount, the settings page announcing how many
+controls it carries. It is another singular/plural branch, so the Korean arm is
+one form - "설정 {count}개". 설정 is the client's own word (Addon 4000, "시스템
+설정"), and 개 is the counter the other hand-written lines already use for a
+plain count of things (항목 {count}개, 키 충돌 {count}개).
+
 Build: 0 warnings, 0 errors against ClientStructs 7.55 and 7.51
 Verified: DE/EN snapshot unchanged - 688 pairs. HelpFull fragment count equal
 across the three languages
@@ -54,8 +60,8 @@ In-Game: not checked
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
  .../Services/AccessibilityStrings.Chat.cs     |   6 +-
- .../Services/AccessibilityStrings.cs          | 152 ++++++++++++++----
- 2 files changed, 123 insertions(+), 35 deletions(-)
+ .../Services/AccessibilityStrings.cs          | 160 ++++++++++++++----
+ 2 files changed, 128 insertions(+), 38 deletions(-)
 
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.Chat.cs b/FF14Accessibility/Services/AccessibilityStrings.Chat.cs
 index 29c3ca8..7660040 100644
@@ -80,7 +86,7 @@ index 29c3ca8..7660040 100644
      /// <summary>Eine Lautstärke-Zeile: "Beacon, 35 Prozent" oder "Beacon, aus".</summary>
      public static string OptionVolume(string name, float volume) =>
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index dcddcbd..53ae29e 100644
+index e7cad65..13892fe 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -118,7 +118,8 @@ public static partial class AccessibilityStrings
@@ -173,7 +179,22 @@ index dcddcbd..53ae29e 100644
                  ? $"{items.Count} passende Gegenstände: {string.Join(", ", items)}. Auswählen und dann Übergeben drücken."
                  : $"{items.Count} matching items: {string.Join(", ", items)}. Select one, then press Hand Over.",
      };
-@@ -969,7 +987,8 @@ public static partial class AccessibilityStrings
+@@ -939,9 +957,11 @@ public static partial class AccessibilityStrings
+     /// Spieler sieht die ganze Seite auf einen Blick; die Zahl ist das
+     /// Gegenstueck dazu.</summary>
+     public static string ConfigPageWithCount(string heading, int count) =>
+-        IsGerman
+-            ? $"{heading}, {count} {(count == 1 ? "Einstellung" : "Einstellungen")}"
+-            : $"{heading}, {count} {(count == 1 ? "setting" : "settings")}";
++        Loc.IsKorean
++            ? $"{heading}, 설정 {count}개"
++            : IsGerman
++                ? $"{heading}, {count} {(count == 1 ? "Einstellung" : "Einstellungen")}"
++                : $"{heading}, {count} {(count == 1 ? "setting" : "settings")}";
+ 
+     public static string TabPressedNoPageChange => Pick("Reiter gedrückt, aber kein Seitenwechsel erkannt.",
+                                                         "Tab pressed, but no page change detected.",
+@@ -981,7 +1001,8 @@ public static partial class AccessibilityStrings
      // ── Zusammengesetzte Ansagen (UIReader Etappe 2) ─────────────────
      /// <summary>" item: " / " items: " count label for a gathered/read item list.</summary>
      public static string ItemsCountLabel(int count) =>
@@ -183,7 +204,7 @@ index dcddcbd..53ae29e 100644
                   : (count == 1 ? " item: " : " items: ");
  
      /// <summary>The word "Level" / "Stufe" - used both standalone and to expand
-@@ -1005,7 +1024,8 @@ public static partial class AccessibilityStrings
+@@ -1017,7 +1038,8 @@ public static partial class AccessibilityStrings
      /// <summary>One option while stepping through an OPENED drop-down. Names the
      /// stored choice, which a sighted player sees highlighted in the list.</summary>
      public static string DropdownOption(string option, int index, int count, bool selected) =>
@@ -193,7 +214,7 @@ index dcddcbd..53ae29e 100644
              ? $"{option}, {index} von {count}{(selected ? ", ausgewählt" : "")}"
              : $"{option}, {index} of {count}{(selected ? ", selected" : "")}";
      // ── Zur Wegrichtung drehen (Numpad5) ─────────────────────────────
-@@ -1069,7 +1089,8 @@ public static partial class AccessibilityStrings
+@@ -1081,7 +1103,8 @@ public static partial class AccessibilityStrings
      // ── Belohnungs-Zeile (JournalResult) ─────────────────────────────
      // Currency type is only a UI image, so the mod labels amounts by position.
      public static string[] RewardCurrencyLabels =>
@@ -203,7 +224,7 @@ index dcddcbd..53ae29e 100644
      public static string MoreReward => Pick("weitere Vergütung", "further reward", "추가 보상");
      /// <summary>Prefix spoken in front of the whole quest-completion reward summary.</summary>
      public static string RewardPrefix => Pick("Belohnung: ", "Reward: ", "보상: ");
-@@ -1122,7 +1143,8 @@ public static partial class AccessibilityStrings
+@@ -1134,7 +1157,8 @@ public static partial class AccessibilityStrings
      // ── Keybind-Zeile (Config) ───────────────────────────────────────
      public static string KeyBindingLine(string label, IReadOnlyList<string> keys) =>
          keys.Count > 0
@@ -213,7 +234,7 @@ index dcddcbd..53ae29e 100644
              : (Pick($"{label}, keine Taste", $"{label}, no key", $"{label}, 키 없음"));
  
      // ── Anfaenger-Arena (BeginnersMansionProblem) ────────────────────
-@@ -1313,7 +1335,8 @@ public static partial class AccessibilityStrings
+@@ -1325,7 +1349,8 @@ public static partial class AccessibilityStrings
      // Welche EIGENEN Klassen das Teil tragen koennen - die Frage vorm Verkaufen.
      // Ein- und Mehrzahl getrennt, sonst stolpert die Ansage bei einer Klasse.
      public static string ForYourClasses(string classes, int count) =>
@@ -223,7 +244,7 @@ index dcddcbd..53ae29e 100644
              ? (count == 1 ? $", für deine Klasse {classes}" : $", für deine Klassen {classes}")
              : (count == 1 ? $", for your {classes}" : $", for your classes {classes}");
      // Langform fuer den einzelnen Gegenstand, wo Platz fuer die Warnung ist.
-@@ -1426,10 +1449,13 @@ public static partial class AccessibilityStrings
+@@ -1438,10 +1463,13 @@ public static partial class AccessibilityStrings
               $"공격 주기 {seconds:0.0}초");
      /// <summary>One attribute bonus, e.g. "Stärke plus 4" - name from the sheet.</summary>
      public static string AttributeValue(string name, int v) =>
@@ -239,7 +260,7 @@ index dcddcbd..53ae29e 100644
          ? (n == 1 ? "1 Materia-Slot" : $"{n} Materia-Slots")
          : (n == 1 ? "1 materia slot" : $"{n} materia slots");
  
-@@ -1440,7 +1466,8 @@ public static partial class AccessibilityStrings
+@@ -1452,7 +1480,8 @@ public static partial class AccessibilityStrings
      /// string; the dots are spoken out per language so the screen reader does
      /// not run the digits together.</summary>
      public static string VersionReady(string version) =>
@@ -249,7 +270,7 @@ index dcddcbd..53ae29e 100644
              ? $"FF14 Accessibility Version {version.Replace(".", " Punkt ")} bereit."
              : $"FF14 Accessibility version {version.Replace(".", " point ")} ready.";
  
-@@ -1544,7 +1571,42 @@ public static partial class AccessibilityStrings
+@@ -1556,7 +1585,42 @@ public static partial class AccessibilityStrings
      /// <summary>The full "/acc help" readout: every plugin hotkey and command.
      /// Keys are the current defaults (Page keys, Numpad 3, Plus - kept in sync
      /// with <see cref="Configuration"/>).</summary>
@@ -293,7 +314,7 @@ index dcddcbd..53ae29e 100644
          ? "Tasten: " +
            "Bild ab, nächstes Objekt ansagen und anvisieren. " +
            "Bild auf, vorheriges Objekt. " +
-@@ -1792,7 +1854,9 @@ public static partial class AccessibilityStrings
+@@ -1804,7 +1868,9 @@ public static partial class AccessibilityStrings
      public static string TrailCount(int count) => Pick($"{count} Spuren in diesem Gebiet.",
                                                         $"{count} trails in this area.",
                                                         $"이 지역에 발자취 {count}개.");
@@ -304,7 +325,7 @@ index dcddcbd..53ae29e 100644
          ? $"{number}: {name}, {MetersRemaining(length)}, {(bothWays ? "in beide Richtungen" : "nur in Laufrichtung")}."
          : $"{number}: {name}, {MetersRemaining(length)}, {(bothWays ? "both ways" : "one way only")}.";
      public static string TrailUnknownNumber => Pick("Diese Nummer gibt es hier nicht.",
-@@ -1874,13 +1938,15 @@ public static partial class AccessibilityStrings
+@@ -1886,13 +1952,15 @@ public static partial class AccessibilityStrings
      /// <summary>Target-bar summary: how many slots are filled, plus a warning
      /// when the bar has no keys bound.</summary>
      public static string TargetBarSummary(int bar, int filled, int total, bool anyKey) =>
@@ -322,7 +343,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}, Stufe {level}{(location != null ? $", liegt auf {location}" : "")}, {index} von {count}"
              : $"{name}, level {level}{(location != null ? $", on {location}" : "")}, {index} of {count}";
  
-@@ -1888,7 +1954,8 @@ public static partial class AccessibilityStrings
+@@ -1900,7 +1968,8 @@ public static partial class AccessibilityStrings
      /// sits (optional) and its position in the list. The count is spoken because
      /// a stack of one is a different decision than a stack of twenty.</summary>
      public static string ItemBrowseEntry(string name, int quantity, bool isHq, string? location, int index, int count) =>
@@ -332,7 +353,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}{(isHq ? HighQuality : "")}, {quantity} Stück{(location != null ? $", liegt auf {location}" : "")}, {index} von {count}"
              : $"{name}{(isHq ? HighQuality : "")}, {quantity}{(location != null ? $", on {location}" : "")}, {index} of {count}";
  
-@@ -1922,7 +1989,8 @@ public static partial class AccessibilityStrings
+@@ -1934,7 +2003,8 @@ public static partial class AccessibilityStrings
      /// and mounts. Same shape as the other browse entries so the menu sounds
      /// consistent no matter which list is open.</summary>
      public static string PlainBrowseEntry(string name, string? location, int index, int count) =>
@@ -342,7 +363,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}{(location != null ? $", liegt auf {location}" : "")}, {index} von {count}"
              : $"{name}{(location != null ? $", on {location}" : "")}, {index} of {count}";
  
-@@ -1936,7 +2004,8 @@ public static partial class AccessibilityStrings
+@@ -1948,7 +2018,8 @@ public static partial class AccessibilityStrings
      /// and where it already sits. The cast time matters in a fight - three
      /// seconds of standing still is a decision.</summary>
      public static string QuestItemBrowseEntry(string name, int quantity, byte castTime, string? location, int index, int count) =>
@@ -352,7 +373,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}, {quantity} Stück{(castTime > 0 ? $", Wirkzeit {castTime} Sekunden" : "")}{(location != null ? $", liegt auf {location}" : "")}, {index} von {count}"
              : $"{name}, {quantity}{(castTime > 0 ? $", cast time {castTime} seconds" : "")}{(location != null ? $", on {location}" : "")}, {index} of {count}";
  
-@@ -1996,7 +2065,11 @@ public static partial class AccessibilityStrings
+@@ -2008,7 +2079,11 @@ public static partial class AccessibilityStrings
                             $", 나보다 {-heightDiff:F0}미터 아래"),
              _ => string.Empty,
          };
@@ -365,7 +386,7 @@ index dcddcbd..53ae29e 100644
              ? $"Kein durchgehender Weg zu {target}. Ich laufe zum nächstmöglichen Punkt, " +
                $"{walkDistance:F0} Meter nach {compass}. Von dort ist das Ziel noch " +
                $"{gapDistance:F0} Meter entfernt{hoehe}."
-@@ -2132,7 +2205,8 @@ public static partial class AccessibilityStrings
+@@ -2144,7 +2219,8 @@ public static partial class AccessibilityStrings
          Pick("Keine Emotes verfügbar.", "No emotes available.", "쓸 수 있는 감정 표현 없음.");
      /// <summary>One browsed emote: name, chat command (optional), list position.</summary>
      public static string EmoteBrowseEntry(string name, string command, int index, int count) =>
@@ -375,7 +396,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}{(command.Length > 0 ? $", Befehl {command}" : "")}, {index} von {count}"
              : $"{name}{(command.Length > 0 ? $", command {command}" : "")}, {index} of {count}";
  
-@@ -2234,7 +2308,8 @@ public static partial class AccessibilityStrings
+@@ -2246,7 +2322,8 @@ public static partial class AccessibilityStrings
      // ════════════════════════════════════════════════════════════════
      /// <summary>Announced the moment a roll opens.</summary>
      public static string LootRollStarted(string name, int count, string options) =>
@@ -385,7 +406,7 @@ index dcddcbd..53ae29e 100644
              ? $"Verlosung: {name}{(count > 1 ? $" mal {count}" : "")}. {options}"
              : $"Loot roll: {name}{(count > 1 ? $" times {count}" : "")}. {options}";
  
-@@ -2260,7 +2335,8 @@ public static partial class AccessibilityStrings
+@@ -2272,7 +2349,8 @@ public static partial class AccessibilityStrings
  
      /// <summary>One entry of the on-demand readout.</summary>
      public static string LootRollEntry(string name, int count, string options, string ownRoll) =>
@@ -395,7 +416,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}{(count > 1 ? $" mal {count}" : "")}, {options}{(ownRoll.Length > 0 ? $", {ownRoll}" : "")}"
              : $"{name}{(count > 1 ? $" times {count}" : "")}, {options}{(ownRoll.Length > 0 ? $", {ownRoll}" : "")}";
  
-@@ -2271,7 +2347,12 @@ public static partial class AccessibilityStrings
+@@ -2283,7 +2361,12 @@ public static partial class AccessibilityStrings
      /// for everything that is not equipment.
      /// </summary>
      public static string LootRollRow(string name, int count, string gear, string options, string remaining) =>
@@ -409,7 +430,7 @@ index dcddcbd..53ae29e 100644
              ? $"{name}{(count > 1 ? $" mal {count}" : "")}" +
                $"{(gear.Length      > 0 ? $", {gear}"      : "")}" +
                $"{(options.Length  > 0 ? $", {options}"  : "")}" +
-@@ -2378,7 +2459,8 @@ public static partial class AccessibilityStrings
+@@ -2390,7 +2473,8 @@ public static partial class AccessibilityStrings
      public static string CategorySummary(string category, int count) =>
          count == 0
              ? (Pick($"{category}, leer", $"{category}, empty", $"{category}, 비어 있음"))
@@ -419,7 +440,7 @@ index dcddcbd..53ae29e 100644
                          : $"{category}, {count} {(count == 1 ? "message" : "messages")}");
      public static string HistoryStart =>
          Pick("Anfang des Verlaufs.", "Start of history.", "기록 처음.");
-@@ -2714,7 +2796,8 @@ public static partial class AccessibilityStrings
+@@ -2726,7 +2810,8 @@ public static partial class AccessibilityStrings
      /// Typ-4-Menue gehoert, also wird nichts zugeschrieben, was sich nicht belegen
      /// laesst.</summary>
      public static string CharaMakeFeatureBit(string label, int number, bool on) =>
@@ -429,7 +450,7 @@ index dcddcbd..53ae29e 100644
                   : $"{label} {number}, {(on ? "on" : "off")}";
  
      /// <summary>Derselbe Schalter, aber mit NAMEN statt Nummer. User: *"facial
-@@ -2724,20 +2807,23 @@ public static partial class AccessibilityStrings
+@@ -2736,20 +2821,23 @@ public static partial class AccessibilityStrings
      /// Gesichtsmerkmale, Eintrag "1 von 5", kippte Bit 0 - also Reihe i = Bit
      /// i-1.</summary>
      public static string CharaMakeFeatureNamed(string label, int number, string what, bool on) =>

@@ -1,7 +1,7 @@
-From 9ef4d71d82a1ffa8d6c13f108e21cad2c4ee280e Mon Sep 17 00:00:00 2001
+From 3435015dae531dc416afaee9d7e0006a96640ba2 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 07:36:36 +0900
-Subject: [PATCH 2/2] Loc: resolve the language once, and make adding one a
+Subject: [PATCH 2/3] Loc: resolve the language once, and make adding one a
  two-line change
 
 IsGerman was a bool, so every caller had exactly two answers available and

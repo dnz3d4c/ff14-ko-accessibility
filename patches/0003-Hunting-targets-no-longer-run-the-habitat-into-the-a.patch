@@ -1,0 +1,47 @@
+From e38e6ac6468d24e702494c894c2bd222e680810f Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Tue, 18 Aug 2026 09:26:59 +0900
+Subject: [PATCH 3/3] Hunting targets no longer run the habitat into the area
+ name
+
+The habitat clause and the area clause were concatenated without a
+separator, so the announcement said
+
+    lives in Sandgate Ridgein the area Eastern Thanalan
+
+Screen readers pronounce "Ridgein" as one unknown word. Sighted users
+never notice - the text still reads.
+
+HuntingArea ends without a space and InArea/InAnotherArea start without
+one; the two other InArea call sites prepend their own ", " and are
+unaffected, so the space belongs at this call site rather than in the
+strings.
+
+This breaks in every locale, German included:
+
+    lebt in Kaktusgrundim Gebiet Ost-Thanalan
+
+Measured on a Korean client (2026-08-18 log), read from the source for
+German and English.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+---
+ FF14Accessibility/Services/NavigationService.cs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/FF14Accessibility/Services/NavigationService.cs b/FF14Accessibility/Services/NavigationService.cs
+index 8ae8a0b..9f57aad 100644
+--- a/FF14Accessibility/Services/NavigationService.cs
++++ b/FF14Accessibility/Services/NavigationService.cs
+@@ -1152,7 +1152,7 @@ public sealed class NavigationService
+             var zone = string.IsNullOrEmpty(target.ZoneName)
+                 ? AccessibilityStrings.InAnotherArea
+                 : AccessibilityStrings.InArea(target.ZoneName);
+-            text += ", " + AccessibilityStrings.HuntingArea(target.AreaName) + zone;
++            text += ", " + AccessibilityStrings.HuntingArea(target.AreaName) + " " + zone;
+ 
+             var hop = _places.FindFirstHopToMap(target.MapId, out var hops);
+             if (hop != null)
+-- 
+2.55.0.windows.3
+

@@ -50,6 +50,31 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | Hook 루트 | `%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2` |
 | 에셋 | `%APPDATA%\XIVLauncherKR\dalamudAssets\437` (44개 파일) |
 
+### 프로필 루트 이름이 `XIVLauncherKR`인 이유
+
+**우리가 지은 이름이 아니고, 없는 런처를 가리키는 것도 아니다.** KR Dalamud 쪽 프로필 규약이고 업데이터가 그걸 전제한다. 한국어 런처가 이 구성에서 안 도는 것은 맞지만(`kr-runtime-setup.md` §9), 그렇다고 이름이 빈 것은 아니다.
+
+- 업데이터 설정 `UpdaterSettings.ProfileRoot`의 **기본값**이 `%APPDATA%\XIVLauncherKR`이다
+- `README-KR.txt`: "기존 `%APPDATA%\XIVLauncherKR` 프로필, 런타임, 설정과 플러그인을 사용합니다"
+- 업데이터 바이너리 전체에서 `XIVLauncherKR` 문자열은 **3개뿐**이고 전부 그 기본값과 오류 메시지다. 다른 경로 하드코딩이 없다 (`KrDalamudUpdaterGui.dll` v0.5.0 디컴파일, 2026-08-18)
+
+**그리고 그 폴더는 대부분 우리 것이 아니다.** 464MB 중 우리 몫은 두 조각뿐이다.
+
+| 무엇 | 크기 | 주인 |
+|------|------|------|
+| `addon\Hooks` | 388MB | Dalamud 런타임 |
+| `dalamudAssets` | 70MB | Dalamud |
+| `devPlugins\vnavmesh` | 5.5MB의 대부분 | 남의 플러그인 |
+| `devPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
+
+### 바꿀 수는 있는데 안 바꾼다 (2026-08-18 결정)
+
+`%APPDATA%\KrDalamudUpdater\settings.json`의 `ProfileRoot`를 고치면 옮겨진다. 막는 것이 없다 — `UpdaterSettings`가 그 값을 `Load()`/`Save()`로 왕복 저장하고, 검증(`SafeProfileManager.RequireSafeProfileRoot`)이 거부하는 것은 **`%APPDATA%` 자기 자신과 드라이브 루트 둘뿐**이다.
+
+**안 바꾸는 이유는 설치기 쪽이 갈라지기 때문이다.** 우리 설치기는 프로필 루트를 하드코딩해서 만든다(`overlay/patches/0006`, `Path.Combine(ApplicationData, "XIVLauncherKR")`). 이름을 바꾸면 설치기가 만든 곳과 업데이터가 보는 곳이 달라지고, 업데이터는 **자기 기본값으로 빈 프로필을 새로 만들어 거기에 주입한다.** 오류가 안 나고 플러그인만 조용히 빠진다 — [status.md](status.md) §3이 "아무 일도 안 일어난다의 원인은 늘 경로 중 하나다"라고 적어 둔 바로 그 실패다.
+
+막으려면 우리 설치기가 **남의 프로그램 설정 파일**(`%APPDATA%\KrDalamudUpdater\settings.json`)을 써야 한다. 그건 [status.md](status.md) §4-3에서 vnavmesh 두고 정한 "남의 것은 남이 관리하게 둔다"와 어긋난다. 얻는 것은 이름뿐이고 잃는 것은 조용한 실패라서 안 바꾼다.
+
 업데이터 GUI의 Check Update로 공식 Dalamud stable `15.0.3.2`와 에셋 `437`을 받고 KR 호환 패치까지 자동 적용했다.
 
 적용 확인:

@@ -133,6 +133,8 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 
 업데이터는 게임을 띄우지 않는다. 돌고 있는 `ffxiv_dx11` 프로세스에 붙을 뿐이다(`inject <pid>`). XIVLauncher는 이 구성에서 쓰지 않는다 — `XIVLauncherKR`은 프로그램이 아니라 폴더 이름이다.
 
+**그렇다고 이름이 빈 것은 아니다.** KR Dalamud 업데이터가 쓰는 프로필 규약이고 그쪽 기본값이다. 유래와 "바꿀 수 있는데 왜 안 바꾸나"는 [environment.md](environment.md) §3이 갖는다.
+
 ## 10. 성공 확인
 
 **"적용 완료" 알림을 믿으면 안 된다.** 인젝터가 종료 코드 0으로 끝나면 뜨는데, 게임 안에서 실패해도 0으로 끝난 적이 있다.

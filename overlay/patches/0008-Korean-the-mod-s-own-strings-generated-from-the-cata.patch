@@ -1,6 +1,6 @@
-From 8534232d26d0e96f8c03ecbc936cb9b28ce3146d Mon Sep 17 00:00:00 2001
+From 80ceace9df67e7603ea7210be556524d05260760 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
-Date: Tue, 18 Aug 2026 13:33:33 +0900
+Date: Tue, 18 Aug 2026 13:43:42 +0900
 Subject: [PATCH 8/9] Korean: the mod's own strings, generated from the
  catalogue
 MIME-Version: 1.0
@@ -377,7 +377,7 @@ index f9e0d33..29c3ca8 100644
 +             "기록에는 그대로 남음.");
  }
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 9254a0b..085476d 100644
+index 9254a0b..dcddcbd 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -13,84 +13,102 @@ public static partial class AccessibilityStrings
@@ -986,7 +986,7 @@ index 9254a0b..085476d 100644
 -            : "No open hunting targets in this rank.";
 +        Pick("Keine offenen Jagdziele in diesem Rang.",
 +             "No open hunting targets in this rank.",
-+             "이 등급에 남은 토벌 대상 없음.");
++             "이 단계에 남은 토벌 대상 없음.");
  
      // ── Freibriefe (Levequests): Geber-NPCs + Ziele ──
      public static string CategoryLevequestCount(int givers, int goals) =>
@@ -1484,10 +1484,10 @@ index 9254a0b..085476d 100644
 -        : (IsGerman ? $"Rang {rank}, {done} von {total} Einträgen erledigt" : $"Rank {rank}, {done} of {total} entries done");
 +        ? (Pick($"Rang {rank}, alle {total} Einträge erledigt",
 +                $"Rank {rank}, all {total} entries complete",
-+                $"{rank}등급, {total}개 전부 완료"))
++                $"{rank}단계, {total}개 전부 완료"))
 +        : (Pick($"Rang {rank}, {done} von {total} Einträgen erledigt",
 +                $"Rank {rank}, {done} of {total} entries done",
-+                $"{rank}등급, {total}개 중 {done}개 완료"));
++                $"{rank}단계, {total}개 중 {done}개 완료"));
  
      // ── Gegenstand abliefern (Request / delivery) ────────────────────
      // "Hand Over" is the EN client's button; verify against an EN dump in Teil 2.
@@ -1637,7 +1637,7 @@ index 9254a0b..085476d 100644
 -        IsGerman ? $"Ausgerichtet. {distance} geradeaus." : $"Aligned. {distance} straight ahead.";
 +        Pick($"Ausgerichtet. {distance} geradeaus.",
 +             $"Aligned. {distance} straight ahead.",
-+             $"방향 맞춤. 정면으로 {distance}.");
++             $"방향 맞춤. {distance}, 정면.");
  
      /// <summary>The key was pressed without a walk guide running.</summary>
      public static string FaceNoRoute =>
@@ -3669,7 +3669,7 @@ index 9254a0b..085476d 100644
  
      /// <summary>Kategorie-Bezeichnung fuer die beiden Leuchten.</summary>
 -    public static string DeepCategoryCairns => IsGerman ? "Leuchten" : "Cairns";
-+    public static string DeepCategoryCairns => Pick("Leuchten", "Cairns", "등불");
++    public static string DeepCategoryCairns => Pick("Leuchten", "Cairns", "석탑");
  
      /// <summary>Ein Raum, nach dem spieleigenen Index dafuer.</summary>
 -    public static string DeepRoomName(int index) => IsGerman ? $"Raum {index}" : $"Room {index}";

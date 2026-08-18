@@ -442,6 +442,13 @@
       "row_text": "토벌수첩"
     },
     {
+      "en": "Rank (hunting log)",
+      "ko": "단계",
+      "addon": 1893,
+      "row_text": "단계 수행 조건",
+      "note": "1893행이 '단계 수행 조건'"
+    },
+    {
       "en": "Echo",
       "ko": "혼잣말",
       "addon": 1912,
@@ -656,6 +663,18 @@
       "addon": 9836,
       "row_text": "접속 종료",
       "note": "시스템 메뉴에서도 확인됨 (2026-08-18 로그)"
+    },
+    {
+      "en": "Cairn of Return",
+      "ko": "부활 석탑",
+      "addon": 10418,
+      "row_text": "부활 석탑"
+    },
+    {
+      "en": "Cairn of Passage",
+      "ko": "전송 석탑",
+      "addon": 10419,
+      "row_text": "전송 석탑"
     },
     {
       "en": "North",

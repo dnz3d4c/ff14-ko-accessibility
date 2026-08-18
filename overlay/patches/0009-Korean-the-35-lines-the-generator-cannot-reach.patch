@@ -1,4 +1,4 @@
-From e8dec02d0b4e7187ab93d76d5dc61ebbf16ca2e5 Mon Sep 17 00:00:00 2001
+From b93fd6cd4c28b48a003d641f3866b7447cbe72ff Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 12:29:15 +0900
 Subject: [PATCH 9/9] Korean: the 35 lines the generator cannot reach
@@ -80,7 +80,7 @@ index 29c3ca8..7660040 100644
      /// <summary>Eine Lautstärke-Zeile: "Beacon, 35 Prozent" oder "Beacon, aus".</summary>
      public static string OptionVolume(string name, float volume) =>
 diff --git a/FF14Accessibility/Services/AccessibilityStrings.cs b/FF14Accessibility/Services/AccessibilityStrings.cs
-index 085476d..f55f9f0 100644
+index dcddcbd..53ae29e 100644
 --- a/FF14Accessibility/Services/AccessibilityStrings.cs
 +++ b/FF14Accessibility/Services/AccessibilityStrings.cs
 @@ -118,7 +118,8 @@ public static partial class AccessibilityStrings

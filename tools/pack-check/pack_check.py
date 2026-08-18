@@ -292,6 +292,87 @@ def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
+def binding_detail(stdout: str, stderr: str = "") -> str:
+    """asmref-check 출력에서 사람이 볼 줄만 남긴다.
+
+    931건 중 걸린 것은 보통 한 줄이다. 전문을 그대로 뱉으면 그 한 줄이 묻힌다.
+    아무 줄도 못 고르면 잘라서라도 원문을 보여 준다 - 조용히 "실패"만 남기는
+    것이 제일 나쁘다.
+    """
+    picked = [
+        line.strip() for line in stdout.splitlines()
+        if "MISSING" in line or "ARITY" in line
+    ]
+    if picked:
+        return "; ".join(picked)
+    return (stdout + stderr).strip()[-400:] or "(출력 없음)"
+
+
+def kr_dalamud_dir() -> Path | None:
+    """KR Dalamud의 Hooks 폴더. 이름이 버전이라 최신을 고른다.
+
+    규칙을 여기서 새로 만들지 않는다 - 프로필 루트는 `kr_profile`이 정하고,
+    `dev`를 건너뛰는 것은 `run\\_env.cmd`와 같다.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kr-setup"))
+    import kr_profile  # noqa: PLC0415 - 배치가 파일 경로로 직접 부른다
+
+    hooks = Path(kr_profile.resolve_root()) / "addon" / "Hooks"
+    if not hooks.is_dir():
+        return None
+    versions = sorted(d for d in hooks.iterdir() if d.is_dir() and d.name != "dev")
+    return versions[-1] if versions else None
+
+
+def dotnet_path() -> Path:
+    scoop = Path(os.environ.get("SCOOP", str(Path.home() / "scoop")))
+    return scoop / "apps" / "dotnet-sdk" / "current" / "dotnet.exe"
+
+
+def check_kr_binding(dist: Path, repo: Path, kr_dalamud: str | None, dotnet: str | None) -> list[str]:
+    """압축 안의 DLL이 **KR이 깔아 둔** FFXIVClientStructs에 붙는가.
+
+    이게 왜 필요한가: `run\\check.bat`은 같은 소스를 KR(7.51)과 글로벌(7.55)로
+    두 번 빌드하고 **둘 다 같은 bin에 쓴다.** 마지막이 글로벌이라, 검사 직후에
+    패킹하면 글로벌 바인딩 DLL이 배포물로 나간다. 그건 적재는 되고 **첫
+    장비세트 호출에서 죽는다** - 게임 안에서만 드러나는 고장이다.
+
+    2026-08-18에 실제로 그렇게 나갔다. 순서를 지키는 것으로는 못 막는다 -
+    산출물을 직접 재야 한다.
+    """
+    refdir = Path(kr_dalamud) if kr_dalamud else kr_dalamud_dir()
+    if refdir is None or not refdir.is_dir():
+        return ["KR Dalamud를 못 찾아 바인딩을 대조하지 못했다"]
+
+    exe = Path(dotnet) if dotnet else dotnet_path()
+    if not exe.is_file():
+        return [f".NET SDK를 못 찾아 바인딩을 대조하지 못했다: {exe}"]
+
+    workdir = Path(tempfile.mkdtemp(prefix="ff14acc-asmref-"))
+    try:
+        with zipfile.ZipFile(dist / f"{INTERNAL_NAME}.zip") as archive:
+            archive.extract(f"{INTERNAL_NAME}.dll", workdir)
+
+        result = subprocess.run(
+            [
+                str(exe), "run", "-c", "Release",
+                "--project", str(repo / "tools" / "asmref-check"), "--",
+                str(workdir / f"{INTERNAL_NAME}.dll"), str(refdir),
+            ],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            cwd=str(repo), timeout=600,
+        )
+        if result.returncode != 0:
+            return [
+                "압축 안의 DLL이 KR FFXIVClientStructs에 안 붙는다. 글로벌 빌드가 섞였을 수 "
+                f"있다 (run\\check.bat 뒤에 패킹하면 그렇게 된다): {binding_detail(result.stdout, result.stderr)}"
+            ]
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+    return []
+
+
 def check_install_e2e(dist: Path) -> list[str]:
     """설치기를 버리는 프로필에 대고 실제로 돌려 보고 결과를 잰다."""
     exe = dist / "FF14AccessibilityInstaller-KR.exe"
@@ -347,10 +428,14 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="배포 산출물 위생·모양 검사")
     parser.add_argument("--dist", default=str(repo / "dist"))
     parser.add_argument("--e2e", action="store_true", help="설치기를 실제로 돌려 본다")
+    parser.add_argument("--kr-dalamud", help="KR Dalamud Hooks 폴더. 안 주면 프로필에서 찾는다")
+    parser.add_argument("--dotnet", help=".NET SDK 경로. 안 주면 scoop 기본값")
     args = parser.parse_args(argv[1:])
 
     dist = Path(args.dist)
     problems = check_artifacts(dist, repo, default_needles())
+    if not problems:
+        problems += check_kr_binding(dist, repo, args.kr_dalamud, args.dotnet)
     if args.e2e:
         problems += check_install_e2e(dist)
 

@@ -11,6 +11,7 @@ Everything except the last class runs on synthetic bytes, no install needed.
 from __future__ import annotations
 
 import struct
+import sys
 from pathlib import Path
 
 import pytest
@@ -24,9 +25,26 @@ from extract_sigs import (
     read_compressed_uint,
 )
 
-PLUGIN = Path(
-    r"C:\Users\USER\AppData\Roaming\XIVLauncherKR\devPlugins"
-    r"\FF14Accessibility\FF14Accessibility.dll")
+def _our_plugin() -> Path:
+    """배포된 우리 플러그인 DLL. 경로가 둘이라 둘 다 본다.
+
+    정식 설치(`installedPlugins\\<이름>\\<버전>\\`)가 먼저고, 없으면 개발
+    배포(`devPlugins\\<이름>\\`)를 본다. 프로필 루트를 여기서 박지 않는 이유는
+    `tools/kr-setup/kr_profile.py`가 갖는다 - 박아 두면 설치기와 갈린다.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kr-setup"))
+    import kr_profile
+
+    root = Path(kr_profile.resolve_root())
+    installed = root / "installedPlugins" / "FF14Accessibility"
+    if installed.is_dir():
+        found = sorted(installed.glob("*/FF14Accessibility.dll"))
+        if found:
+            return found[-1]
+    return root / "devPlugins" / "FF14Accessibility" / "FF14Accessibility.dll"
+
+
+PLUGIN = _our_plugin()
 
 
 class TestIsSignature:

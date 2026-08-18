@@ -24,6 +24,14 @@ uv run --no-project python tools/pack-check/pack_check.py --e2e
 
 **빌드 경로(`C:\project`)는 일부러 안 막는다.** .NET 어셈블리는 PDB 경로를 디버그 디렉토리에 박고, 그건 모든 .NET 빌드가 하는 일이라 개인 설정이 아니다. 여기서 막는 것은 사람을 가리키는 것이다.
 
+### 바인딩 — KR 것이 맞나
+
+압축 안의 DLL이 **KR이 깔아 둔 FFXIVClientStructs(7.51)에 붙는지**를 `tools/asmref-check`로 대조한다.
+
+**이게 왜 필요한지는 실제 사고가 답한다.** `run\check.bat`은 같은 소스를 KR(7.51)과 글로벌(7.55)로 두 번 빌드하는데 **둘 다 같은 bin에 쓴다.** 마지막이 글로벌이라, 검사를 돌린 직후에 패킹하면 글로벌 바인딩 DLL이 배포물로 나간다. 그건 **적재는 되고 첫 장비세트 호출에서 죽는다** — 게임 안에서만, 그것도 특정 키를 눌러야 드러난다.
+
+2026-08-18에 실제로 그렇게 나갔고, 이 검사가 잡았다(`MISSING MEMBER RaptureGearsetModule.IsItemRegisteredToGearset`). 그래서 지금은 두 겹이다 — `run\pack.bat`이 KR로 **다시 빌드해서** 담고, 그렇게 담은 것을 여기서 **다시 잰다.** 순서를 지키는 규율로는 못 막는다.
+
 ### 모양 — 설치 결과가 적재되는 모양인가
 
 `--e2e`가 설치기를 **버리는 프로필 루트**(`FF14ACC_KR_PROFILE`)에 대고 `--install --skip-vnavmesh`로 실제로 돌린다. 네트워크를 타지 않고, 이 머신의 프로필도 건드리지 않는다.

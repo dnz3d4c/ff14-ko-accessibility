@@ -148,6 +148,30 @@ def test_버전_파싱():
     assert pack_check.parse_version("5.87.0-rc1") is None
 
 
+# ── KR 바인딩 ──────────────────────────────────────────────────────────────
+
+ASMREF_FAIL = """\
+# plugin: FF14Accessibility.dll
+# Dalamud ref=15.0.3.2 actual=15.0.3.2
+  (no issues)
+# FFXIVClientStructs ref=7.55.1.8875 actual=7.51.0.8667
+  MISSING MEMBER  ...RaptureGearsetModule.IsItemRegisteredToGearset    want Boolean ...
+SUMMARY: 931 checked, 0 missing-type, 1 missing-member, 0 arity, 0 sig-diff
+"""
+
+
+def test_안_붙는_멤버만_뽑아_말한다():
+    # 931건 중 걸린 한 줄이 전문에 묻히면 아무도 안 읽는다.
+    detail = pack_check.binding_detail(ASMREF_FAIL)
+    assert "IsItemRegisteredToGearset" in detail
+    assert "no issues" not in detail
+
+
+def test_고를_줄이_없으면_원문이라도_보여_준다():
+    assert "터졌다" in pack_check.binding_detail("", "도구가 터졌다")
+    assert pack_check.binding_detail("", "") == "(출력 없음)"
+
+
 # ── dalamudConfig ──────────────────────────────────────────────────────────
 
 DEV_DLL = r"C:\p\devPlugins\FF14Accessibility\FF14Accessibility.dll"

@@ -26,10 +26,13 @@ echo.
 
 
 echo [3/3] 빌드 - KR(7.51)과 글로벌(7.55) 양쪽
-call :build "%DALAMUD_HOME%" "KR 7.51"
-if errorlevel 1 set "FAILED=!FAILED! KR빌드"
+rem **글로벌을 먼저, KR을 나중에 돌린다.** 둘이 같은 bin에 쓰기 때문에
+rem 마지막 빌드가 산출물로 남는다. KR을 마지막에 두면 남는 것이 KR용이고,
+rem 반대면 검사 직후 패킹이 글로벌 바인딩 DLL을 배포물로 낸다
+rem (2026-08-18 실제로 그렇게 나갔다). run\pack.bat도 자기가 다시 빌드해서
+rem 순서에 기대지 않지만, 여기서도 KR 상태로 두는 편이 맞다.
 
-rem 글로벌 참조는 이 머신에 상주하지 않는다. 업데이터가 KR 호환본으로 덮기
+rem 글로벌 참조는 이 머신에 상주하지 않는다. 업데이터가 KR 호환본을 깔기
 rem 때문이다(docs/environment.md 4절). 없으면 건너뛰되 조용히 넘어가지 않는다.
 set "GLOBAL=%LOCALAPPDATA%\Temp\dalamud-official-15.0.3.2"
 if exist "%GLOBAL%\Dalamud.dll" (
@@ -39,6 +42,9 @@ if exist "%GLOBAL%\Dalamud.dll" (
   echo   [건너뜀] 글로벌 참조가 없다: %GLOBAL%
   echo            받는 법은 docs/environment.md 4절. 글로벌 회귀는 확인 못 했다.
 )
+
+call :build "%DALAMUD_HOME%" "KR 7.51"
+if errorlevel 1 set "FAILED=!FAILED! KR빌드"
 
 echo.
 if defined FAILED (

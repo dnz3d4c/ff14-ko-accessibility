@@ -1,4 +1,4 @@
-From e38e6ac6468d24e702494c894c2bd222e680810f Mon Sep 17 00:00:00 2001
+From ad9499d67c398d588a29d98ffb04ef8e0baeec06 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 09:26:59 +0900
 Subject: [PATCH 3/3] Hunting targets no longer run the habitat into the area
@@ -17,6 +17,10 @@ one; the two other InArea call sites prepend their own ", " and are
 unaffected, so the space belongs at this call site rather than in the
 strings.
 
+HuntingArea returns an empty string when the log names no habitat, so
+the separator is only added when there is something to separate. That
+case keeps exactly the wording it had before.
+
 This breaks in every locale, German included:
 
     lebt in Kaktusgrundim Gebiet Ost-Thanalan
@@ -26,19 +30,22 @@ German and English.
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ---
- FF14Accessibility/Services/NavigationService.cs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ FF14Accessibility/Services/NavigationService.cs | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/FF14Accessibility/Services/NavigationService.cs b/FF14Accessibility/Services/NavigationService.cs
-index 8ae8a0b..9f57aad 100644
+index 8ae8a0b..e31eaa0 100644
 --- a/FF14Accessibility/Services/NavigationService.cs
 +++ b/FF14Accessibility/Services/NavigationService.cs
-@@ -1152,7 +1152,7 @@ public sealed class NavigationService
+@@ -1152,7 +1152,10 @@ public sealed class NavigationService
              var zone = string.IsNullOrEmpty(target.ZoneName)
                  ? AccessibilityStrings.InAnotherArea
                  : AccessibilityStrings.InArea(target.ZoneName);
 -            text += ", " + AccessibilityStrings.HuntingArea(target.AreaName) + zone;
-+            text += ", " + AccessibilityStrings.HuntingArea(target.AreaName) + " " + zone;
++            // HuntingArea is empty when the log names no habitat. The separator
++            // has to go away with it, otherwise the sentence opens on a gap.
++            var habitat = AccessibilityStrings.HuntingArea(target.AreaName);
++            text += ", " + (habitat.Length > 0 ? habitat + " " + zone : zone);
  
              var hop = _places.FindFirstHopToMap(target.MapId, out var hops);
              if (hop != null)

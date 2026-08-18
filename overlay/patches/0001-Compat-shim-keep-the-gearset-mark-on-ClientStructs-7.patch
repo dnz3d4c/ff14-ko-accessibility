@@ -1,4 +1,4 @@
-From 88362fcf34f3e5081495881d4da135e925145140 Mon Sep 17 00:00:00 2001
+From 5bdc56a69a167de6b1155731bd5fad345e4cbb9d Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Mon, 17 Aug 2026 20:41:44 +0900
 Subject: [PATCH 1/8] Compat shim: keep the gearset mark on ClientStructs 7.51

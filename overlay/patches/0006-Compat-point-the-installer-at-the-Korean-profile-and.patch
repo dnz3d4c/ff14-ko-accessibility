@@ -1,4 +1,4 @@
-From 53d468117883a2480ca9fb6bfcb85fa5e468177f Mon Sep 17 00:00:00 2001
+From e285315a76e970f7f11410cebf90ab89b33c3e49 Mon Sep 17 00:00:00 2001
 From: dnz3d4c <dnz3d4c@users.noreply.github.com>
 Date: Tue, 18 Aug 2026 06:24:06 +0900
 Subject: [PATCH 6/8] Compat: point the installer at the Korean profile and a

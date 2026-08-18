@@ -323,8 +323,14 @@ def test_소스가_카탈로그대로다():
 
 
 @needs_vendor
-def test_마지막_커밋이_생성물이다():
-    # 이 도구의 존재 이유를 지키는 검사다. 마지막 커밋에 손편집이 섞이면 다음
+def test_생성_커밋을_제목으로_찾는다():
+    # 끝 커밋이라고 가정하면 안 된다 - 손으로 쓴 커밋이 그 뒤에 붙는다.
+    assert ko_apply.generated_commit() is not None
+
+
+@needs_vendor
+def test_생성_커밋이_정말_생성물이다():
+    # 이 도구의 존재 이유를 지키는 검사다. 그 커밋에 손편집이 섞이면 다음
     # 재생성 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어
     # 스냅샷에는 안 걸린다.
     problems = ko_apply.tip_is_generated()

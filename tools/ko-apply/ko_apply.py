@@ -55,9 +55,13 @@ VENDOR = REPO / "vendor" / "ff14-accessibility"
 SOURCE_ROOT = VENDOR / "FF14Accessibility"
 CATALOG = REPO / "overlay" / "ko" / "ko.json"
 
-#: 생성 커밋이 앉아 있는 브랜치. 그 **끝 커밋**이 생성물이고, 그 부모가
-#: 생성 전 상태다.
+#: 생성 커밋이 앉아 있는 브랜치.
 WORK_BRANCH = "kr-port"
+
+#: 생성 커밋을 **제목으로** 찾는다. 끝 커밋이라고 가정하지 않는다 - 도구가
+#: 못 읽는 모양(중첩 삼항·이어붙이기·배열)은 손으로 쓴 별도 커밋으로 그 뒤에
+#: 붙기 때문이다. 제목이 고정형인 이유가 이것이기도 하다.
+GENERATED_SUBJECT = "Korean: the mod's own strings, generated from the catalogue"
 
 #: 소스 루트가 vendor 안에서 갖는 이름.
 SOURCE_NAME = "FF14Accessibility"
@@ -473,24 +477,43 @@ def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     )
 
 
-def tip_is_generated(vendor: Path = VENDOR, catalog_path: Path = CATALOG) -> list[str]:
-    """`kr-port`의 끝 커밋이 정말 생성물인지 왕복으로 확인한다.
+def generated_commit(vendor: Path = VENDOR) -> str | None:
+    """제목으로 생성 커밋을 찾는다. 없으면 None."""
+    found = _git(
+        "log", "--format=%H", "--fixed-strings", f"--grep={GENERATED_SUBJECT}",
+        WORK_BRANCH, cwd=vendor,
+    )
+    if found.returncode != 0:
+        return None
+    heads = found.stdout.split()
+    return heads[0] if heads else None
 
-    이게 이 도구의 존재 이유를 지키는 검사다. **끝 커밋을 손으로 고치는 순간
+
+def tip_is_generated(vendor: Path = VENDOR, catalog_path: Path = CATALOG) -> list[str]:
+    """생성 커밋이 정말 생성물인지 왕복으로 확인한다.
+
+    이게 이 도구의 존재 이유를 지키는 검사다. **그 커밋을 손으로 고치는 순간
     여기가 빨개진다** - 손편집이 섞이면 다음 재생성 때 그 줄만 조용히 사라지고,
     사라진 게 한국어라 독일어·영어 검사에는 안 걸린다.
 
-    부모 커밋(생성 전)을 임시 워크트리에 꺼내 생성기를 돌리고, 결과가 끝
+    부모 커밋(생성 전)을 임시 워크트리에 꺼내 생성기를 돌리고, 결과가 생성
     커밋과 같은지 파일 단위로 본다.
+
+    **끝 커밋이라고 가정하지 않는다.** 도구가 못 읽는 모양은 손으로 쓴 별도
+    커밋으로 그 뒤에 붙는다.
     """
     if not (vendor / ".git").exists():
         return []
+
+    target = generated_commit(vendor)
+    if target is None:
+        return [f"생성 커밋을 못 찾았다 - 제목이 `{GENERATED_SUBJECT}`인 커밋이 없다"]
 
     catalog = load_catalog(catalog_path)
     workdir = Path(tempfile.mkdtemp(prefix="ko-apply-"))
     tree = workdir / "tree"
     try:
-        added = _git("worktree", "add", "--detach", str(tree), f"{WORK_BRANCH}~1", cwd=vendor)
+        added = _git("worktree", "add", "--detach", str(tree), f"{target}~1", cwd=vendor)
         if added.returncode != 0:
             return [f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"]
 
@@ -499,15 +522,15 @@ def tip_is_generated(vendor: Path = VENDOR, catalog_path: Path = CATALOG) -> lis
 
         for path in source_files(tree / SOURCE_NAME):
             relative = f"{SOURCE_NAME}/{path.relative_to(tree / SOURCE_NAME).as_posix()}"
-            want = _git("show", f"{WORK_BRANCH}:{relative}", cwd=vendor)
+            want = _git("show", f"{target}:{relative}", cwd=vendor)
             if want.returncode != 0:
-                problems.append(f"{relative}: 끝 커밋에 없는 파일이다")
+                problems.append(f"{relative}: 생성 커밋에 없는 파일이다")
                 continue
             got = made.get(path, path.read_text(encoding="utf-8"))
             if got.replace("\r\n", "\n") != want.stdout.replace("\r\n", "\n"):
                 problems.append(
-                    f"{relative}: 생성기가 만든 것과 끝 커밋이 다르다 - "
-                    "끝 커밋을 손으로 고쳤거나 생성기가 바뀌었다"
+                    f"{relative}: 생성기가 만든 것과 생성 커밋이 다르다 - "
+                    "그 커밋을 손으로 고쳤거나 생성기가 바뀌었다"
                 )
         return problems
     finally:

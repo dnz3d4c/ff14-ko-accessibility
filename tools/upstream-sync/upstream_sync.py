@@ -259,7 +259,7 @@ def applies_onto(base: str, patches: list[Path], vendor: Path = VENDOR) -> str |
         if added.returncode != 0:
             return f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"
 
-        applied = _git("am", *(str(p) for p in patches), cwd=tree)
+        applied = _git("am", "-3", *(str(p) for p in patches), cwd=tree)
         if applied.returncode == 0:
             return None
 
@@ -555,7 +555,9 @@ def cmd_to(tag: str, offline: bool) -> int:
     _git("branch", "-f", WORK_BRANCH, tag)
     _git("checkout", WORK_BRANCH)
 
-    applied = _git("am", *(str(p) for p in patches))
+    # 붙여 보기(`applies_onto`)와 같은 방식이어야 한다. 한쪽만 3-way면
+    # "붙여 보기는 됐는데 실제 적용이 실패"가 상시로 뜬다.
+    applied = _git("am", "-3", *(str(p) for p in patches))
     if applied.returncode != 0:
         _git("am", "--abort")
         _git("branch", "-f", WORK_BRANCH, backup)

@@ -20,6 +20,16 @@
 서로 다른 것을 검사하게 된다. 그걸 조용히 지나가지 않으려고 핀에 못박는다.
 핀을 옮기는 것은 `tools/upstream-sync`다.
 
+**`git am -3`으로 붙인다.** 업스트림은 8일에 릴리스를 7개 내면서 우리가 고치는
+줄 바로 옆에 새 문장을 끼워 넣는다 - 그러면 패치에 딸린 문맥 세 줄이 안 맞는다.
+3-way 없이 붙이면 그 hunk 하나 때문에 시리즈 전체가 죽고, 어디까지 멀쩡했는지도
+안 남는다. 패치의 `index` 줄이 가리키는 원본 blob이 저장소에 있으므로 3-way면
+합쳐진다. **같은 줄을 양쪽이 다르게 고친 진짜 충돌은 3-way도 못 합치고 그대로
+실패한다** - 통과 범위가 넓어지는 게 아니라, 안 겹치는 변경을 충돌로 안 세게 된다.
+
+3번(동등) 검사가 이걸 받친다. 3-way가 합쳐 낸 결과가 `kr-port`와 다르면 거기서
+잡힌다.
+
 `vendor/` 클론이 없으면 검사를 건너뛴다(오류가 아니다). 있는데 깨졌으면 막는다.
 
 사용법:
@@ -138,7 +148,7 @@ def check_applies_and_matches(
         if added.returncode != 0:
             return [f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"]
 
-        applied = _git("am", *(str(p) for p in patches), cwd=tree)
+        applied = _git("am", "-3", *(str(p) for p in patches), cwd=tree)
         if applied.returncode != 0:
             # 붙이다 만 상태를 남기지 않는다 - 워크트리를 지우기 전에 중단한다.
             _git("am", "--abort", cwd=tree)

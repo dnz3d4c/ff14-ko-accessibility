@@ -4,10 +4,23 @@
 클론이 있을 때만 돌린다. 클론이 없는 머신에서 빨간불이 뜨면 아무도 안 본다.
 """
 
+import subprocess
 from pathlib import Path
 
 import patch_check
 import pytest
+
+
+def _run(*args: str, cwd: Path) -> None:
+    subprocess.run(
+        ["git", "-c", "core.hooksPath=", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
 
 
 # --- 적용 순서 ------------------------------------------------------------
@@ -109,3 +122,102 @@ def test_이_저장소의_패치가_순서대로_붙고_kr_port와_같다():
     # docs가 적어 둔 적용 명령이 실제로 성립하는지. 업스트림 태그를 올릴 때
     # 여기가 먼저 깨지므로 이게 조기 경보다.
     assert patch_check.check_applies_and_matches(patch_check.ordered_patches()) == []
+
+
+# --- 업스트림이 문맥을 건드렸을 때 ----------------------------------------
+#
+# 이게 이 프로젝트에서 실제로 일어나는 일이다. 업스트림은 8일에 릴리스를 7개
+# 내고, 우리 패치가 고치는 줄 바로 옆에 새 문장을 끼워 넣는다. 그러면 패치에
+# 딸려 있는 문맥 세 줄이 안 맞는다.
+#
+# 3-way 없이 붙이면 hunk 하나가 어긋나는 순간 시리즈 전체가 죽고, 어디까지
+# 멀쩡했는지도 안 남는다. 원본 blob이 저장소에 있으므로 3-way면 합쳐진다.
+
+
+def _out(*args: str, cwd: Path) -> str:
+    result = subprocess.run(
+        ["git", "-c", "core.hooksPath=", *args],
+        cwd=cwd, check=True, capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
+    )
+    return result.stdout.strip()
+
+
+def _lines(*changes: tuple[int, str]) -> str:
+    """1~10번 줄짜리 파일. `changes`로 지정한 줄만 바꾼다."""
+    rows = [f"line {i}" for i in range(1, 11)]
+    for number, text in changes:
+        rows[number - 1] = text
+    return "\n".join(rows) + "\n"
+
+
+def _drifted(root: Path) -> tuple[Path, list[Path], str]:
+    """우리가 고친 줄의 문맥을 업스트림이 건드린 저장소.
+
+    돌려주는 것은 (vendor, 패치 목록, 붙는 자리)다.
+    """
+    vendor = root / "vendor"
+    vendor.mkdir()
+    _run("init", "-b", "main", cwd=vendor)
+    _run("config", "user.email", "t@example.invalid", cwd=vendor)
+    _run("config", "user.name", "t", cwd=vendor)
+
+    target = vendor / "a.txt"
+
+    # 패치를 뽑은 시점의 업스트림.
+    target.write_text(_lines(), encoding="utf-8")
+    _run("add", "a.txt", cwd=vendor)
+    _run("commit", "-m", "upstream: base", cwd=vendor)
+    old_base = _out("rev-parse", "HEAD", cwd=vendor)
+
+    # 우리 변경 - 5번 줄. 문맥으로 2~4번과 6~8번 줄이 패치에 딸려 간다.
+    target.write_text(_lines((5, "line 5 - ours")), encoding="utf-8")
+    _run("commit", "-am", "ours: line 5", cwd=vendor)
+
+    outdir = root / "patches"
+    _run("format-patch", f"{old_base}..HEAD", "-o", str(outdir), cwd=vendor)
+    patches = sorted(outdir.glob("*.patch"))
+
+    # 그 사이 업스트림이 3번과 7번 줄을 고쳤다 - 우리 hunk의 문맥 안이다.
+    _run("checkout", "--detach", old_base, cwd=vendor)
+    target.write_text(
+        _lines((3, "line 3 - upstream"), (7, "line 7 - upstream")), encoding="utf-8"
+    )
+    _run("commit", "-am", "upstream: moved", cwd=vendor)
+    new_base = _out("rev-parse", "HEAD", cwd=vendor)
+    _run("branch", "-f", "main", new_base, cwd=vendor)
+
+    # 붙인 뒤에 나와야 하는 모양 - 업스트림의 3·7번 줄에 우리 5번 줄.
+    _run("checkout", "-B", patch_check.WORK_BRANCH, new_base, cwd=vendor)
+    target.write_text(
+        _lines(
+            (3, "line 3 - upstream"),
+            (5, "line 5 - ours"),
+            (7, "line 7 - upstream"),
+        ),
+        encoding="utf-8",
+    )
+    _run("commit", "-am", "ours: line 5", cwd=vendor)
+
+    return vendor, patches, new_base
+
+
+def test_문맥이_밀려도_3way로_붙는다(tmp_path: Path):
+    vendor, patches, base = _drifted(tmp_path)
+    problems = patch_check.check_applies_and_matches(patches, vendor=vendor, base=base)
+    assert problems == [], problems
+
+
+def test_진짜_같은_줄이_충돌하면_그건_잡는다(tmp_path: Path):
+    # 3-way가 아무거나 통과시키면 검사기가 죽는다. 같은 줄을 양쪽이 다르게
+    # 고친 것은 사람이 봐야 한다.
+    vendor, patches, _ = _drifted(tmp_path)
+    target = vendor / "a.txt"
+
+    _run("checkout", "--detach", "main", cwd=vendor)
+    target.write_text(_lines((5, "line 5 - upstream")), encoding="utf-8")
+    _run("commit", "-am", "upstream: took line 5 too", cwd=vendor)
+    clash = _out("rev-parse", "HEAD", cwd=vendor)
+
+    problems = patch_check.check_applies_and_matches(patches, vendor=vendor, base=clash)
+    assert problems, "같은 줄 충돌은 통과시키면 안 된다"

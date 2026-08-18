@@ -94,6 +94,18 @@ def newer_tags(tags: list[str], current: str) -> list[str]:
     return sorted((t for t in tags if version_key(t) > here), key=version_key)
 
 
+def previous_tag(tag: str, tags: list[str]) -> str | None:
+    """`tag` 바로 앞선 태그. 없으면 None.
+
+    핀을 이미 옮긴 뒤에 그 판의 이력 자리를 만들 때 커밋 범위의 시작이
+    필요한데, 핀 파일에는 이전 태그가 안 남는다(덮어쓴다). 태그 목록에서
+    다시 고른다. 없으면 **지어내지 않는다** - 아무거나 넣으면 범위가
+    저장소 처음까지 벌어져서 이력이 아니라 전사가 된다.
+    """
+    older = [t for t in tags if version_key(t) < version_key(tag)]
+    return max(older, key=version_key) if older else None
+
+
 # --- 핀 -------------------------------------------------------------------
 
 
@@ -135,6 +147,21 @@ def missing_tags(text: str, tags: list[str]) -> list[str]:
     """이력에 아예 없는 태그. 미번역보다 더 조용한 실패다."""
     known = split_sections(text)
     return [tag for tag in tags if tag not in known]
+
+
+def tags_to_write(pin_tag: str, tags: list[str], text: str) -> list[str]:
+    """이력에 자리를 만들어야 하는 판. 오래된 것부터.
+
+    **핀 태그 자신도 대상이다.** `--to`가 끝나면 핀은 이미 새 태그이고 그
+    시점에 "새 태그"는 0개다. 정작 없는 것은 방금 올라탄 그 판의 이력인데,
+    새것만 세면 만들 자리가 없다고 답한다.
+
+    `--check`와 `--notes`가 **같은 목록을 보게** 하는 것이 이 함수의 목적이다.
+    갈라졌던 실물이 있다 - v5.88 동기화에서 `--check`는 "변경 이력에 없는 판:
+    v5.88"이라고 하고 `--notes`는 "새로 만들 자리가 없다"고 답했다. 그래서
+    그 절을 손으로 썼다.
+    """
+    return missing_tags(text, [pin_tag, *newer_tags(tags, pin_tag)])
 
 
 def render_section(tag: str, date: str, commits: list[Commit]) -> str:
@@ -320,7 +347,8 @@ def survey(offline: bool) -> dict:
         result["pin_missing"] = True
         return result
 
-    fresh = newer_tags(all_tags(), pin["tag"])
+    tags = all_tags()
+    fresh = newer_tags(tags, pin["tag"])
     result["new_tags"] = fresh
     result["untagged_commits"] = len(commits_between(pin["commit"], "origin/main"))
 
@@ -340,7 +368,7 @@ def survey(offline: bool) -> dict:
 
     if CHANGES.is_file():
         text = CHANGES.read_text(encoding="utf-8")
-        result["missing_notes"] = missing_tags(text, [pin["tag"], *fresh])
+        result["missing_notes"] = tags_to_write(pin["tag"], tags, text)
         result["untranslated"] = untranslated_tags(text)
     else:
         result["missing_notes"] = [pin["tag"], *fresh]
@@ -490,9 +518,9 @@ def cmd_notes(offline: bool) -> int:
         fetch()
 
     pin = read_pin()
-    fresh = newer_tags(all_tags(), pin["tag"])
+    tags = all_tags()
     text = CHANGES.read_text(encoding="utf-8") if CHANGES.is_file() else ""
-    wanted = [tag for tag in fresh if tag not in split_sections(text)]
+    wanted = tags_to_write(pin["tag"], tags, text)
 
     if not wanted:
         print("새로 만들 자리가 없다.")
@@ -502,7 +530,17 @@ def cmd_notes(offline: bool) -> int:
     sections: list[str] = []
     # 최신이 위로 가야 하므로 오래된 것부터 만들어 뒤집는다.
     for tag in wanted:
-        sections.append(render_section(tag, tag_date(tag), commits_between(base, tag)))
+        if tag == pin["tag"]:
+            # 핀이 이미 이 태그다(`--to`를 먼저 돌린 경우). 커밋 범위의 시작은
+            # 핀이 아니라 **그 앞 태그**다 - 핀을 쓰면 범위가 비어서 원문 한
+            # 줄 없는 자리가 나온다.
+            start = previous_tag(tag, tags)
+            if start is None:
+                print(f"  {tag}보다 앞선 태그가 없다 - 원문 없이 자리만 만든다")
+            commits = commits_between(start, tag) if start else []
+        else:
+            commits = commits_between(base, tag)
+        sections.append(render_section(tag, tag_date(tag), commits))
         base = tag
 
     CHANGES.write_text(insert_sections(text, list(reversed(sections))), encoding="utf-8")

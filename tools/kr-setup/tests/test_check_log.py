@@ -25,8 +25,10 @@ GOOD = """\
 2026-08-18 05:41:21.285 +09:00 [INF] Initializing a session..
 2026-08-18 05:41:22.100 +09:00 [INF] Lumina is ready: C:\\Program Files (x86)\\FINAL FANTASY XIV - KOREA\\game\\sqpack
 2026-08-18 05:41:22.818 +09:00 [INF] [PluginManager] Loading dev plugin vnavmesh
+2026-08-18 05:41:22.900 +09:00 [INF] [PluginManager] Loading plugin FF14Accessibility
 2026-08-18 05:41:23.210 +09:00 [INF] [FF14Accessibility] [Compat] AtkResNode::IsVisible resolved by the Korean signature at 0x7FF61438E7E0 (ClientStructs left it null).
-2026-08-18 05:41:23.276 +09:00 [INF] [FF14Accessibility] [Speak] 'Compatibility note: Gearset marks go by item ID.'
+2026-08-18 05:41:23.276 +09:00 [INF] [FF14Accessibility] [Compat] Kompatibilitätshinweis: Ausrüstungsset-Markierung geht nach Gegenstands-ID.
+2026-08-18 05:41:23.290 +09:00 [INF] [FF14Accessibility] [Speak] 'FF14 Accessibility 버전 5 점 87 준비됨.'
 2026-08-18 05:41:23.711 +09:00 [INF] [LocalPlugin] Finished loading vnavmesh
 2026-08-18 05:41:24.000 +09:00 [INF] [LocalPlugin] Finished loading FF14Accessibility
 2026-08-18 05:42:39.820 +09:00 [INF] [FF14Accessibility] [Speak] INT 'Walking to 츠츠모코.'
@@ -98,4 +100,33 @@ def test_마지막_세션만_본다():
 
 
 def test_빈_로그는_전부_실패():
-    assert not any(verdicts("", "").values())
+    # "사본이 하나뿐"만 빼고다. 그건 "두 번 뜨지 않았다"를 보는 검사라
+    # 아무것도 안 뜬 로그에서도 참이다 - 없는 것을 있다고 말하지 않는다.
+    results = verdicts("", "")
+    del results["사본이 하나뿐"]
+    assert not any(results.values())
+
+
+def test_적재_경로를_구분해_말한다():
+    assert check_log.inspect(GOOD, SIDECAR).route == "정식 플러그인"
+
+    dev = GOOD.replace(
+        "Loading plugin FF14Accessibility", "Loading dev plugin FF14Accessibility"
+    )
+    # 개발 중에는 이게 정상이다. 사실만 말하고 실패로 세지 않는다.
+    report = check_log.inspect(dev, SIDECAR)
+    assert report.route == "개발용 플러그인"
+    assert report.checks[-1].passed
+
+
+def test_두_사본이_같이_뜨면_실패():
+    # 정식 설치 옆에 옛 dev 사본이 남은 상태다. 같은 명령과 같은 단축키를
+    # 두 번 등록하고, 게임 안에서는 "가끔 두 번 말한다"로만 드러난다.
+    both = GOOD.replace(
+        "Loading plugin FF14Accessibility",
+        "Loading plugin FF14Accessibility\n"
+        "2026-08-18 05:41:22.950 +09:00 [INF] [PluginManager] Loading dev plugin FF14Accessibility",
+    )
+    report = check_log.inspect(both, SIDECAR)
+    assert report.route == "둘 다"
+    assert verdicts(both)["사본이 하나뿐"] is False

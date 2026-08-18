@@ -117,11 +117,20 @@ def main(argv: list[str]) -> int:
         return 1
 
     config = json.loads(raw.decode("utf-8"))
+    before = json.dumps(config, sort_keys=True)
+
+    working_id = seed(config, dll_path, internal_name, str(uuid.uuid4()))
+
+    # 바뀐 게 없으면 쓰지 않는다. 게임이 떠 있는 동안 이 파일을 건드리면
+    # Dalamud가 자기 메모리 상태로 종료할 때 덮어써서 우리 쓴 것이 사라진다.
+    # 개발 배포(run\build.bat)는 게임이 떠 있는 채로 도는 것이 정상이라,
+    # "이미 심겨 있다"를 조용히 지나갈 수 있어야 한다.
+    if json.dumps(config, sort_keys=True) == before:
+        print(f"이미 심겨 있다. 건드리지 않았다. WorkingPluginId: {working_id}")
+        return 0
 
     backup = config_path.with_suffix(".json.bak-kr-seed")
     shutil.copy2(config_path, backup)
-
-    working_id = seed(config, dll_path, internal_name, str(uuid.uuid4()))
 
     # BOM 금지 - 위 모듈 주석 참조.
     config_path.write_text(
@@ -130,6 +139,7 @@ def main(argv: list[str]) -> int:
 
     print(f"백업: {backup}")
     print(f"WorkingPluginId: {working_id}")
+    print("설정을 새로 심었다. 게임이 떠 있었다면 껐다 켜야 반영된다.")
     return 0
 
 

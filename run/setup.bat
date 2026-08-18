@@ -5,6 +5,10 @@ call "%~dp0_env.cmd"
 rem 최초 1회. 프로필의 빠진 조각을 만들고 접근성 모드를 설정에 심는다.
 rem docs/kr-runtime-setup.md 3절, 7절.
 rem
+rem **여기가 심는 것은 개발 경로다**(devPlugins). 사용자에게 나가는 정식
+rem 설치는 설치기가 installedPlugins에 넣는다. 둘은 동시에 있으면 안 된다 -
+rem 자세한 것은 kr-runtime-setup.md 7절.
+rem
 rem **vnavmesh는 여기서 다루지 않는다.** 그건 설치기가 갖는다 - 업스트림이
 rem puni.sh 매니페스트에서 최신을 받아 버전을 비교하는 방식이고, 우리도 그걸
 rem 그대로 따른다. 손으로 받아 심으면 그 버전에 묶여 갱신이 멈춘다.

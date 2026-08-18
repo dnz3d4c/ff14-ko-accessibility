@@ -25,7 +25,7 @@ if not exist "%PLUGINZIP%" (
 )
 
 set "DOTNET_CLI_UI_LANGUAGE=en"
-echo 1/2  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
+echo 1/3  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
 "%DOTNET%" publish -c Release "%INSTALLER%"
 if errorlevel 1 (
   echo [실패] 설치기 빌드가 깨졌다.
@@ -33,12 +33,20 @@ if errorlevel 1 (
 )
 
 echo.
-echo 2/2  배포 폴더에 모은다.
+echo 2/3  배포 폴더에 모은다.
 if not exist "%OUT%" mkdir "%OUT%"
 copy /y "%PUBLISH%\FF14AccessibilityInstaller-KR.exe" "%OUT%\" >nul
 if errorlevel 1 goto :fail
 copy /y "%PLUGINZIP%" "%OUT%\FF14Accessibility.zip" >nul
 if errorlevel 1 goto :fail
+
+echo.
+echo 3/3  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
+uv run --no-project python "%REPO%\tools\pack-check\pack_check.py" --e2e
+if errorlevel 1 (
+  echo [실패] 배포 검사가 걸렸다. 위 목록을 본다.
+  goto :fail
+)
 
 echo.
 echo 끝: %OUT%

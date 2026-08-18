@@ -22,6 +22,7 @@ if not defined KR_PROFILE (
 set "KR_LOG=%KR_PROFILE%\dalamud-kr-gui.log"
 set "KR_CONFIG=%KR_PROFILE%\dalamudConfig.json"
 set "KR_DEVPLUGINS=%KR_PROFILE%\devPlugins"
+set "KR_INSTALLEDPLUGINS=%KR_PROFILE%\installedPlugins"
 set "UPDATER=%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe"
 set "GAME_LNK=%ProgramData%\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk"
 

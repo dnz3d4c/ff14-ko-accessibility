@@ -1,0 +1,371 @@
+"""배포 산출물이 정말 '바닐라'인지 검사한다.
+
+`run\\pack.bat`이 내는 두 파일(`dist\\FF14Accessibility.zip`,
+`dist\\FF14AccessibilityInstaller-KR.exe`)에 **이 머신의 것이 섞였는지**와,
+그 산출물이 **Dalamud가 정식 플러그인으로 읽는 모양인지**를 본다.
+
+세 갈래다.
+
+1. **위생** - 압축 안에 들어갈 것만 들어 있나, 사용자 이름·홈 경로·설정 파일이
+   섞이지 않았나, 매니페스트가 빌드와 같은 버전인가
+2. **모양** - 설치 결과가 `installedPlugins\\<이름>\\<버전>\\<이름>.dll`인가.
+   Dalamud는 **버전으로 파싱되지 않는 폴더를 지운다**(`PluginManager.CleanupPlugins`),
+   그래서 폴더 이름은 취향이 아니라 적재 여부를 가르는 조건이다
+3. **실물 검증(`--e2e`)** - 설치기를 버리는 프로필 루트(`FF14ACC_KR_PROFILE`)에
+   대고 `--install`로 실제로 돌려 보고 그 결과를 위 규칙으로 잰다.
+   설치기는 창이라 눈으로만 볼 수 있는데, 이 경로는 기계가 볼 수 있다
+
+**왜 방향을 뒤집나**: "설치기가 성공이라고 말했다"와 "파일이 Dalamud가 보는
+자리에 있다"는 다른 주장이다. 앞의 것만 믿다가 갈린 적이 있다(현황판 §8-1).
+
+사용법:
+    uv run --no-project python tools/pack-check/pack_check.py [--dist DIR] [--e2e]
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import zipfile
+from pathlib import Path
+
+#: 플러그인 내부 이름. Dalamud는 폴더 이름·DLL 이름·매니페스트가 다 이것이길 요구한다.
+INTERNAL_NAME = "FF14Accessibility"
+
+#: Dalamud가 "공식 저장소에서 왔다"에 쓰는 값(`SpecialPluginSource.MainRepo`).
+#: 이 값이라야 `LocalPlugin.IsOrphaned`가 거짓이 되고, 참이면 **적재를 건너뛴다.**
+OFFICIAL_SOURCE = "OFFICIAL"
+
+#: 압축에 들어가도 되는 정확한 이름들.
+ALLOWED_EXACT = {
+    f"{INTERNAL_NAME}.dll",
+    f"{INTERNAL_NAME}.json",
+    f"{INTERNAL_NAME}.deps.json",
+    f"{INTERNAL_NAME}.pdb",
+    "Tolk.dll",
+    "nvdaControllerClient64.dll",
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md",
+}
+
+#: 이름이 판마다 늘어나는 것들. NAudio는 우리가 고르는 목록이 아니라 의존성이다.
+ALLOWED_PATTERNS = (re.compile(r"^NAudio(\.[A-Za-z]+)?\.dll$"),)
+
+#: 배포물에 있으면 안 되는 것. 설치기가 설치할 때 **붙이는** 필드라서,
+#: 압축 안에 이미 있으면 누군가 설치된 사본을 다시 압축했다는 뜻이다.
+LOCAL_ONLY_FIELDS = ("InstalledFromUrl", "WorkingPluginId", "Disabled", "ScheduledForDeletion")
+
+
+def _text_variants(needle: str) -> tuple[bytes, ...]:
+    """.NET 바이너리는 문자열을 UTF-16으로 갖는다. 둘 다 본다."""
+    return needle.encode("utf-8"), needle.encode("utf-16-le")
+
+
+def personal_traces(blob: bytes, needles: list[str]) -> list[str]:
+    """바이트 안에서 발견된 개인 흔적. 없으면 빈 목록."""
+    return [n for n in needles if any(v in blob for v in _text_variants(n))]
+
+
+def default_needles() -> list[str]:
+    """이 머신을 가리키는 문자열들. 인자로 받는 이유는 테스트 때문이다.
+
+    빌드 경로(`C:\\project`)는 **일부러 뺐다.** .NET 어셈블리는 PDB 경로를
+    디버그 디렉토리에 박고, 그건 모든 .NET 빌드가 하는 일이라 개인 설정이
+    아니다. 여기서 막는 것은 **사람을 가리키는 것** - 계정 이름과 홈 경로다.
+    """
+    user = os.environ.get("USERNAME", "")
+    needles = [str(Path.home())]
+    if user:
+        needles.append(user)
+    return [n for n in needles if n]
+
+
+def zip_problems(names: list[str]) -> list[str]:
+    """압축 목록에서 규칙을 어긴 것들."""
+    problems = []
+    for name in names:
+        if "/" in name or "\\" in name:
+            problems.append(f"압축 안에 폴더가 있다: {name}")
+            continue
+        if name in ALLOWED_EXACT:
+            continue
+        if any(p.match(name) for p in ALLOWED_PATTERNS):
+            continue
+        problems.append(f"목록에 없는 파일이 들어 있다: {name}")
+
+    for required in (f"{INTERNAL_NAME}.dll", f"{INTERNAL_NAME}.json"):
+        if required not in names:
+            problems.append(f"있어야 할 파일이 없다: {required}")
+    return problems
+
+
+def manifest_problems(manifest: dict, csproj_version: str | None) -> list[str]:
+    """배포용 매니페스트 검사. 설치 뒤의 매니페스트는 규칙이 다르다."""
+    problems = []
+    if manifest.get("InternalName") != INTERNAL_NAME:
+        problems.append(f"InternalName이 {manifest.get('InternalName')!r}다")
+
+    version = manifest.get("AssemblyVersion")
+    if not version:
+        problems.append("AssemblyVersion이 없다")
+    elif csproj_version and version != csproj_version:
+        problems.append(f"버전이 빌드 설정과 다르다: 매니페스트 {version}, csproj {csproj_version}")
+
+    if not isinstance(manifest.get("DalamudApiLevel"), int):
+        problems.append("DalamudApiLevel이 없거나 숫자가 아니다")
+
+    for field in LOCAL_ONLY_FIELDS:
+        if field in manifest:
+            problems.append(f"설치 뒤에나 붙는 필드가 배포물에 있다: {field}")
+    return problems
+
+
+def parse_version(text: str) -> tuple[int, ...] | None:
+    """`Version.TryParse`가 받아들이는 모양인가. 2~4마디 숫자만 통과한다."""
+    parts = text.split(".")
+    if not 2 <= len(parts) <= 4:
+        return None
+    if not all(p.isdigit() for p in parts):
+        return None
+    return tuple(int(p) for p in parts)
+
+
+def installed_layout_problems(plugin_root: Path) -> list[str]:
+    """설치 결과가 Dalamud가 읽는 모양인가."""
+    if not plugin_root.is_dir():
+        return [f"설치 폴더가 없다: {plugin_root}"]
+
+    version_dirs = [d for d in plugin_root.iterdir() if d.is_dir()]
+    if len(version_dirs) != 1:
+        names = ", ".join(sorted(d.name for d in version_dirs)) or "(없음)"
+        return [f"버전 폴더가 하나여야 하는데 {len(version_dirs)}개다: {names}"]
+
+    version_dir = version_dirs[0]
+    problems = []
+    if parse_version(version_dir.name) is None:
+        # Dalamud가 이런 폴더를 지운다. 조용히 사라지고 플러그인만 없어진다.
+        problems.append(f"버전 폴더 이름이 버전이 아니다: {version_dir.name}")
+
+    dll = version_dir / f"{INTERNAL_NAME}.dll"
+    if not dll.is_file():
+        problems.append(f"DLL이 폴더 이름과 안 맞거나 없다: {dll}")
+
+    manifest_path = version_dir / f"{INTERNAL_NAME}.json"
+    if not manifest_path.is_file():
+        return problems + [f"매니페스트가 없다: {manifest_path}"]
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("InstalledFromUrl") != OFFICIAL_SOURCE:
+        problems.append(
+            f"InstalledFromUrl이 {manifest.get('InstalledFromUrl')!r}다. "
+            f"{OFFICIAL_SOURCE!r}가 아니면 Dalamud가 고아로 보고 적재를 건너뛴다"
+        )
+    if manifest.get("Disabled") is not False:
+        problems.append("매니페스트가 Disabled를 거짓으로 갖고 있지 않다")
+    if manifest.get("AssemblyVersion") != version_dir.name:
+        problems.append(
+            f"폴더 이름과 매니페스트 버전이 다르다: {version_dir.name} vs {manifest.get('AssemblyVersion')}"
+        )
+    if not manifest.get("WorkingPluginId"):
+        problems.append("WorkingPluginId가 비었다. 프로필 항목과 이어지지 않는다")
+    return problems
+
+
+def working_plugin_id(plugin_root: Path) -> str | None:
+    """설치된 사본의 WorkingPluginId. 없으면 None."""
+    for version_dir in sorted(plugin_root.glob("*")):
+        manifest = version_dir / f"{INTERNAL_NAME}.json"
+        if manifest.is_file():
+            return json.loads(manifest.read_text(encoding="utf-8")).get("WorkingPluginId")
+    return None
+
+
+def config_problems(config: dict, expected_id: str | None, dev_dll: str) -> list[str]:
+    """dalamudConfig.json이 정식 경로를 가리키고 dev 흔적이 없는가."""
+    problems = []
+
+    entries = (config.get("DefaultProfile") or {}).get("Plugins", {}).get("$values", [])
+    ours = [e for e in entries if e.get("InternalName") == INTERNAL_NAME]
+    if len(ours) != 1:
+        problems.append(f"기본 프로필의 우리 항목이 {len(ours)}개다. 하나여야 한다")
+    else:
+        entry = ours[0]
+        if entry.get("IsEnabled") is not True:
+            problems.append("기본 프로필에서 꺼져 있다")
+        if expected_id and entry.get("WorkingPluginId") != expected_id:
+            problems.append(
+                "프로필 항목의 WorkingPluginId가 매니페스트와 다르다: "
+                f"{entry.get('WorkingPluginId')} vs {expected_id}"
+            )
+
+    locations = (config.get("DevPluginLoadLocations") or {}).get("$values", [])
+    if any(str(loc.get("Path", "")).lower() == dev_dll.lower() for loc in locations):
+        problems.append("dev 적재 경로가 남아 있다. 같은 모드가 두 번 적재된다")
+
+    dev_settings = config.get("DevPluginSettings") or {}
+    if any(k.lower() == dev_dll.lower() for k in dev_settings):
+        problems.append("DevPluginSettings 항목이 남아 있다")
+
+    return problems
+
+
+# ── 산출물 검사 ────────────────────────────────────────────────────────────
+
+
+def csproj_assembly_version(repo: Path) -> str | None:
+    csproj = repo / "vendor" / "ff14-accessibility" / INTERNAL_NAME / f"{INTERNAL_NAME}.csproj"
+    if not csproj.is_file():
+        return None
+    match = re.search(r"<AssemblyVersion>([^<]+)</AssemblyVersion>", csproj.read_text(encoding="utf-8"))
+    return match.group(1) if match else None
+
+
+def check_artifacts(dist: Path, repo: Path, needles: list[str]) -> list[str]:
+    problems = []
+    zip_path = dist / f"{INTERNAL_NAME}.zip"
+    exe_path = dist / "FF14AccessibilityInstaller-KR.exe"
+
+    for path in (zip_path, exe_path):
+        if not path.is_file():
+            problems.append(f"산출물이 없다: {path}")
+    if problems:
+        return problems
+
+    extra = sorted(p.name for p in dist.iterdir() if p.name not in {zip_path.name, exe_path.name})
+    if extra:
+        problems.append(f"dist에 배포물이 아닌 것이 있다: {', '.join(extra)}")
+
+    with zipfile.ZipFile(zip_path) as archive:
+        names = archive.namelist()
+        problems += zip_problems(names)
+        for name in names:
+            found = personal_traces(archive.read(name), needles)
+            if found:
+                problems.append(f"압축의 {name}에 개인 흔적이 있다: {', '.join(found)}")
+        if f"{INTERNAL_NAME}.json" in names:
+            manifest = json.loads(archive.read(f"{INTERNAL_NAME}.json").decode("utf-8"))
+            problems += manifest_problems(manifest, csproj_assembly_version(repo))
+
+    found = personal_traces(exe_path.read_bytes(), needles)
+    if found:
+        problems.append(f"설치기 EXE에 개인 흔적이 있다: {', '.join(found)}")
+
+    return problems
+
+
+# ── 실물 검증 ──────────────────────────────────────────────────────────────
+
+
+def _seed_profile(root: Path) -> None:
+    """설치기가 "Dalamud가 있다"고 볼 만큼만 갖춘 가짜 프로필."""
+    (root / "addon" / "Hooks" / "15.0.0.0").mkdir(parents=True)
+    (root / "dalamudConfig.json").write_text(
+        json.dumps(
+            {
+                "$type": "Dalamud.Configuration.Internal.DalamudConfiguration, Dalamud",
+                "DevPluginLoadLocations": {"$values": []},
+                "DefaultProfile": {"Plugins": {"$values": []}},
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
+def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
+    env = dict(os.environ)
+    env["FF14ACC_KR_PROFILE"] = str(root)
+    return subprocess.run(
+        [str(exe), "--install", "--skip-vnavmesh"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        env=env,
+        timeout=300,
+    )
+
+
+def check_install_e2e(dist: Path) -> list[str]:
+    """설치기를 버리는 프로필에 대고 실제로 돌려 보고 결과를 잰다."""
+    exe = dist / "FF14AccessibilityInstaller-KR.exe"
+    if not exe.is_file():
+        return [f"설치기가 없다: {exe}"]
+
+    problems = []
+    workdir = Path(tempfile.mkdtemp(prefix="ff14acc-e2e-"))
+    try:
+        root = workdir / "profile"
+        root.mkdir()
+        _seed_profile(root)
+
+        # 옛 dev 설치가 남아 있는 머신을 흉내 낸다. 설치기가 이걸 걷어내야
+        # 같은 모드가 두 번 적재되지 않는다.
+        dev_dir = root / "devPlugins" / INTERNAL_NAME
+        dev_dir.mkdir(parents=True)
+        (dev_dir / f"{INTERNAL_NAME}.dll").write_bytes(b"stale")
+
+        first = run_installer(exe, root)
+        if first.returncode != 0:
+            problems.append(f"설치기가 실패했다(코드 {first.returncode}):\n{first.stdout}{first.stderr}")
+            return problems
+
+        plugin_root = root / "installedPlugins" / INTERNAL_NAME
+        problems += installed_layout_problems(plugin_root)
+
+        if dev_dir.exists():
+            problems.append(f"dev 설치가 그대로 남았다: {dev_dir}")
+
+        config = json.loads((root / "dalamudConfig.json").read_text(encoding="utf-8"))
+        first_id = working_plugin_id(plugin_root)
+        problems += config_problems(
+            config, first_id, str(dev_dir / f"{INTERNAL_NAME}.dll")
+        )
+
+        # 두 번째 실행: 갱신 경로다. 신원이 바뀌면 프로필에 죽은 항목이 쌓인다.
+        second = run_installer(exe, root)
+        if second.returncode != 0:
+            problems.append(f"두 번째 설치가 실패했다(코드 {second.returncode})")
+        elif working_plugin_id(plugin_root) != first_id:
+            problems.append("두 번 설치했더니 WorkingPluginId가 바뀌었다")
+
+        problems += installed_layout_problems(plugin_root)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+    return problems
+
+
+def main(argv: list[str]) -> int:
+    repo = Path(__file__).resolve().parents[2]
+    parser = argparse.ArgumentParser(description="배포 산출물 위생·모양 검사")
+    parser.add_argument("--dist", default=str(repo / "dist"))
+    parser.add_argument("--e2e", action="store_true", help="설치기를 실제로 돌려 본다")
+    args = parser.parse_args(argv[1:])
+
+    dist = Path(args.dist)
+    problems = check_artifacts(dist, repo, default_needles())
+    if args.e2e:
+        problems += check_install_e2e(dist)
+
+    if problems:
+        print("== 배포 검사: 확인 필요 ==\n")
+        for problem in problems:
+            print(f"  - {problem}")
+        return 1
+
+    print("== 배포 검사: 통과 ==")
+    print(f"  {dist}")
+    if args.e2e:
+        print("  설치 경로까지 실제로 돌려 봤다")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

@@ -11,8 +11,8 @@
 | `log.bat` | 이번 판이 정상인지 판정 | 아무 때나 |
 | `sync.bat` | 업스트림이 앞서 갔는지 보고, 깨끗하면 올린다 | 아무 때나 |
 | `terms.bat` | 게임이 쓰는 한국어 낱말 찾기 (sqpack 직독) | **꺼져 있어도 됨** |
-| `setup.bat` | **최초 1회.** 프로필 부트스트랩 + dev 플러그인 시딩 | **꺼져 있어야 함** |
-| `pack.bat` | 남에게 줄 배포 폴더 만들기 | 아무 때나 |
+| `setup.bat` | **최초 1회.** 프로필 부트스트랩 + 개발용 시딩 | **꺼져 있어야 함** |
+| `pack.bat` | 남에게 줄 배포 폴더 만들기 (+ 낸 것을 다시 잰다) | 아무 때나 |
 | `_env.cmd` | 직접 실행하지 않는다. 나머지가 경로를 얻는 곳 | — |
 
 ## 사람 없이 돌릴 때 — `FF14_NOPAUSE`
@@ -27,7 +27,11 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 
 `sync.bat`은 인자 없이는 **아무것도 안 옮긴다** — 재기만 한다. 올릴 때는 태그를 손으로 적는다(`run\sync.bat v5.87`). 실수로 최신에 끌려가지 않게 하려는 것이고, 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
 
-`setup.bat`과 설치기 EXE는 **같은 일을 한다.** 이 저장소 안에서 개발하며 쓸 때는 `setup.bat`이 빠르고, 남에게 주거나 다른 PC에 옮길 때는 `pack.bat`이 낸 `dist/`를 통째로 건넨다.
+`setup.bat`과 설치기 EXE는 비슷한 일을 하지만 **플러그인을 놓는 자리가 다르다.** `build.bat`·`setup.bat`은 개발용 자리(`devPlugins`)에, 설치기는 정식 자리(`installedPlugins`)에 놓는다. 둘은 **상호 배타적**이고 서로를 걷어낸다 — 같이 있으면 Dalamud가 같은 모드를 두 번 적재한다. 근거와 조건은 [docs/kr-runtime-setup.md](../docs/kr-runtime-setup.md) §7.
+
+즉 **`build.bat`을 돌리면 그 머신은 개발 상태가 된다.** 배포 상태로 되돌리려면 `dist\FF14AccessibilityInstaller-KR.exe`를 다시 실행한다. 배포판을 인게임에서 검증하는 중이라면 그 사이에 `build.bat`을 돌리지 않는다.
+
+`pack.bat`은 낸 것을 그대로 믿지 않는다. 3단계에서 `tools/pack-check`가 압축 내용을 규칙과 대조하고, 설치기를 **버리는 프로필 루트**에 대고 실제로 돌려 결과를 잰다.
 
 `setup.bat`이 게임을 끈 상태를 요구하는 이유는 Dalamud가 **종료할 때 설정을 저장하기 때문**이다. 켜 놓고 심으면 조용히 덮인다.
 

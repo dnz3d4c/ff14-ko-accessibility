@@ -49,6 +49,9 @@ class Report:
     warnings: int = 0
     key_conflicts: int = 0
     unknown_keys: int = 0
+    #: 어느 경로로 적재됐나. 개발 중에는 개발용이 정상이고 배포 상태에서는
+    #: 정식이 정상이라, 이건 합격/불합격이 아니라 사실 보고다.
+    route: str = "알 수 없음"
 
     @property
     def ok(self) -> bool:
@@ -127,6 +130,27 @@ def inspect(text: str, sidecar: str = "") -> Report:
         evidence = _find(lines, *needles)
         report.checks.append(Check(name, evidence is not None, evidence, hint))
 
+    # 어느 경로로 들어왔나. 설치기는 installedPlugins에 넣고(정식), run\build.bat은
+    # devPlugins에 넣는다(개발용). Dalamud가 줄 모양으로 구분해 준다.
+    as_installed = _find(lines, "Loading plugin FF14Accessibility")
+    as_dev = _find(lines, "Loading dev plugin FF14Accessibility")
+    report.route = (
+        "정식 플러그인" if as_installed and not as_dev
+        else "개발용 플러그인" if as_dev and not as_installed
+        else "둘 다" if as_dev and as_installed
+        else "알 수 없음"
+    )
+    # **두 사본이 동시에 뜨는 것만 결함이다.** 같은 명령과 같은 단축키를 두 번
+    # 등록하고, 게임 안에서는 "가끔 두 번 말한다"로만 드러난다.
+    report.checks.append(
+        Check(
+            "사본이 하나뿐",
+            not (as_dev and as_installed),
+            as_installed if as_dev and as_installed else None,
+            "정식 설치와 개발용 설치가 같이 있다. 설치기를 다시 돌려 dev 사본을 걷어낸다",
+        )
+    )
+
     for line in lines:
         if "[ERR]" in line or "[FTL]" in line:
             report.errors += 1
@@ -155,6 +179,7 @@ def render(report: Report) -> str:
             lines.append(f"         -> {check.hint}")
 
     lines.append("")
+    lines.append(f"적재 경로: {report.route}")
     lines.append(f"오류 {report.errors}건, 경고 {report.warnings}건")
     if report.key_conflicts:
         lines.append(f"  키 충돌 {report.key_conflicts}건 (현황판 W-03)")

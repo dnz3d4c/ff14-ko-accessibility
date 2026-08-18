@@ -75,6 +75,20 @@ def test_기존_프로필_항목이_있으면_되살린다():
     assert profile["WorkingPluginId"] == NEW_ID
 
 
+def test_이미_심긴_설정은_한_글자도_안_바뀐다():
+    # `main()`이 이걸로 "쓸까 말까"를 정한다. 게임이 떠 있는 동안 이 파일에
+    # 쓰면 Dalamud가 종료할 때 자기 상태로 덮어써서 우리 것이 사라진다 -
+    # 개발 배포는 게임이 켜진 채로 도는 게 정상이라 조용히 지나가야 한다.
+    import json
+
+    config = fresh_config()
+    seed_devplugin.seed(config, DLL, NAME, NEW_ID)
+    before = json.dumps(config, sort_keys=True)
+
+    seed_devplugin.seed(config, DLL, NAME, "22222222-2222-2222-2222-222222222222")
+    assert json.dumps(config, sort_keys=True) == before
+
+
 def test_로드_위치는_경로_대소문자를_구분하지_않는다():
     # DevPluginSettings는 딕셔너리 키라 정확히 일치해야 한다 - 업스트림도 같다.
     # 여기서 보장하는 것은 로드 위치 목록뿐이다.

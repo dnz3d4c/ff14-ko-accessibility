@@ -5,6 +5,11 @@ call "%~dp0_env.cmd"
 rem KR 패치가 적용된 vendor 클론을 빌드하고 devPlugins에 배포한다.
 rem AutomaticReloading이 켜져 있어서 게임이 떠 있어도 덮어쓰면 반영된다
 rem (docs/kr-runtime-setup.md 7절).
+rem
+rem 여기는 **개발 상태**를 만든다. 사용자에게 나가는 정식 설치는 설치기가
+rem installedPlugins에 넣는다. 둘은 상호 배타적이다 - 같이 있으면 Dalamud가
+rem 같은 모드를 두 번 적재하고, 명령과 단축키가 겹친다. 그래서 이 배치는
+rem 정식 설치본을 먼저 걷어낸다.
 
 set "PROJ=%REPO%\vendor\ff14-accessibility\FF14Accessibility\FF14Accessibility.csproj"
 set "OUTZIP=%REPO%\vendor\ff14-accessibility\FF14Accessibility\bin\Release\net10.0-windows\FF14Accessibility\latest.zip"
@@ -64,11 +69,27 @@ if not exist "%OUTZIP%" (
 )
 
 echo.
+set "INSTALLED=%KR_INSTALLEDPLUGINS%\FF14Accessibility"
+if exist "%INSTALLED%" (
+  echo 정식 설치본을 걷어낸다: %INSTALLED%
+  echo   되돌리려면 dist\FF14AccessibilityInstaller-KR.exe를 다시 실행한다.
+  rd /s /q "%INSTALLED%"
+)
+
 echo 배포: %TARGET%
 if not exist "%TARGET%" mkdir "%TARGET%"
 7z x -y -o"%TARGET%" "%OUTZIP%" >nul
 if errorlevel 1 (
   echo [실패] 압축을 못 풀었다. 게임이 DLL을 잠갔을 수 있다.
+  goto :fail
+)
+
+rem 설치기가 정식 경로로 옮기면서 dev 항목을 지웠을 수 있다. 없으면 심고,
+rem 이미 있으면 손대지 않는다 - 게임이 떠 있는 동안 설정을 쓰면 Dalamud가
+rem 종료할 때 자기 상태로 덮어써서 우리 것이 사라진다.
+uv run --no-project python "%REPO%\tools\kr-setup\seed_devplugin.py" "%KR_CONFIG%" "%TARGET%\FF14Accessibility.dll" FF14Accessibility
+if errorlevel 1 (
+  echo [실패] dev 플러그인 설정을 심지 못했다.
   goto :fail
 )
 

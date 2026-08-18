@@ -160,14 +160,14 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 
 | # | 항목 | 상태 | 근거 |
 |---|------|------|------|
-| 1 | Addon 시트 행 ID 동일 여부 | **미확인** | 깊은 던전 미진입. sqpack이 있어 오프라인 확인 가능 |
+| 1 | Addon 시트 행 ID 동일 여부 | **첫 증거 있음** | 업스트림이 독일어에서 본 채팅 설정 블록(1205~1290행)의 `Alle auswählen`·`Alle abwählen`이 KR 1273 `모두 켜기`·1274 `모두 끄기`에 그대로 앉아 있다. **한 블록의 일치지 전수 대조는 아니다** (`tools/ko-terms`) |
 | 2 | 모드 단축키 반응 | **해소** | `Ctrl+F3`·`Ctrl+F9`·`Ctrl+F5` 등이 실제 발화. 조사 §4 가설 12 통과 |
 | 3 | addon 이름 90종 동일 | **대체로 해소** | `_TitleMenu`, `_CharaSelectListMenu`, `_CharaMake*` 9종이 그대로 잡힘 |
 | 4 | 플러그인 자체 오프셋 3곳 | **2/3 해소** | human.cmp 팔레트 46,688색 로드, LogFilter 278행·69채널 파싱(Broken 아님). 트리플 트라이어드는 미확인 |
 | 5 | 툴팁 후킹 3개 | **해소** | `[Tooltip] Hooks aktiv (Attach/Detach/DetachByAddon)` |
 | 6 | vnavmesh 동작 | **미확인** | 설치와 사전 검증은 끝났고 인게임 적재가 남았다. §7 |
 | 7 | CS 7.51 컴파일 | **해소** | §4 참조 |
-| 8 | KR에 영어 시트 존재 | **미확인** | |
+| 8 | KR에 영어 시트 존재 | **해소 — 없다** | `run\terms.bat langs`가 sqpack에서 읽어 낸 언어는 한국어 하나뿐이다(Addon 19,592행). 영어·일본어·독일어·프랑스어 전부 0. 그래서 용어를 "영어로 찾아 한국어를 읽는" 방식이 로컬에서는 안 되고, 행 번호로 짚어야 한다 (`tools/ko-terms/README.md`) |
 | 9 | UI 노드 ID/휴리스틱 | **부분 해소, 결함 1건 발견** | 아래 참조 |
 | 10 | 채팅 채널 ID | **미확인** | 인게임 대화 미시도 |
 | 11 | 커스텀 저장소 로드 | **해당 없음** | devPlugins 경로를 쓴다 |

@@ -67,13 +67,27 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | `devPlugins\vnavmesh` | 5.5MB의 대부분 | 남의 플러그인 |
 | `devPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
 
-### 바꿀 수는 있는데 안 바꾼다 (2026-08-18 결정)
+### 바꿀 수 있다. 우리가 따라간다 (2026-08-18)
 
 `%APPDATA%\KrDalamudUpdater\settings.json`의 `ProfileRoot`를 고치면 옮겨진다. 막는 것이 없다 — `UpdaterSettings`가 그 값을 `Load()`/`Save()`로 왕복 저장하고, 검증(`SafeProfileManager.RequireSafeProfileRoot`)이 거부하는 것은 **`%APPDATA%` 자기 자신과 드라이브 루트 둘뿐**이다.
 
-**안 바꾸는 이유는 설치기 쪽이 갈라지기 때문이다.** 우리 설치기는 프로필 루트를 하드코딩해서 만든다(`overlay/patches/0006`, `Path.Combine(ApplicationData, "XIVLauncherKR")`). 이름을 바꾸면 설치기가 만든 곳과 업데이터가 보는 곳이 달라지고, 업데이터는 **자기 기본값으로 빈 프로필을 새로 만들어 거기에 주입한다.** 오류가 안 나고 플러그인만 조용히 빠진다 — [status.md](status.md) §3이 "아무 일도 안 일어난다의 원인은 늘 경로 중 하나다"라고 적어 둔 바로 그 실패다.
+**그 파일은 내부 값이 아니라 공개된 사용자 설정이다.** `README-KR.txt`가 직접 적어 뒀다 — "사용자 설정은 `%APPDATA%\KrDalamudUpdater\settings.json`에 보관됩니다". 업데이터가 옆에 `settings.json.bak`을 남기며 자기가 다시 쓴다.
 
-막으려면 우리 설치기가 **남의 프로그램 설정 파일**(`%APPDATA%\KrDalamudUpdater\settings.json`)을 써야 한다. 그건 [status.md](status.md) §4-3에서 vnavmesh 두고 정한 "남의 것은 남이 관리하게 둔다"와 어긋난다. 얻는 것은 이름뿐이고 잃는 것은 조용한 실패라서 안 바꾼다.
+**전에는 우리가 세 군데에 박아 뒀다** — 설치기·`run/_env.cmd`·`tools/kr-setup/check_log.py`. 셋이 서로 맞는지도, 업데이터의 실제 설정과 맞는지도 아무도 안 봤다. 사용자가 값을 옮기면 설치기는 옛 폴더에 넣고 업데이터는 **빈 프로필을 새로 만들어 거기 주입한다** — 오류 없이 플러그인만 빠진다. [status.md](status.md) §3이 "아무 일도 안 일어난다의 원인은 늘 경로 중 하나다"라고 적어 둔 바로 그 실패다.
+
+**그래서 지금은 읽는다** (`overlay/patches/0011`). 순서는 셋이다.
+
+1. `FF14ACC_KR_PROFILE` — 우리 탈출구. 옮긴 프로필을 가리키거나, 아무것도 없는 분기를 이미 다 있는 머신에서 돌려 볼 때
+2. 업데이터 설정의 `ProfileRoot` — 환경변수를 펼친 뒤. 업데이터가 `%APPDATA%\XIVLauncherKR` 모양 그대로 저장하기 때문이다
+3. `%APPDATA%\XIVLauncherKR` — 업데이터 기본값과 같은 값
+
+없거나 깨졌거나 못 쓸 값이면 조용히 3번으로 간다. **남의 파일이 깨졌다고 우리 설치기가 죽지 않는다.**
+
+**"남의 것은 남이 관리하게 둔다"(§4-3)에 어긋나지 않는다.** 그 방침이 막는 것은 남의 설정 파일을 우리가 **쓰는** 것이고(vnavmesh 설정을 우리가 만들어 주면 그쪽 스키마에 묶인다), 여기서 하는 것은 **읽기**다. 그리고 박아 두는 쪽이 결합이 더 세다 — 박으면 "그쪽 기본값이 안 바뀐다"와 "사용자가 안 고친다" 둘 다에 걸어야 하는데, 읽으면 앞의 하나만 남고 그마저 폴백이 받는다.
+
+**폴더 이름 자체는 여전히 안 바꾼다.** 얻는 것이 이름뿐인데, 위 표대로 그 폴더는 464MB 중 458MB가 남의 것이라 애초에 우리 폴더가 아니다.
+
+규칙의 단일 원천은 `tools/kr-setup/kr_profile.py`이고, 설치기(C#)·배치·로그 판정 셋이 갈라지면 `tools/kr-setup/tests/test_kr_profile.py`가 빨개진다.
 
 업데이터 GUI의 Check Update로 공식 Dalamud stable `15.0.3.2`와 에셋 `437`을 받고 KR 호환 패치까지 자동 적용했다.
 

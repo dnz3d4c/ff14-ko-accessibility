@@ -51,6 +51,12 @@
 | `{monster} lebt in {area}. Dieses Gebiet ist auf der Karte nicht verzeichnet.` | `{monster} lives in {area}. That area is not marked on the map.` |
 | `{monster} lebt in {zone}. Dorthin führt kein Weg über Gebietsübergänge.` | `{monster} lives in {zone}. No route there over zone transitions.` |
 
+**KR에서 확인해야 할 것 셋**(`W-15`). 업스트림 실측은 전부 독일어 클라이언트 기준이다.
+
+1. **몬스터 이름 자리표시자** — `HuntingLogService.ResolveMonsterName`이 시트 이름에 `[`가 있으면 **독일어일 때만** 어미를 채우고 나머지 언어는 자리표시자를 지운다. KR 시트에 그런 표시가 있으면 이름이 어긋나고, `FindNearestLive`가 이름으로 찾으므로 **몬스터까지 걸어가는 기능이 죽는다**
+2. **등급 줄 모양** — `TryFormatBestiaryRank`가 노드 id가 아니라 "숫자 하나 + 진행 토큰 하나"로 줄을 알아본다. KR 창이 같은 모양으로 그리는지는 인게임에서만 안다
+3. **서식지 표** — "647개 전부 해석되고 590개가 마커를 갖는다"는 업스트림 실측이다. KR 시트에서 같은 수치인지 미확인
+
 ## v5.85 — 2026-08-16
 
 **숫자만 덩그러니 읽히던 창 세 곳이 그 숫자가 무슨 뜻인지 말한다.**

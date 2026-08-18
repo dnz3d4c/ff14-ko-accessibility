@@ -81,6 +81,23 @@ $"{option}, {index} von {count}{(selected ? ", ausgewählt" : "")}"
 
 `RewardCurrencyLabels`가 `{ "Erfahrung", "Gil" }`. 인덱스로 꺼내 쓰므로 **개수와 순서를 그대로** 맞춘다.
 
+### 스냅샷 안에 있는데도 위험한 것 — 세는 말 하나
+
+`CounterConnector`는 평범한 삼항이라 스냅샷이 지킨다. **그런데 이건 말하는 쪽과 읽는 쪽이 같이 쓴다.**
+
+```csharp
+public static string CounterConnector => IsGerman ? "von" : "of";
+public static string Counter(int index, int count) => $"{index} {CounterConnector} {count}";
+```
+
+`UIReaderService.TryParseSpokenProgress`가 자기가 찍은 이 문장을 **다시 읽어서** 사냥수첩 줄을 알아본다. 조건이 딱 셋이다 — 공백으로 끊어 **조각 3개**, 첫째와 셋째가 **전부 숫자**, 둘째가 `CounterConnector`와 **글자까지 같을 것**.
+
+**한국어로 옮길 때 여기가 조용히 깨진다.** 자연스러운 한국어는 어순이 뒤집히고(`10개 중 3개`) 숫자에 단위가 붙는다. 그러면 첫 조각이 `3개`라 "전부 숫자"에서 떨어지고, **사냥수첩 목록이 통째로 사라진다.** 예외도 로그도 없다.
+
+업스트림도 같은 자리에서 한 번 당했다 — 읽는 쪽에 `"von"`을 박아 놨더니 영어에서 사냥수첩이 사라졌고, 그래서 상수를 노출한 것이다(`AccessibilityStrings.cs`의 주석이 그 사고를 적어 뒀다).
+
+옮길 때 지킬 것: **연결어 한 낱말만 바꾸고, 어순과 숫자 자리는 건드리지 않는다.** 어순을 바꾸려면 읽는 쪽(`TryParseSpokenProgress`)을 같이 고쳐야 하고, 그건 번역이 아니라 코드 변경이다.
+
 ### 기타 2곳
 
 **버전 안내** — `version.Replace(".", " Punkt ")`. 소수점을 말로 읽는다. 한국어로 "5 점 85"라고 할지 어떻게 띄울지 정해야 한다. 사용자 확인 사항.

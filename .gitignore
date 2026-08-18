@@ -18,3 +18,8 @@ dist/
 # 재배포하지 않는다 - 우리가 실제로 쓰는 낱말만 출처와 함께 overlay/ko/terms.json에
 # 남긴다. 다시 뽑는 명령은 그 파일의 method에 적혀 있다.
 tools/ko-terms/out/
+
+# 공식 가이드 원문 캐시 (run\guide.bat fetch가 만든다, 56MB). 같은 이유로 저장소에
+# 넣지 않는다 - 액토즈/스퀘어에닉스의 문서를 통째로 재배포하지 않는다. 우리가
+# 실제로 인용한 문장만 문서 번호를 붙여 overlay/ko/guide-quotes.json에 남긴다.
+tools/ko-guide/out/

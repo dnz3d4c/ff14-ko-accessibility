@@ -1,0 +1,526 @@
+{
+  "note": "공식 가이드(guide.ff14.co.kr) 문서 대장. 원문은 저장소에 넣지 않는다 - `tools/ko-guide/out/`에 받아 두고 여기에는 무엇을 어디서 받았는지만 남긴다. 우리가 인용한 문장은 overlay/ko/guide-quotes.json에 따로 있다.",
+  "method": "uv run --no-project python tools/ko-guide/guide.py fetch",
+  "game_version": "7.55",
+  "guide_updated": "2026. 08. 04",
+  "fetched": "2026-08-18",
+  "docs": [
+    {
+      "id": 107,
+      "title": "회원가입",
+      "group": "기초 가이드",
+      "sub": "게임시작",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/107"
+    },
+    {
+      "id": 106,
+      "title": "보안서비스",
+      "group": "기초 가이드",
+      "sub": "게임시작",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/106"
+    },
+    {
+      "id": 102,
+      "title": "설치/실행",
+      "group": "기초 가이드",
+      "sub": "게임시작",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/102"
+    },
+    {
+      "id": 103,
+      "title": "캐릭터 생성",
+      "group": "기초 가이드",
+      "sub": "게임시작",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/103"
+    },
+    {
+      "id": 104,
+      "title": "조작법",
+      "group": "기초 가이드",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/104"
+    },
+    {
+      "id": 112,
+      "title": "인터페이스/HUD",
+      "group": "기초 가이드",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/112"
+    },
+    {
+      "id": 113,
+      "title": "퀘스트",
+      "group": "기초 가이드",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/113"
+    },
+    {
+      "id": 114,
+      "title": "탈것",
+      "group": "기초 가이드",
+      "sub": "이동(비행/잠수/탈것)",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/114"
+    },
+    {
+      "id": 115,
+      "title": "비행&잠수",
+      "group": "기초 가이드",
+      "sub": "이동(비행/잠수/탈것)",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/115"
+    },
+    {
+      "id": 116,
+      "title": "초코보 수송",
+      "group": "기초 가이드",
+      "sub": "이동(비행/잠수/탈것)",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/116"
+    },
+    {
+      "id": 117,
+      "title": "비공정",
+      "group": "기초 가이드",
+      "sub": "이동(비행/잠수/탈것)",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/117"
+    },
+    {
+      "id": 105,
+      "title": "초보자의 집",
+      "group": "기초 가이드",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/105"
+    },
+    {
+      "id": 119,
+      "title": "모험록",
+      "group": "기초 가이드",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/119"
+    },
+    {
+      "id": 120,
+      "title": "장비 착용",
+      "group": "캐릭터 & 육성",
+      "sub": "장비",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/120"
+    },
+    {
+      "id": 121,
+      "title": "장비 수리",
+      "group": "캐릭터 & 육성",
+      "sub": "장비",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/121"
+    },
+    {
+      "id": 122,
+      "title": "마테리아",
+      "group": "캐릭터 & 육성",
+      "sub": "장비",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/122"
+    },
+    {
+      "id": 123,
+      "title": "토벌수첩",
+      "group": "캐릭터 & 육성",
+      "sub": "수첩",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/123"
+    },
+    {
+      "id": 124,
+      "title": "공략수첩",
+      "group": "캐릭터 & 육성",
+      "sub": "수첩",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/124"
+    },
+    {
+      "id": 125,
+      "title": "탐험수첩",
+      "group": "캐릭터 & 육성",
+      "sub": "수첩",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/125"
+    },
+    {
+      "id": 126,
+      "title": "길드 의뢰",
+      "group": "캐릭터 & 육성",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/126"
+    },
+    {
+      "id": 127,
+      "title": "버디",
+      "group": "캐릭터 & 육성",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/127"
+    },
+    {
+      "id": 128,
+      "title": "우호부족",
+      "group": "캐릭터 & 육성",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/128"
+    },
+    {
+      "id": 129,
+      "title": "알라그 석판",
+      "group": "캐릭터 & 육성",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/129"
+    },
+    {
+      "id": 130,
+      "title": "총사령부",
+      "group": "캐릭터 & 육성",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/130"
+    },
+    {
+      "id": 131,
+      "title": "임무 찾기 이용",
+      "group": "전투 콘텐츠",
+      "sub": "임무 찾기",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/131"
+    },
+    {
+      "id": 132,
+      "title": "임무 지원",
+      "group": "전투 콘텐츠",
+      "sub": "임무 찾기",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/132"
+    },
+    {
+      "id": 133,
+      "title": "트러스트",
+      "group": "전투 콘텐츠",
+      "sub": "임무 찾기",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/133"
+    },
+    {
+      "id": 134,
+      "title": "돌발 임무",
+      "group": "전투 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/134"
+    },
+    {
+      "id": 135,
+      "title": "마물 사냥",
+      "group": "전투 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/135"
+    },
+    {
+      "id": 136,
+      "title": "특수 던전",
+      "group": "전투 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/136"
+    },
+    {
+      "id": 137,
+      "title": "금단의 땅 에우레카",
+      "group": "전투 콘텐츠",
+      "sub": "특수 필드",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/137"
+    },
+    {
+      "id": 138,
+      "title": "세이브 더 퀸",
+      "group": "전투 콘텐츠",
+      "sub": "특수 필드",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/138"
+    },
+    {
+      "id": 165,
+      "title": "초승달 섬",
+      "group": "전투 콘텐츠",
+      "sub": "특수 필드",
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/165"
+    },
+    {
+      "id": 139,
+      "title": "소장품",
+      "group": "생활 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/139"
+    },
+    {
+      "id": 140,
+      "title": "단골 거래",
+      "group": "생활 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/140"
+    },
+    {
+      "id": 141,
+      "title": "먼바다 낚시",
+      "group": "생활 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/141"
+    },
+    {
+      "id": 142,
+      "title": "아이템 분해",
+      "group": "생활 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/142"
+    },
+    {
+      "id": 143,
+      "title": "보물찾기",
+      "group": "부가 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/143"
+    },
+    {
+      "id": 144,
+      "title": "무기 강화",
+      "group": "부가 콘텐츠",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/144"
+    },
+    {
+      "id": 145,
+      "title": "초보자 채널",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/145"
+    },
+    {
+      "id": 146,
+      "title": "파티 찾기",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/146"
+    },
+    {
+      "id": 147,
+      "title": "자유부대",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/147"
+    },
+    {
+      "id": 148,
+      "title": "링크셸",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/148"
+    },
+    {
+      "id": 149,
+      "title": "감정 표현",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/149"
+    },
+    {
+      "id": 150,
+      "title": "동아리",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/150"
+    },
+    {
+      "id": 166,
+      "title": "대화 말풍선",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/166"
+    },
+    {
+      "id": 168,
+      "title": "전략 게시판",
+      "group": "커뮤니티",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/168"
+    },
+    {
+      "id": 151,
+      "title": "집사",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/151"
+    },
+    {
+      "id": 152,
+      "title": "장터",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/152"
+    },
+    {
+      "id": 153,
+      "title": "여관",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/153"
+    },
+    {
+      "id": 154,
+      "title": "장비 투영",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/154"
+    },
+    {
+      "id": 155,
+      "title": "아이템 염색",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/155"
+    },
+    {
+      "id": 156,
+      "title": "미용",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/156"
+    },
+    {
+      "id": 157,
+      "title": "서버 텔레포",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/157"
+    },
+    {
+      "id": 158,
+      "title": "유실물 찾기",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/158"
+    },
+    {
+      "id": 159,
+      "title": "우편(모그레터)",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/159"
+    },
+    {
+      "id": 167,
+      "title": "빠른 메뉴",
+      "group": "편의 기능",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/167"
+    },
+    {
+      "id": 160,
+      "title": "데이터 백업/복원",
+      "group": "기타",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/160"
+    },
+    {
+      "id": 161,
+      "title": "모험가 카드 & 초상화",
+      "group": "기타",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/161"
+    },
+    {
+      "id": 162,
+      "title": "꼬마 친구",
+      "group": "기타",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/162"
+    },
+    {
+      "id": 163,
+      "title": "스크린샷",
+      "group": "기타",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/163"
+    },
+    {
+      "id": 164,
+      "title": "매크로/명령어",
+      "group": "기타",
+      "sub": null,
+      "url": "https://guide.ff14.co.kr/lodestone/playguide/view/164"
+    }
+  ],
+  "sections": [
+    {
+      "slug": "deepdungeon",
+      "title": "딥 던전: 망자의 궁전",
+      "url": "https://guide.ff14.co.kr/deepdungeon"
+    },
+    {
+      "slug": "deepdungeon2",
+      "title": "딥 던전: 천궁탑",
+      "url": "https://guide.ff14.co.kr/deepdungeon2"
+    },
+    {
+      "slug": "deepdungeon3",
+      "title": "딥 던전: 에우레카 오르토스",
+      "url": "https://guide.ff14.co.kr/deepdungeon3"
+    },
+    {
+      "slug": "deepdungeon4",
+      "title": "딥 던전: 노르브란트 순례길",
+      "url": "https://guide.ff14.co.kr/deepdungeon4"
+    },
+    {
+      "slug": "housing",
+      "title": "하우징",
+      "url": "https://guide.ff14.co.kr/housing"
+    },
+    {
+      "slug": "goldsaucer",
+      "title": "맨더빌 골드 소서",
+      "url": "https://guide.ff14.co.kr/Goldsaucer"
+    },
+    {
+      "slug": "islandsanctuary",
+      "title": "무인도 개척",
+      "url": "https://guide.ff14.co.kr/IslandSanctuary"
+    },
+    {
+      "slug": "cosmic",
+      "title": "우주 개척",
+      "url": "https://guide.ff14.co.kr/cosmic_exploration"
+    },
+    {
+      "slug": "ishgard",
+      "title": "이슈가르드 부흥",
+      "url": "https://guide.ff14.co.kr/Ishgard"
+    },
+    {
+      "slug": "job",
+      "title": "전투 직업 가이드",
+      "url": "https://guide.ff14.co.kr/job"
+    },
+    {
+      "slug": "job-craft",
+      "title": "생활 직업 가이드",
+      "url": "https://guide.ff14.co.kr/job/CraftingGathering"
+    },
+    {
+      "slug": "map",
+      "title": "풍맥 가이드",
+      "url": "https://guide.ff14.co.kr/map"
+    }
+  ],
+  "stats": {
+    "습니다체 종결": 862,
+    "한다체 종결": 0,
+    "가능형": 563,
+    "UI 경로": 56,
+    "버튼 표기": 9,
+    "보충 표기": 188,
+    "모험가님": 13,
+    "도해 라벨": 11,
+    "그림": 532,
+    "대체 텍스트 있는 그림": 0,
+    "도입문": 62,
+    "시각 의존": 229,
+    "시각 의존 갈래": {
+      "마우스": 140,
+      "위치": 69,
+      "색": 16,
+      "모양": 3,
+      "그림 참조": 1
+    }
+  }
+}

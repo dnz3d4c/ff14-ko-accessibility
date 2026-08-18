@@ -43,6 +43,7 @@ CATALOG = REPO / "overlay" / "ko" / "ko.json"
 TERMS = REPO / "overlay" / "ko" / "terms.json"
 LINT = REPO / "tools" / "commit-lint" / "commit_lint.py"
 HAND_CASES_DOC = REPO / "docs" / "ko-hand-cases.md"
+GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
 
 #: 손으로 옮긴 자리를 세는 패치. 이름이 바뀌면 0을 세므로 존재를 검사한다.
 HAND_PATCH_GLOB = "overlay/patches/0009-*.patch"
@@ -96,9 +97,43 @@ def hand_type_sum(path: Path = HAND_CASES_DOC) -> int:
     return sum(int(n) for n in rows)
 
 
+def guide_facts(repo: Path = REPO) -> dict[str, int]:
+    """공식 가이드 코퍼스에서 센 값. `tools/ko-guide`가 원문에서 계산해 대장에 적는다.
+
+    ko-user-guide 스킬이 "공식 가이드는 이렇게 쓴다"고 주장하는 근거가 전부
+    여기 있다. 가이드가 개정되면 값이 움직이고, 그때 스킬이 빨개진다.
+    """
+    corpus = _json(repo / "tools" / "ko-guide" / "corpus.json")
+    stats = corpus["stats"]
+    kinds = stats["시각 의존 갈래"]
+    quotes = _json(repo / "overlay" / "ko" / "guide-quotes.json")
+    return {
+        "가이드 문서": len(corpus["docs"]),
+        "가이드 대분류": len(corpus["sections"]),
+        "가이드 인용": len(quotes["quotes"]),
+        "가이드 도입문": stats["도입문"],
+        "가이드 보충 표기": stats["보충 표기"],
+        "가이드 도해 라벨": stats["도해 라벨"],
+        "가이드 습니다체": stats["습니다체 종결"],
+        "가이드 한다체": stats["한다체 종결"],
+        "가이드 가능형": stats["가능형"],
+        "가이드 모험가님": stats["모험가님"],
+        "가이드 UI 경로": stats["UI 경로"],
+        "가이드 시각 의존": stats["시각 의존"],
+        "가이드 시각 마우스": kinds["마우스"],
+        "가이드 시각 위치": kinds["위치"],
+        "가이드 시각 색": kinds["색"],
+        "가이드 시각 모양": kinds["모양"],
+        "가이드 시각 그림 참조": kinds["그림 참조"],
+        "가이드 그림": stats["그림"],
+        "가이드 대체 텍스트": stats["대체 텍스트 있는 그림"],
+    }
+
+
 def facts(repo: Path = REPO) -> dict[str, int]:
     golden = _json(repo / "tools" / "strings-golden" / "golden" / "de-en.json")
     return {
+        **guide_facts(repo),
         "골든 쌍": golden["pairs"],
         "골든 미해석": golden["unparsed"],
         "카탈로그 문장": len(_json(repo / "overlay" / "ko" / "ko.json")["strings"]),
@@ -127,6 +162,29 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("docs/ko-hand-cases.md", "골든 미해석", r"\*\*(\d+)\*\* \| 스냅샷 파서가 못 읽은"),
     ("docs/ko-hand-cases.md", "손으로 볼 자리", r"\*\*(\d+)\*\* \| 그중 진짜 손으로 볼"),
     ("docs/ko-hand-cases.md", "손으로 옮긴 자리", r"\*\*(\d+)\*\* \| 실제로 한국어를 넣은"),
+    # 공식 가이드 코퍼스. 스킬이 대는 숫자는 전부 원문에서 다시 계산해 대조한다.
+    (GUIDE_SKILL, "가이드 문서", r"원문 (\d+)건 \+ 대분류"),
+    (GUIDE_SKILL, "가이드 대분류", r"\+ 대분류 (\d+)건"),
+    (GUIDE_SKILL, "가이드 도입문", r"문서 (\d+)건이 빠짐없이"),
+    (GUIDE_SKILL, "가이드 보충 표기", r"`※`로 시작한다\*\* \((\d+)회\)"),
+    (GUIDE_SKILL, "가이드 도해 라벨", r"있지만 \((\d+)회\)"),
+    (GUIDE_SKILL, "가이드 습니다체", r"`~습니다`가 ([\d,]+)회"),
+    (GUIDE_SKILL, "가이드 한다체", r"`~된다`가 \*\*(\d+)\*\*회"),
+    (GUIDE_SKILL, "가이드 가능형", r"`~할 수 있습니다` \((\d+)회\)"),
+    (GUIDE_SKILL, "가이드 모험가님", r"아예 없다\*\* \((\d+)회\)"),
+    (GUIDE_SKILL, "가이드 UI 경로", r"대괄호 쪽이 (\d+)회로"),
+    (GUIDE_SKILL, "가이드 시각 의존", r"그런 자리가 (\d+)곳이다"),
+    (GUIDE_SKILL, "가이드 시각 마우스", r"\| 마우스 조작 \| (\d+) \|"),
+    (GUIDE_SKILL, "가이드 시각 위치", r"\| 위치 지시 \| (\d+) \|"),
+    (GUIDE_SKILL, "가이드 시각 색", r"\| 색 구분 \| (\d+) \|"),
+    (GUIDE_SKILL, "가이드 시각 모양", r"\| 아이콘 모양 \| (\d+) \|"),
+    (GUIDE_SKILL, "가이드 시각 그림 참조", r"\| 그림 참조 \| (\d+) \|"),
+    (GUIDE_SKILL, "가이드 그림", r"그림 (\d+)장을 싣는데"),
+    (GUIDE_SKILL, "가이드 대체 텍스트", r"붙은 것은 (\d+)장\*\*"),
+    ("docs/ko-guide-corpus.md", "가이드 문서", r"문서 (\d+)건을 받아"),
+    ("docs/ko-guide-corpus.md", "가이드 대분류", r"대분류 랜딩 (\d+)건"),
+    ("docs/ko-guide-corpus.md", "가이드 인용", r"지금 (\d+)줄이다"),
+    ("docs/ko-guide-corpus.md", "가이드 시각 의존", r"(\d+)곳을 센다"),
 )
 
 
@@ -147,7 +205,8 @@ def check_citations(repo: Path = REPO) -> list[str]:
                 f"안 고치면 이 검사가 조용히 죽는다"
             )
             continue
-        if int(hits[0]) != known[name]:
+        # 천 단위 쉼표는 문서 쪽 표기다(`1,254회`). 값 비교에서는 걷어낸다.
+        if int(hits[0].replace(",", "")) != known[name]:
             bad.append(
                 f"{rel}: `{name}`가 {hits[0]}라고 적혀 있는데 실제는 {known[name]}이다"
             )

@@ -23,9 +23,9 @@ Microsoft.WindowsDesktop.App 10.0.11 [C:\Program Files\dotnet\shared\Microsoft.W
 
 해당 줄이 출력되지 않는다면 [dotnet.microsoft.com/download/dotnet/10.0](https://dotnet.microsoft.com/download/dotnet/10.0)에 접속해 **.NET Desktop Runtime**의 **x64** 설치 파일을 다운로드해 설치합니다. SDK나 ASP.NET Core Runtime이 아닙니다.
 
-### 3) 설치기가 받아 주는 것
+### 3) 설치 프로그램이 받아 주는 것
 
-KR Dalamud 업데이터와 vnavmesh는 설치기가 받아 옵니다. 둘 다 설치기가 받기 전에 먼저 물어봅니다.
+KR Dalamud 업데이터와 vnavmesh는 설치 프로그램이 받아 옵니다. 둘 다 설치 프로그램이 받기 전에 먼저 물어봅니다.
 
 vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다. 대신 자동 이동 키를 누르면 `자동 이동을 쓸 수 없음. vnavmesh 플러그인이 없거나 적재되지 않음.`이 들립니다.
 
@@ -33,7 +33,7 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 1) 받는 것
 
-- `FF14AccessibilityInstaller-KR.exe` — 설치기
+- `FF14AccessibilityInstaller-KR.exe` — 설치 프로그램
 - `FF14Accessibility.zip` — 모드 본체
 - `사용 안내.md` — 이 문서
 
@@ -41,13 +41,13 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 2) 설치 순서
 
-처음 설치할 때는 **설치기를 두 번 실행하게 됩니다.** 중간에 Dalamud를 받는 단계가 끼어 있고, 그 단계만은 다른 프로그램의 창에서 직접 눌러야 하기 때문입니다. 나중에 갱신할 때는 한 번만 실행하면 됩니다.
+처음 설치할 때는 **설치 프로그램을 두 번 실행하게 됩니다.** 중간에 Dalamud를 받는 단계가 끼어 있고, 그 단계만은 다른 프로그램의 창에서 직접 눌러야 하기 때문입니다. 나중에 갱신할 때는 한 번만 실행하면 됩니다.
 
 #### ① 게임 종료
 
 설치 전 게임이 꺼져 있어야 합니다.
 
-#### ② 설치기 실행
+#### ② 설치 프로그램 실행
 
 `FF14AccessibilityInstaller-KR.exe`를 실행합니다.
 
@@ -59,9 +59,9 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 #### ④ 설치 시작
 
-설치기 창에서 [설치 / 갱신] 버튼에 초점이 갑니다.
+설치 프로그램 창에서 [설치 / 갱신] 버튼에 초점이 갑니다.
 
-창에는 [진행 상황]이라는 이름의 읽기 전용 글 상자가 있고, 설치기가 하는 말이 여기 쌓입니다. **화살표 키로 읽을 수 있습니다.**
+창에는 [진행 상황]이라는 이름의 읽기 전용 글 상자가 있고, 설치 프로그램이 하는 말이 여기 쌓입니다. **화살표 키로 읽을 수 있습니다.**
 
 #### ⑤ KR Dalamud 업데이터 질문에 답하기
 
@@ -71,7 +71,7 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 - `이것이 없으면 모드를 설치해도 게임에 올라오지 않는다.`
 - `KR Dalamud 업데이터를 지금 받을까?`
 
-[예]를 고르면 설치기가 업데이터를 내려받고 업데이터를 실행합니다.
+[예]를 고르면 설치 프로그램이 업데이터를 내려받고 업데이터를 실행합니다.
 
 %LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
@@ -79,9 +79,9 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 #### ⑥ 첫 실행은 여기서 끝납니다
 
-**처음 설치하는 경우, 설치기는 여기까지만 하고 끝냅니다.** 아직 Dalamud가 없어서 모드를 넣을 자리가 없기 때문입니다.
+**처음 설치하는 경우, 설치 프로그램은 여기까지만 하고 끝냅니다.** 아직 Dalamud가 없어서 모드를 넣을 자리가 없기 때문입니다.
 
-- 진행 상황 영역에 `한국 서버용 Dalamud가 아직 없다.`가 남고, 이어서 **다음에 무엇을 할지 알려 주는 줄이 셋 더** 남습니다. 업데이터를 실행해 [Check Update]를 누르라는 안내, 업데이터의 경로, 끝나면 설치기를 다시 실행하라는 안내입니다
+- 진행 상황 영역에 `한국 서버용 Dalamud가 아직 없다.`가 남고, 이어서 **다음에 무엇을 할지 알려 주는 줄이 셋 더** 남습니다. 업데이터를 실행해 [Check Update]를 누르라는 안내, 업데이터의 경로, 끝나면 설치 프로그램을 다시 실행하라는 안내입니다
 - **`== 결과 ==` 블록이 나오지 않습니다.** 다음 절의 성공 표지도, `실패:`로 시작하는 줄도 없습니다
 - 그런데도 `끝났다. 자세한 것은 창의 진행 상황 영역에서 읽는다.`라는 대화 상자가 뜹니다
 
@@ -91,9 +91,9 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 공식 Dalamud를 내려받아 한국 서버용으로 고치는 작업이라 **몇 분 걸립니다.**
 
-#### ⑧ 설치기 다시 실행
+#### ⑧ 설치 프로그램 다시 실행
 
-업데이터를 닫고 설치기를 다시 실행합니다. ②부터 ④까지를 한 번 더 하는 것이고, 이번에는 Dalamud가 있으므로 설치가 끝까지 진행됩니다.
+업데이터를 닫고 설치 프로그램을 다시 실행합니다. ②부터 ④까지를 한 번 더 하는 것이고, 이번에는 Dalamud가 있으므로 설치가 끝까지 진행됩니다.
 
 #### ⑨ vnavmesh 질문에 답하기
 
@@ -117,7 +117,7 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 `== 결과 ==`가 아예 없으면 ⑥의 상태로 돌아간 것입니다. Dalamud를 아직 못 받은 것이므로 ⑦부터 다시 합니다.
 
-※ 설치기가 `DALAMUD_RUNTIME을 걸었다`와 `이 값은 게임을 새로 켜야 반영된다`를 말한 경우, 게임이 켜져 있었다면 한 번 껐다 켜야 합니다.
+※ 설치 프로그램이 `DALAMUD_RUNTIME을 걸었다`와 `이 값은 게임을 새로 켜야 반영된다`를 말한 경우, 게임이 켜져 있었다면 한 번 껐다 켜야 합니다.
 
 ### 3) 업데이트 방법
 
@@ -226,19 +226,75 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ※ KR Dalamud 업데이터에서 프로필 폴더를 옮긴 적이 있다면 `XIVLauncherKR` 자리에 그 폴더 이름이 들어갑니다.
 
-파일 안에서 변경하려는 기능의 이름을 찾아 고칩니다. 기능 이름은 아래 키 목록에 괄호로 적어 두었습니다. 예를 들어 방향 안내를 `N`에서 `Ctrl+N`으로 옮기려면 이렇게 됩니다.
+파일 안에서 변경하려는 기능의 이름을 찾아 그 값을 고칩니다. 예를 들어 방향 안내를 `N`에서 `Ctrl+N`으로 옮기려면 이렇게 됩니다.
 
 "KeyToggleHeading": "Strg+N",
+
+키마다 설정 파일에 적힌 이름은 다음과 같습니다. 순서는 아래 키 목록과 같습니다.
+
+| 키 | 설정 파일의 이름 |
+|----|------------------|
+| Page Down | `KeyNextObject` |
+| Page Up | `KeyPrevObject` |
+| Ctrl+Page Down | `KeyCategory` |
+| Ctrl+Page Up | `KeyCategoryPrev` |
+| 숫자패드 3 | `KeyAutoWalk` |
+| Ctrl+숫자패드 3 | `KeyWalkGuide` |
+| + | `KeyFollowTarget` |
+| Ctrl+숫자패드 5 | `KeyRoutePreview` |
+| 숫자패드 5 | `KeyFaceWaypoint` |
+| Ctrl+Shift+F1 | `KeyGotoCoords` |
+| Ctrl+Shift+F2 | `KeyCopyCoords` |
+| Ctrl+Shift+F6 | `KeyRecordTrail` |
+| N | `KeyToggleHeading` |
+| Ctrl+F1 | `KeyHelp` |
+| Ctrl+F2 | `KeyWhereAmI` |
+| Ctrl+F10 | `KeyReadUI` |
+| Ctrl+F11 | `KeySilence` |
+| Ctrl+Delete | `KeyCombatStatus` |
+| Ctrl+End | `KeySpStatus` |
+| Ctrl+L | `KeyLevelExp` |
+| Shift+L | `KeyRestedStatus` |
+| Ctrl+F | `KeyDeepFloor` |
+| Shift+F9 | `KeyOptionsMenu` |
+| Ctrl+F3 | `KeyReadInventory` |
+| Shift+F3 | `KeyReadGil` |
+| Ctrl+F4 | `KeyBestiary` |
+| Ctrl+F12 | `KeyNotification` |
+| Ctrl+Shift+F3 | `KeyToggleAoeWarning` |
+| Shift+F7 | `KeyReadLootRolls` |
+| Shift+F8 | `KeyFocusLootRolls` |
+| Ctrl+F6 | `KeyReadEquipment` |
+| Ctrl+F7 | `KeyEquipBest` |
+| Ctrl+F8 | `KeyRandomLook` |
+| Ctrl+F9 | `KeyReadHotbar` |
+| Ctrl+숫자패드 0 | `KeySkillMenu` |
+| Alt+Page Up | `KeyChatCatPrev` |
+| Alt+Page Down | `KeyChatCatNext` |
+| Shift+Page Up | `KeyChatReadOlder` |
+| Shift+Page Down | `KeyChatReadNewer` |
+| Shift+Home | `KeyChatReadOldest` |
+| Shift+End | `KeyChatReadNewest` |
+| Alt+Home | `KeyChatTabPrev` |
+| Alt+End | `KeyChatTabNext` |
+| Shift+F4 | `KeyEmotePrev` |
+| Shift+F5 | `KeyEmoteNext` |
+| Shift+F6 | `KeyEmoteDo` |
+| Ctrl+Shift+F4 | `KeyReadBoard` |
+| Ctrl+Shift+F5 | `KeyReadHand` |
+| Shift+F1 | `KeyPluginsNext` |
+| Shift+F2 | `KeyPluginsPrev` |
+| Shift+F12 | `KeyPluginsConfig` |
+| Ctrl+F5 | `KeyDumpUI` |
 
 **게임을 끈 상태에서 변경합니다.** 모드는 설정이 변경될 때마다 파일 전체를 다시 쓰므로, 게임이 켜져 있는 동안 변경하면 나중에 덮어써질 수 있습니다.
 
 ### 3) 대상 찾기
 
-- **Page Down** — 다음 대상 알려 주고 지정하기 (`KeyNextObject`)
-- **Page Up** — 이전 대상 알려 주고 지정하기 (`KeyPrevObject`)
-- **Ctrl+Page Down** — 다음 분류로 옮기기 (`KeyCategory`)
-- **Ctrl+Page Up** — 이전 분류로 옮기기 (`KeyCategoryPrev`)
-
+- **Page Down** — 다음 대상 알려 주고 지정하기
+- **Page Up** — 이전 대상 알려 주고 지정하기
+- **Ctrl+Page Down** — 다음 분류로 옮기기
+- **Ctrl+Page Up** — 이전 분류로 옮기기
 분류는 스무 개이고 `Ctrl+Page Down`을 누를 때마다 변경된 분류 이름을 읽습니다.
 
 전체, NPC, 상인, 적, 아군, 플레이어, 사물, 임무, 퀘스트 NPC, 퀘스트 사물, 퀘스트 적, 채집 지점, 돌발 임무, 토벌 대상, 낚시터, 에테라이트, 퀘스트 목표, 받을 수 있는 퀘스트, 길드 의뢰, 경유지입니다.
@@ -251,16 +307,15 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 4) 이동과 길안내
 
-- **숫자패드 3** — 자동 이동 켜고 끄기. vnavmesh가 필요합니다 (`KeyAutoWalk`)
-- **Ctrl+숫자패드 3** — 길안내 켜고 끄기 (`KeyWalkGuide`)
-- **+** — 지정한 대상 따라가기 켜고 끄기. vnavmesh가 필요합니다 (`KeyFollowTarget`)
-- **Ctrl+숫자패드 5** — 경로 미리 듣기 (`KeyRoutePreview`)
-- **숫자패드 5** — 길안내가 가리키는 쪽으로 한 번 돌기 (`KeyFaceWaypoint`)
-- **Ctrl+Shift+F1** — 클립보드에 복사해 둔 좌표로 이동하기 (`KeyGotoCoords`)
-- **Ctrl+Shift+F2** — 지금 서 있는 자리의 좌표를 클립보드로 복사하기 (`KeyCopyCoords`)
-- **Ctrl+Shift+F6** — 발자취 기록 켜고 끄기 (`KeyRecordTrail`)
-- **N** — 방향 안내 켜고 끄기 (`KeyToggleHeading`)
-
+- **숫자패드 3** — 자동 이동 켜고 끄기. vnavmesh가 필요합니다
+- **Ctrl+숫자패드 3** — 길안내 켜고 끄기
+- **+** — 지정한 대상 따라가기 켜고 끄기. vnavmesh가 필요합니다
+- **Ctrl+숫자패드 5** — 경로 미리 듣기
+- **숫자패드 5** — 길안내가 가리키는 쪽으로 한 번 돌기
+- **Ctrl+Shift+F1** — 클립보드에 복사해 둔 좌표로 이동하기
+- **Ctrl+Shift+F2** — 지금 서 있는 자리의 좌표를 클립보드로 복사하기
+- **Ctrl+Shift+F6** — 발자취 기록 켜고 끄기
+- **N** — 방향 안내 켜고 끄기
 #### 이 갈래의 소리가 무엇을 나타내나
 
 **목표 방향 신호음**은 지정한 목표가 어느 쪽에 있는지 계속 알려 줍니다.
@@ -287,29 +342,27 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 5) 읽어 주기와 정보
 
-- **Ctrl+F1** — 지금 쓸 수 있는 키와 명령 말해 주기 (`KeyHelp`)
-- **Ctrl+F2** — 지금 초점이 있는 창 알려 주기 (`KeyWhereAmI`)
-- **Ctrl+F10** — 지금 열려 있는 메뉴 읽기. 퀘스트 목록이 열려 있으면 퀘스트를 읽고, 캐릭터 생성의 외모 단계에서는 지금까지 고른 외모를 한 번에 읽습니다 (`KeyReadUI`)
-- **Ctrl+F11** — 말하기 즉시 멈추기 (`KeySilence`)
-- **Ctrl+Delete** — 내 HP와 MP 말해 주기 (`KeyCombatStatus`)
-- **Ctrl+End** — 채집가의 GP 말해 주기 (`KeySpStatus`)
-- **Ctrl+L** — 레벨과 남은 경험치 말해 주기 (`KeyLevelExp`)
-- **Shift+L** — 휴식 구역과 휴식 보너스 말해 주기 (`KeyRestedStatus`)
-- **Ctrl+F** — 어느 딥 던전의 몇 층인지 말해 주기 (`KeyDeepFloor`)
-- **Shift+F9** — 설정 메뉴 열고 닫기 (`KeyOptionsMenu`)
-- **Ctrl+F3** — 소지품과 중요 아이템 읽기. 건네주기 창이 열려 있으면 소지품 전체가 아니라 **낼 수 있는 물건만** 읽습니다 (`KeyReadInventory`)
-- **Shift+F3** — 소지금 말해 주기 (`KeyReadGil`)
-- **Ctrl+F4** — 토벌수첩 읽기. **토벌수첩 창이 열려 있어야 합니다.** 닫혀 있으면 `토벌수첩이 열려 있지 않음.`이라고만 말합니다 (`KeyBestiary`)
-- **Ctrl+F12** — 들어온 알림·초대 수락하기 (`KeyNotification`)
-
+- **Ctrl+F1** — 지금 쓸 수 있는 키와 명령 말해 주기
+- **Ctrl+F2** — 지금 초점이 있는 창 알려 주기
+- **Ctrl+F10** — 지금 열려 있는 메뉴 읽기. 퀘스트 목록이 열려 있으면 퀘스트를 읽고, 캐릭터 생성의 외모 단계에서는 지금까지 고른 외모를 한 번에 읽습니다
+- **Ctrl+F11** — 말하기 즉시 멈추기
+- **Ctrl+Delete** — 내 HP와 MP 말해 주기
+- **Ctrl+End** — 채집가의 GP 말해 주기
+- **Ctrl+L** — 레벨과 남은 경험치 말해 주기
+- **Shift+L** — 휴식 구역과 휴식 보너스 말해 주기
+- **Ctrl+F** — 어느 딥 던전의 몇 층인지 말해 주기
+- **Shift+F9** — 설정 메뉴 열고 닫기
+- **Ctrl+F3** — 소지품과 중요 아이템 읽기. 건네주기 창이 열려 있으면 소지품 전체가 아니라 **낼 수 있는 물건만** 읽습니다
+- **Shift+F3** — 소지금 말해 주기
+- **Ctrl+F4** — 토벌수첩 읽기. **토벌수첩 창이 열려 있어야 합니다.** 닫혀 있으면 `토벌수첩이 열려 있지 않음.`이라고만 말합니다
+- **Ctrl+F12** — 들어온 알림·초대 수락하기
 **`Ctrl+F`는 지금 동작하지 않습니다.** 자세한 것은 6장 1절에 있습니다.
 
 ### 6) 전투
 
-- **Ctrl+Shift+F3** — 범위 경고 켜고 끄기. **기본값은 꺼짐**입니다 (`KeyToggleAoeWarning`)
-- **Shift+F7** — 열려 있는 전리품 입찰 읽기 (`KeyReadLootRolls`)
-- **Shift+F8** — 전리품 입찰 창으로 초점 옮기기. 그 창에서 숫자패드로 선입찰, 입찰, 포기를 고릅니다 (`KeyFocusLootRolls`)
-
+- **Ctrl+Shift+F3** — 범위 경고 켜고 끄기. **기본값은 꺼짐**입니다
+- **Shift+F7** — 열려 있는 전리품 입찰 읽기
+- **Shift+F8** — 전리품 입찰 창으로 초점 옮기기. 입찰 창에서 숫자패드로 선입찰, 입찰, 포기를 고릅니다
 #### 이 갈래의 소리가 무엇을 나타내나
 
 **HP와 MP는 소리로도 나갑니다.** 남은 양이 소리가 나는 위치로 바뀝니다.
@@ -331,18 +384,16 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 7) 장비
 
-- **Ctrl+F6** — 착용 중인 장비 읽기 (`KeyReadEquipment`)
-- **Ctrl+F7** — 가장 좋은 장비를 한 번에 착용하기 (`KeyEquipBest`)
-- **Ctrl+F8** — 무작위 외모 고르기. 캐릭터 생성에서만 동작합니다 (`KeyRandomLook`)
-
+- **Ctrl+F6** — 착용 중인 장비 읽기
+- **Ctrl+F7** — 가장 좋은 장비를 한 번에 착용하기
+- **Ctrl+F8** — 무작위 외모 고르기. 캐릭터 생성에서만 동작합니다
 ※ 게임 화면에서 이 기능의 이름은 `최강 장비`인데 모드는 `추천 장비 착용됨.`으로 시작하는 문장을 말합니다. 뒤에 몇 개가 바뀌었는지가 붙습니다. 같은 기능입니다.
 
 ### 8) 기술 메뉴
 
-- **Ctrl+F9** — 첫 단축바 읽기. 1번부터 0번 키에 할당된 값을 음성으로 출력합니다 (`KeyReadHotbar`)
-- **Ctrl+숫자패드 0** — 기술 메뉴 열고 닫기 (`KeySkillMenu`)
-
-기술 메뉴가 열려 있는 동안 숫자패드는 메뉴를 다루는 데만 쓰입니다. 아래 키들은 원래 게임에서 이동과 확인·취소에 쓰이는 것이라 메뉴가 열려 있는 동안에는 게임에 전달되지 않습니다. 메뉴를 넘기다가 캐릭터가 움직이는 일을 막기 위해서입니다.
+- **Ctrl+F9** — 첫 단축바 읽기. 1번부터 0번 키에 할당된 값을 음성으로 출력합니다
+- **Ctrl+숫자패드 0** — 기술 메뉴 열고 닫기
+기술 메뉴가 열려 있는 동안 숫자패드는 메뉴를 다루는 데만 쓰입니다. 아래 키들은 원래 게임에서 이동과 확인·취소에 쓰이는 것이라 메뉴가 열려 있는 동안에는 게임에 전달되지 않습니다.
 
 - **숫자패드 8, 숫자패드 2** — 목록 넘기기
 - **숫자패드 4, 숫자패드 6** — 목록 바꾸기. 목록은 다섯입니다. 기술, 아이템, 퀘스트 아이템, 일반 기술, 탈것입니다
@@ -351,14 +402,14 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 9) 로그 되읽기
 
-- **Alt+Page Up** — 이전 채널로 옮기기 (`KeyChatCatPrev`)
-- **Alt+Page Down** — 다음 채널로 옮기기 (`KeyChatCatNext`)
-- **Shift+Page Up** — 고른 채널에서 더 오래된 줄 읽기 (`KeyChatReadOlder`)
-- **Shift+Page Down** — 고른 채널에서 더 새로운 줄 읽기 (`KeyChatReadNewer`)
-- **Shift+Home** — 채널의 맨 처음으로 가기 (`KeyChatReadOldest`)
-- **Shift+End** — 채널의 맨 끝으로 가기 (`KeyChatReadNewest`)
-- **Alt+Home** — 이전 로그 탭으로 옮기기 (`KeyChatTabPrev`)
-- **Alt+End** — 다음 로그 탭으로 옮기기 (`KeyChatTabNext`)
+- **Alt+Page Up** — 이전 채널로 옮기기
+- **Alt+Page Down** — 다음 채널로 옮기기
+- **Shift+Page Up** — 고른 채널에서 더 오래된 줄 읽기
+- **Shift+Page Down** — 고른 채널에서 더 새로운 줄 읽기
+- **Shift+Home** — 채널의 맨 처음으로 가기
+- **Shift+End** — 채널의 맨 끝으로 가기
+- **Alt+Home** — 이전 로그 탭으로 옮기기
+- **Alt+End** — 다음 로그 탭으로 옮기기
 - **Enter** — 방금 읽은 줄에 같은 채널로 답장하기
 
 채널을 옮기면 채널 이름과 그 안에 쌓인 줄 수를 말해 줍니다. 채널은 대화, 말하기, 외치기, 파티, 연합 파티, 귓속말, 자유부대, 시스템, 전리품입니다.
@@ -371,24 +422,21 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 ### 10) 감정 표현
 
-- **Shift+F4** — 이전 감정 표현 알려 주기 (`KeyEmotePrev`)
-- **Shift+F5** — 다음 감정 표현 알려 주기 (`KeyEmoteNext`)
-- **Shift+F6** — 고른 감정 표현 실행하기 (`KeyEmoteDo`)
-
+- **Shift+F4** — 이전 감정 표현 알려 주기
+- **Shift+F5** — 다음 감정 표현 알려 주기
+- **Shift+F6** — 고른 감정 표현 실행하기
 ### 11) 카드 대결
 
-- **Ctrl+Shift+F4** — 판 읽기 (`KeyReadBoard`)
-- **Ctrl+Shift+F5** — 내 패 읽기 (`KeyReadHand`)
-
+- **Ctrl+Shift+F4** — 판 읽기
+- **Ctrl+Shift+F5** — 내 패 읽기
 ### 12) 플러그인 목록
 
-- **Shift+F1** — 다음 플러그인 알려 주기 (`KeyPluginsNext`)
-- **Shift+F2** — 이전 플러그인 알려 주기 (`KeyPluginsPrev`)
-- **Shift+F12** — 고른 플러그인의 설정 열기 (`KeyPluginsConfig`)
-
+- **Shift+F1** — 다음 플러그인 알려 주기
+- **Shift+F2** — 이전 플러그인 알려 주기
+- **Shift+F12** — 고른 플러그인의 설정 열기
 ### 13) 진단
 
-- **Ctrl+F5** — 지금 열려 있는 창의 내부 구조를 바탕 화면에 글 파일로 저장하기. 어떤 창이 왜 안 읽히는지 알아보는 데 쓰는 파일이라 문제를 알릴 때 함께 보내면 됩니다 (`KeyDumpUI`)
+- **Ctrl+F5** — 열려 있는 창의 내부 구조를 바탕 화면에 파일로 저장하기. 어떤 창이 왜 안 읽히는지 문제를 파악하는 데 도움이 됩니다
 
 ### 14) 게임 키와 겹치는 것
 
@@ -398,24 +446,20 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 - **Ctrl+End**는 카메라 설정 저장을 겸합니다
 - **숫자패드 5**는 카메라를 대상 쪽으로 돌리는 기능을 겸합니다. 이 키를 누를 때 카메라까지 같이 움직이지 않도록 모드가 이 키를 받고 게임에는 넘기지 않습니다
 
-이 셋은 전부 화면에만 영향을 주는 기능이라 화면을 보지 않고 플레이할 때는 겹쳐도 아무 일이 일어나지 않습니다.
-
 **한국 클라이언트에서 하나가 더 겹칩니다.** 방향 안내를 켜고 끄는 `N`이 제작수첩을 여는 키와 같습니다. 위의 셋과 달리 실제로 창이 열리기 때문에 그냥 둘 수 없는 겹침입니다. 자세한 것은 6장 1절에 있습니다.
-
-접속할 때 들리는 겹침 개수가 평소보다 늘었다면 바탕 화면의 `FFXIV_Keybinds.txt`를 보면 어떤 키인지 알 수 있습니다. 이 파일은 모드가 접속할 때마다 새로 씁니다.
 
 ## 5. 명령어
 
-키 대신 명령어로도 쓸 수 있는 기능이 있습니다. 대화 입력란에 그대로 치면 됩니다.
+키 대신 명령어로 쓸 수 있는 기능이 있습니다. 대화 입력란에 그대로 입력하면 됩니다.
 
 - `/acc help` — 도움말 알려 주기
-- `/acc nav` — 대상까지의 방향과 거리 말해 주기
+- `/acc nav` — 대상까지의 방향과 거리 말하기
 - `/acc set` — 지금 지정한 대상을 계속 따라다니며 안내하기
 - `/acc clear` — 추적 중인 대상 지우기
 - `/acc near` — 가까이 있는 대상 나열하기
-- `/acc status` — HP와 MP 말해 주기
-- `/acc ui` — 지금 열려 있는 메뉴 읽기
-- `/acc win` — 지금 초점이 있는 창 알려 주기
+- `/acc status` — HP와 MP 말하기
+- `/acc ui` — 열려 있는 메뉴 읽기
+- `/acc win` — 초점이 있는 창 알려 주기
 - `/acc keys` — 게임 단축키 설정을 바탕 화면에 저장하기
 - `/acc stop` — 말하기 멈추기
 - `/acc fish` — 이 지역의 낚시터 알려 주기
@@ -428,8 +472,8 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 - `/acc cd` — 기술 준비됨 안내 켜고 끄기. `/acc cooldowns`도 같습니다
 - `/acc soundtest` — 모드가 쓰는 소리를 차례로 들려주기. 4장 4절과 4장 6절의 설명과 짝지어 들으면 됩니다
 - `/acc compat` — 한국 클라이언트에서 어느 기능이 어떤 방식으로 동작하는지 말해 주기. **한국 서버판에만 있습니다.** 무언가 이상할 때 문제를 알리면서 이 내용을 함께 보내면 원인을 찾는 데 쓰입니다
-- `/acc lang ko` — 안내 언어 바꾸기. `ko`, `en`, `de`, `auto`를 쓸 수 있습니다
-- `/acc dump <창 이름>` — 그 창의 구조를 바탕 화면에 저장하기
+- `/acc lang ko` — 모드 안내 메시지 언어 바꾸기. `ko`, `en`, `de`, `auto`를 사용할 수 있습니다
+- `/acc dump <창 이름>` — 창의 구조를 바탕 화면에 저장하기
 
 ## 6. 문제 해결
 
@@ -479,7 +523,7 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 숫자패드 3을 눌렀을 때 들리는 말로 원인이 갈립니다.
 
-- `자동 이동을 쓸 수 없음. vnavmesh 플러그인이 없거나 적재되지 않음.` — vnavmesh가 아직 없습니다. 설치기를 다시 실행해 설치할 수 있습니다
+- `자동 이동을 쓸 수 없음. vnavmesh 플러그인이 없거나 적재되지 않음.` — vnavmesh가 아직 없습니다. 설치 프로그램을 다시 실행해 설치할 수 있습니다
 - `길 정보 적재 중, 42 퍼센트. 잠시 뒤 다시 해라.` — vnavmesh는 동작하고 있습니다. 지역에 처음 들어가면 길 정보를 새로 만드느라 몇 분 걸립니다. 숫자 자리에는 그때의 진행률이 들어갑니다
 - `길 정보가 아직 준비 안 됨. 잠시 뒤 다시 해라.` — vnavmesh는 동작하지만 이 지역의 길 정보가 아직 없습니다
 
@@ -497,15 +541,15 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 접속할 때 vnavmesh 설정 파일이 없다는 오류가 **하나 나는 것이 정상입니다.** vnavmesh가 아직 자기 설정을 저장한 적이 없을 뿐이고 기본값으로 그대로 동작합니다.
 
-#### ⑤ 설치기가 KR Dalamud 업데이터를 받지 못할 때
+#### ⑤ 설치 프로그램이 KR Dalamud 업데이터를 받지 못할 때
 
-진행 상황 영역에 아래 같은 줄이 남았다면 설치기가 인터넷에서 업데이터를 가져오지 못한 것입니다.
+진행 상황 영역에 아래 같은 줄이 남았다면 설치 프로그램이 인터넷에서 업데이터를 가져오지 못한 것입니다.
 
 - `GitHub에 연결하지 못했다: ...`
 - `GitHub 응답이 없다.`
 - `최신 판에 "Portable" 압축이 없다.`
 
-셋 다 뒤에 `업데이터는 직접 받아야 한다.`가 이어집니다. 앞의 둘은 잠시 뒤에 설치기를 다시 실행하면 대개 해결됩니다. 세 번째까지 나오면 업데이터를 직접 받아야 합니다. [github.com/MiqoKR/kr-dalamud-updater](https://github.com/MiqoKR/kr-dalamud-updater)의 최신 릴리스에서 이름에 `Portable`이 들어간 압축 파일을 받아 아래 폴더에 풀면 설치기가 그 자리를 그대로 씁니다.
+셋 다 뒤에 `업데이터는 직접 받아야 한다.`가 이어집니다. 앞의 둘은 잠시 뒤에 설치 프로그램을 다시 실행하면 대개 해결됩니다. 세 번째까지 나오면 업데이터를 직접 받아야 합니다. [github.com/MiqoKR/kr-dalamud-updater](https://github.com/MiqoKR/kr-dalamud-updater)의 최신 릴리스에서 이름에 `Portable`이 들어간 압축 파일을 받아 아래 폴더에 풀면 설치 프로그램이 그 자리를 그대로 씁니다.
 
 %LOCALAPPDATA%\KR-Dalamud-Updater\app
 
@@ -518,7 +562,7 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 - ① **NVDA가 켜져 있는지** 확인합니다
 - ② 게임을 먼저 켜고 업데이터를 실행했는지 확인합니다
 - ③ 업데이터 창에서 [달라무드 적용]을 눌렀는지 확인합니다
-- ④ 설치기를 다시 실행해 진행 상황 영역에 `== 결과 ==`가 있는지 확인합니다. `실패:`로 시작하는 줄이 섞여 있으면 그 줄이 원인을 말합니다
+- ④ 설치 프로그램을 다시 실행해 진행 상황 영역에 `== 결과 ==`가 있는지 확인합니다. `실패:`로 시작하는 줄이 섞여 있으면 그 줄이 원인을 말합니다
 - ⑤ `DALAMUD_RUNTIME` 안내가 나왔던 적이 있다면 게임을 완전히 껐다가 다시 켭니다. 이 값은 게임이 시작할 때만 읽히기 때문입니다
 
 ## 7. 라이선스

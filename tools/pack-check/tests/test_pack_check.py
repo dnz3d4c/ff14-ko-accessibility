@@ -12,10 +12,12 @@
 """
 
 import json
+from pathlib import Path
 
 import pack_check
 
 VERSION = "5.87.0.0"
+REPO = Path(__file__).resolve().parents[3]
 
 
 def zip_names(extra: list[str] | None = None) -> list[str]:
@@ -104,7 +106,7 @@ def install(tmp_path, version_dir: str = VERSION, **manifest_overrides):
         "InternalName": "FF14Accessibility",
         "AssemblyVersion": version_dir,
         "DalamudApiLevel": 15,
-        "InstalledFromUrl": "OFFICIAL",
+        "InstalledFromUrl": pack_check.KR_REPO_URL,
         "Disabled": False,
         "ScheduledForDeletion": False,
         "WorkingPluginId": "3a0abc23-2f5e-4a55-bbd2-f517f16e51db",
@@ -128,6 +130,27 @@ def test_고아가_되는_출처를_잡는다(tmp_path):
     root = install(tmp_path, InstalledFromUrl="")
     problems = pack_check.installed_layout_problems(root)
     assert any("고아" in p for p in problems)
+
+
+def test_저장소를_안_가리키면_잡는다(tmp_path):
+    # OFFICIAL은 적재는 되지만 "공식 저장소가 우리를 목록에 갖고 있다"는 주장이고
+    # 그건 사실이 아니다. Dalamud가 IsDecommissioned를 세우고, 프로필을 다시
+    # 적용할 때(캐릭터 전환) 켜지지 않는다. 설치 프로그램이 저장소를 등록한 뒤
+    # 매니페스트를 옮기므로, 끝나고도 OFFICIAL이면 그 단계가 안 돈 것이다.
+    root = install(tmp_path, InstalledFromUrl="OFFICIAL")
+    assert any("저장소" in p for p in pack_check.installed_layout_problems(root))
+
+
+def test_설치_프로그램의_씨앗과_같은_컨테이너를_만든다(tmp_path):
+    # 검사가 설치 프로그램보다 더 갖춰진 프로필을 만들면, 설치 프로그램이 못
+    # 만드는 구조를 검사가 대신 만들어 주는 셈이 된다. 그래서 첫 설치가 반드시
+    # 실패하는 결함이 배포 직전까지 안 잡혔다(2026-08-19).
+    root = tmp_path / "profile"
+    root.mkdir()
+    pack_check._seed_profile(root)
+
+    seeded = json.loads((root / "dalamudConfig.json").read_text(encoding="utf-8"))
+    assert set(seeded) - {"$type"} == pack_check.installer_seed_containers(REPO)
 
 
 def test_버전_폴더가_둘이면_잡는다(tmp_path):
@@ -178,11 +201,14 @@ DEV_DLL = r"C:\p\devPlugins\FF14Accessibility\FF14Accessibility.dll"
 ID = "3a0abc23-2f5e-4a55-bbd2-f517f16e51db"
 
 
-def config(entries: list[dict], locations=None, dev_settings=None) -> dict:
+def config(entries: list[dict], locations=None, dev_settings=None, repos=None) -> dict:
     return {
         "DefaultProfile": {"Plugins": {"$values": entries}},
         "DevPluginLoadLocations": {"$values": locations or []},
         "DevPluginSettings": dev_settings or {},
+        "ThirdRepoList": {
+            "$values": [{"Url": pack_check.KR_REPO_URL, "IsEnabled": True}] if repos is None else repos
+        },
     }
 
 
@@ -194,6 +220,18 @@ def enabled_entry(**overrides) -> dict:
 
 def test_정상_설정은_통과한다():
     assert pack_check.config_problems(config([enabled_entry()]), ID, DEV_DLL) == []
+
+
+def test_저장소가_등록_안_되면_잡는다():
+    # 매니페스트가 가리키는 저장소가 설정에 없으면 그게 고아다. 오류 없이 안 뜬다.
+    problems = pack_check.config_problems(config([enabled_entry()], repos=[]), ID, DEV_DLL)
+    assert any("저장소" in p for p in problems)
+
+
+def test_등록은_됐는데_꺼져_있으면_잡는다():
+    disabled = [{"Url": pack_check.KR_REPO_URL, "IsEnabled": False}]
+    problems = pack_check.config_problems(config([enabled_entry()], repos=disabled), ID, DEV_DLL)
+    assert any("저장소" in p for p in problems)
 
 
 def test_꺼져_있으면_잡는다():
@@ -230,11 +268,14 @@ def test_항목이_둘이면_잡는다():
 # (2026-08-19). exe와 zip만 나가고 안내는 저장소에만 있었다.
 
 
-def make_dist(tmp_path, *, doc=True):
+def make_dist(tmp_path, *, doc=True, manifests=True):
     (tmp_path / "FF14Accessibility.zip").write_bytes(b"")
     (tmp_path / "FF14AccessibilityInstaller-KR.exe").write_bytes(b"")
     if doc:
         (tmp_path / pack_check.GUIDE_NAME).write_text("안내", encoding="utf-8")
+    if manifests:
+        for name in pack_check.RELEASE_MANIFESTS:
+            (tmp_path / name).write_text("{}", encoding="utf-8")
     return tmp_path
 
 
@@ -254,3 +295,20 @@ def test_모르는_파일은_여전히_잡는다(tmp_path):
     (dist / "내_설정.json").write_text("{}", encoding="utf-8")
     problems = pack_check.dist_layout_problems(dist)
     assert any("내_설정.json" in p for p in problems)
+
+
+def test_릴리스_매니페스트가_빠지면_잡는다(tmp_path):
+    """릴리스에 이 둘이 안 올라가면 자기 갱신과 커스텀 저장소가 통째로 죽는다.
+
+    그런데 받는 쪽은 그걸 오류가 아니라 "새 판이 없다"로 읽는다 - 설치
+    프로그램은 `installer.json`이 없으면 안내 한 줄만 남기고 넘어간다.
+    나갈 자리에 있나를 여기서 못박는다.
+    """
+    problems = pack_check.dist_layout_problems(make_dist(tmp_path, manifests=False))
+    for name in pack_check.RELEASE_MANIFESTS:
+        assert any(name in p for p in problems), (name, problems)
+
+
+def test_릴리스_매니페스트는_배포물로_센다(tmp_path):
+    """있다고 "배포물이 아닌 것"으로 잡히면 패킹이 매번 걸린다."""
+    assert pack_check.dist_layout_problems(make_dist(tmp_path)) == []

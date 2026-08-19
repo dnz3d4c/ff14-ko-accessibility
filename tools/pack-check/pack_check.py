@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import locale
 import os
 import re
 import shutil
@@ -41,9 +42,27 @@ INTERNAL_NAME = "FF14Accessibility"
 #: 받는 폴더에 함께 나가는 안내 문서. 원본은 `overlay/ko/README.ko.md`다.
 GUIDE_NAME = "사용 안내.md"
 
+#: 릴리스에 같이 올라가는 매니페스트 둘. `tools/release-manifest`가 만들고
+#: `run\\pack.bat`이 부른다. 여기서는 **나갈 자리에 있나**만 본다 - 값이 맞나는
+#: 그 도구의 `--check`가, 릴리스에 올라갔나는 `--release`가 잰다.
+RELEASE_MANIFESTS = ("repo.json", "installer.json")
+
 #: Dalamud가 "공식 저장소에서 왔다"에 쓰는 값(`SpecialPluginSource.MainRepo`).
-#: 이 값이라야 `LocalPlugin.IsOrphaned`가 거짓이 되고, 참이면 **적재를 건너뛴다.**
+#: 설치 프로그램이 **처음에 쓰는** 값이고, 설정에 저장소를 등록한 뒤 아래
+#: `KR_REPO_URL`로 옮긴다. 끝나고도 이 값이면 그 단계가 안 돈 것이다.
 OFFICIAL_SOURCE = "OFFICIAL"
+
+#: 우리 저장소. 설치가 끝난 매니페스트의 `InstalledFromUrl`이 이것이어야 하고,
+#: 같은 문자열이 `dalamudConfig.json`의 `ThirdRepoList`에도 있어야 한다.
+#:
+#: **`OFFICIAL`로 두면 왜 안 되나**: 적재는 된다. 그런데 그건 공식 저장소가
+#: 우리를 목록에 갖고 있다는 주장이고 사실이 아니라서, Dalamud가
+#: `IsDecommissioned`를 세운다(`LocalPlugin.cs:196-198`). 그러면 프로필을 다시
+#: 적용할 때 - 캐릭터를 바꿀 때가 그렇다 - 켜지지 않고 경고만 남는다
+#: (`ProfileManager.cs:258`). 갱신도 안 된다.
+#:
+#: Dalamud가 `==`로 대조하므로 대소문자와 후행 슬래시까지 같아야 한다.
+KR_REPO_URL = "https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest/download/repo.json"
 
 #: 압축에 들어가도 되는 정확한 이름들.
 ALLOWED_EXACT = {
@@ -164,10 +183,15 @@ def installed_layout_problems(plugin_root: Path) -> list[str]:
         return problems + [f"매니페스트가 없다: {manifest_path}"]
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("InstalledFromUrl") != OFFICIAL_SOURCE:
+    source = manifest.get("InstalledFromUrl")
+    if source != KR_REPO_URL:
+        # 두 갈래를 갈라서 말한다. `OFFICIAL`이면 설치는 됐는데 저장소로 옮기는
+        # 마지막 단계가 안 돈 것이고, 그 밖이면 어느 저장소와도 안 맞아 고아다.
         problems.append(
-            f"InstalledFromUrl이 {manifest.get('InstalledFromUrl')!r}다. "
-            f"{OFFICIAL_SOURCE!r}가 아니면 Dalamud가 고아로 보고 적재를 건너뛴다"
+            f"InstalledFromUrl이 아직 {OFFICIAL_SOURCE!r}다. 저장소로 옮기는 단계가 안 돌았다"
+            if source == OFFICIAL_SOURCE
+            else f"InstalledFromUrl이 {source!r}다. {KR_REPO_URL!r}가 아니면 "
+            f"Dalamud가 고아로 보고 적재를 건너뛴다"
         )
     if manifest.get("Disabled") is not False:
         problems.append("매니페스트가 Disabled를 거짓으로 갖고 있지 않다")
@@ -215,6 +239,15 @@ def config_problems(config: dict, expected_id: str | None, dev_dll: str) -> list
     if any(k.lower() == dev_dll.lower() for k in dev_settings):
         problems.append("DevPluginSettings 항목이 남아 있다")
 
+    # 매니페스트가 가리키는 저장소가 여기 없으면 그게 고아다. 대소문자를 접지
+    # 않는 이유는 Dalamud가 `==`로 재기 때문이다 - 철자가 다르면 다른 저장소다.
+    repos = (config.get("ThirdRepoList") or {}).get("$values", [])
+    ours_repo = [r for r in repos if r.get("Url") == KR_REPO_URL]
+    if not ours_repo:
+        problems.append(f"저장소가 등록되지 않았다: {KR_REPO_URL}")
+    elif ours_repo[0].get("IsEnabled") is not True:
+        problems.append("저장소는 등록됐는데 꺼져 있다")
+
     return problems
 
 
@@ -235,9 +268,19 @@ def dist_layout_problems(dist: Path) -> list[str]:
     안내 문서가 여기 끼는 이유는 편의가 아니다. 설치의 첫 단계가 "문서를
     읽는 것"인데 그 문서가 저장소에만 있으면, 받는 사람은 무엇부터 눌러야
     하는지 알 방법이 없다.
+
+    매니페스트 둘도 같은 이유로 여기 있다. 릴리스에 그 둘이 같이 안 올라가면
+    자기 갱신과 커스텀 저장소가 통째로 죽는데, **받는 쪽은 그것을 오류가
+    아니라 "새 판이 없다"로 읽는다.** 만드는 것은 `tools/release-manifest`고
+    여기서는 나갈 자리에 있나만 본다.
     """
     problems = []
-    expected = {f"{INTERNAL_NAME}.zip", "FF14AccessibilityInstaller-KR.exe", GUIDE_NAME}
+    expected = {
+        f"{INTERNAL_NAME}.zip",
+        "FF14AccessibilityInstaller-KR.exe",
+        GUIDE_NAME,
+        *RELEASE_MANIFESTS,
+    }
 
     for name in sorted(expected):
         if not (dist / name).is_file():
@@ -279,14 +322,46 @@ def check_artifacts(dist: Path, repo: Path, needles: list[str]) -> list[str]:
 # ── 실물 검증 ──────────────────────────────────────────────────────────────
 
 
+def installer_seed_containers(repo: Path) -> set[str]:
+    """`KrProfile.ConfigSeed`가 만드는 최상위 컨테이너 이름들.
+
+    **왜 소스에서 읽나**: 검사가 설치 프로그램보다 더 갖춰진 프로필을 만들면,
+    설치 프로그램이 못 만드는 구조를 검사가 대신 만들어 주는 셈이 된다. 그러면
+    실물에서만 터지고 검사는 조용히 통과한다. 실제로 그래서 **첫 설치가 반드시
+    실패하는 결함**이 배포 직전까지 안 잡혔다 - 씨앗에는 `$type` 하나뿐인데
+    여기서는 컨테이너 둘을 미리 채워 놓고 있었다(2026-08-19).
+
+    베끼지 않고 세는 쪽을 골랐다. 값까지 맞추면 그게 두 번째 사본이 된다.
+    """
+    source = (repo / "vendor" / "ff14-accessibility" / "Installer" / "KrProfile.cs").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(r"private const string ConfigSeed\s*=(.*?);\n", source, re.DOTALL)
+    if match is None:
+        raise ValueError("KrProfile.cs에서 ConfigSeed를 못 찾았다")
+
+    # C# 문자열 리터럴 조각을 이어 붙여 실제 JSON으로 되돌린다. 세는 것보다
+    # 이쪽이 나은 이유는 **씨앗이 파싱되는지까지 여기서 걸리기 때문**이다 -
+    # 안 그러면 그건 사용자 기계에서만 드러난다.
+    pieces = re.findall(r'"((?:[^"\\]|\\.)*)"', match.group(1))
+    seed = json.loads("".join(pieces).replace('\\"', '"').replace("\\\\", "\\"))
+    return {key for key, value in seed.items() if isinstance(value, dict)}
+
+
 def _seed_profile(root: Path) -> None:
-    """설치기가 "Dalamud가 있다"고 볼 만큼만 갖춘 가짜 프로필."""
+    """설치기가 "Dalamud가 있다"고 볼 만큼만 갖춘 가짜 프로필.
+
+    담는 것은 **설치 프로그램의 `KrProfile.ConfigSeed`가 담는 것과 같아야
+    한다.** 여기가 더 갖춰져 있으면 첫 설치가 겪는 상태를 한 번도 안 태운다 -
+    `installer_seed_containers`가 그걸 지킨다.
+    """
     (root / "addon" / "Hooks" / "15.0.0.0").mkdir(parents=True)
     (root / "dalamudConfig.json").write_text(
         json.dumps(
             {
                 "$type": "Dalamud.Configuration.Internal.DalamudConfiguration, Dalamud",
                 "DevPluginLoadLocations": {"$values": []},
+                "ThirdRepoList": {"$values": []},
                 "DefaultProfile": {"Plugins": {"$values": []}},
             },
             indent=2,
@@ -302,7 +377,10 @@ def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
         [str(exe), "--install", "--skip-vnavmesh"],
         capture_output=True,
         text=True,
-        encoding="utf-8",
+        # 설치 프로그램은 `Console.WriteLine`으로 쓴다. 그건 콘솔 코드페이지지
+        # utf-8이 아니라서, utf-8로 읽으면 **한국어가 전부 깨진 글자로 나온다.**
+        # 실패했을 때 여기 담긴 출력이 유일한 단서인데 그게 안 읽혔다.
+        encoding=locale.getpreferredencoding(False),
         errors="replace",
         env=env,
         timeout=300,

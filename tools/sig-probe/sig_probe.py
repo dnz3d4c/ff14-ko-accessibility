@@ -1,7 +1,8 @@
 """Resolve Dalamud-style byte signatures against a game binary, offline.
 
 Why this exists: the plugin ships a hardcoded Korean signature for
-`AtkResNode::IsVisible` (`overlay/patches/0002`). A signature is only worth
+`AtkResNode::IsVisible` (`Compat/NodeVisibilityCompat.cs` on the `kr-port`
+branch). A signature is only worth
 shipping if someone checked that it matches exactly once, and the game does not
 have to be running to check that - the bytes are in `ffxiv_dx11.exe`.
 

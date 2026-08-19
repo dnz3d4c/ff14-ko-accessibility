@@ -10,6 +10,7 @@
 """
 
 import json
+import subprocess
 
 import ko_words
 import pytest
@@ -48,6 +49,36 @@ def test_게임에_있는_낱말은_안_걸린다():
 def test_게임에_없는_낱말이_걸린다():
     unknown = ko_words.unknown(["장판 경고 켜짐."], "520\t소지품\n")
     assert "장판" in unknown
+
+
+# --- 손 케이스 - kr-port 커밋에서 읽는다 -----------------------------------
+
+
+def test_손_케이스_커밋을_제목으로_찾는다():
+    sha = ko_words.hand_commit()
+    assert len(sha) == 40 and set(sha) <= set("0123456789abcdef"), sha
+
+
+def test_손_케이스_줄을_커밋에서_읽는다():
+    lines = ko_words.hand_lines()
+    assert any("IsKorean" in line for line in lines), "손 케이스 커밋의 더한 줄이어야 한다"
+    # `+` 접두는 걷어낸 상태여야 하고, `+++` 파일 머리글은 아예 안 들어온다.
+    assert all(not line.startswith("++") for line in lines)
+
+
+def test_커밋이_없으면_소리를_낸다(tmp_path):
+    # 패치 glob 시절과 같은 함정 자리다 - 제목이 바뀌면 조용히 0줄을 읽는 대신
+    # 여기서 소리를 내야 한다.
+    subprocess.run(
+        ["git", "init", "-q", "-b", "kr-port", str(tmp_path)], check=True, timeout=10,
+    )
+    subprocess.run(
+        ["git", "-C", str(tmp_path), "-c", "user.email=t@t", "-c", "user.name=t",
+         "commit", "--allow-empty", "-q", "-m", "다른 커밋"],
+        check=True, timeout=10,
+    )
+    with pytest.raises(LookupError):
+        ko_words.hand_commit(tmp_path)
 
 
 # --- 게임 데이터와 대조 - 덤프가 있을 때만 --------------------------------

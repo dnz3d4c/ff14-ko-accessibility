@@ -35,16 +35,16 @@
 
 | 영역 | 뜻 | 대표 경로 |
 |------|-----|-----------|
-| 업스트림 | 원래 만든 사람한테 그대로 보낼 수 있는 것 | `patches/` |
+| 업스트림 | 원래 만든 사람한테 그대로 보낼 수 있는 것 | `vendor/ff14-accessibility` (kr-port 커밋) |
 | 한국전용 | 우리만 쓰는 것 | `overlay/` |
 | 검증 | 테스트, 검증기, 골든 파일 | `tests/`, `tools/` |
 | 문서 | 조사·설계 문서 | `docs/`, `README.md` |
-| 벤더 | 업스트림 핀 이동 | `upstream.json`, `patches/*` 재추출 |
+| 벤더 | 업스트림 핀 이동 | `upstream.json`, `vendor/ff14-accessibility` |
 | 도구 | 빌드 설정, 스크립트, 저장소 설비 | `tools/`, 루트 설정 |
 
 ### 2.2 한 커밋에 영역을 섞지 않는다
 
-특히 `[업스트림]`와 `[한국전용]`는 절대 섞지 않는다. 훅이 경로로 검사한다 — `[업스트림]` 커밋이 `overlay/`를, `[한국전용]` 커밋이 `patches/`를 건드리면 거부한다.
+특히 `[업스트림]`와 `[한국전용]`는 절대 섞지 않는다. 훅이 경로로 검사한다 — `[업스트림]` 커밋이 `overlay/`를 건드리면 거부한다(C7). 반대쪽 경계는 패치 파일이 사라지면서 경로가 아니라 vendor 포인터가 됐다 — §2.8의 C11이 본다.
 
 ### 2.3 `[업스트림]` 커밋은 트레일러 두 줄이 필수다
 
@@ -102,7 +102,11 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 
 `feat:` `fix:` `chore:` 접두 금지. 업스트림 이력 140건 중 **0건**이 쓴다. 우리가 쓰면 보낼 커밋을 옮길 때 제목을 다시 써야 한다.
 
-### 2.8 줄바꿈은 LF
+### 2.8 vendor 포인터는 세 갈래만 옮긴다
+
+`vendor/ff14-accessibility`는 gitlink다 — 우리 저장소는 `kr-port` 커밋 하나를 가리키는 포인터만 기록한다. 그 포인터를 옮길 수 있는 갈래는 `[벤더]`·`[업스트림]`·`[한국전용]`뿐이다. `[문서]`·`[검증]`·`[도구]` 커밋에 포인터가 섞이면 거부한다(C11) — 그런 갈래에서 포인터가 움직이는 것은 대개 `git add -A`가 굴러간 포인터를 주워 담은 실수고, 통과시키면 vendor가 왜 바뀌었는지 이력에 안 남는다.
+
+### 2.9 줄바꿈은 LF
 
 `.gitattributes`의 `* text=auto eol=lf`가 강제한다. 업스트림 blob도 전부 LF다(`git ls-files --eol` 153파일 전수 `i/lf`). 업스트림에는 `.gitattributes`가 **없으므로** CRLF로 오염된 PR을 보내면 diff 전체가 바뀐 것처럼 보인다. PR 전에 `git ls-files --eol`로 확인한다.
 
@@ -150,7 +154,7 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 
 git config core.hooksPath .githooks && git config commit.template .gitmessage && uv run --no-project --with pytest pytest tools/commit-lint/tests -q
 
-검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C10이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
+검증기는 `tools/commit-lint/commit_lint.py`이고 규칙 코드는 C1~C11이다. 훅은 `uv`가 없으면 **막는다(fail closed)** — 조용히 검사를 건너뛰면 규칙이 죽은 걸 아무도 모른다.
 
 규칙을 고칠 때는 `commit_lint.py`와 이 문서를 같이 고친다. 영역 목록(`AREAS`)과 §2.1 표가 어긋나면 안 된다.
 

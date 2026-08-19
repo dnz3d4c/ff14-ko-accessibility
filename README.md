@@ -64,7 +64,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 
 저장소 규율:
 
-- `commit-lint/` — 커밋 메시지 검증기 (`.githooks/commit-msg`가 호출, 규칙 C1~C10)
+- `commit-lint/` — 커밋 메시지 검증기 (`.githooks/commit-msg`가 호출, 규칙 C1~C11)
 - `patch-check/` — 패치가 순서대로 붙고 vendor와 어긋나지 않았는지 (`.githooks/pre-commit`이 개수만, `run\check.bat`이 전체)
 - `docs-check/` — 문서가 인용한 숫자를 산출물에서 다시 계산해 대조하고, 현황판의 절끼리 어긋난 것을 잡는다
 - `upstream-sync/` — 업스트림이 얼마나 앞서 갔는지 재고, 깨끗할 때 올린다. 변경 이력을 한국어로 남길 자리도 여기가 만든다

@@ -79,21 +79,21 @@ UPSTREAM_OK = (
 
 
 def test_업스트림_커밋에_트레일러가_다_있으면_통과한다():
-    assert codes(UPSTREAM_OK, ["patches/0001-confirm-labels.patch"]) == []
+    assert codes(UPSTREAM_OK, ["vendor/ff14-accessibility"]) == []
 
 
 def test_업스트림_커밋에_Upstream_Files가_없으면_거부한다():
     msg = UPSTREAM_OK.replace(
         "Upstream-Files: FF14Accessibility/Services/UIReaderService.cs\n", ""
     )
-    assert "C5" in codes(msg, ["patches/x.patch"])
+    assert "C5" in codes(msg, ["vendor/ff14-accessibility"])
 
 
 def test_업스트림_커밋에_Upstream_Subject가_없으면_거부한다():
     msg = UPSTREAM_OK.replace(
         "Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen\n", ""
     )
-    assert "C5" in codes(msg, ["patches/x.patch"])
+    assert "C5" in codes(msg, ["vendor/ff14-accessibility"])
 
 
 def test_업스트림이_아니면_트레일러를_요구하지_않는다():
@@ -106,7 +106,7 @@ def test_업스트림이_아니면_트레일러를_요구하지_않는다():
 def test_Upstream_Subject의_움라우트는_거부한다():
     # upstream 커밋 140/140이 ae/oe/ue/ss로 치환한다. 이탈하면 안 된다.
     msg = UPSTREAM_OK.replace("Bestaetigen", "Bestätigen")
-    assert "C6" in codes(msg, ["patches/x.patch"])
+    assert "C6" in codes(msg, ["vendor/ff14-accessibility"])
 
 
 def test_움라우트_검사는_Upstream_Subject에만_적용한다():
@@ -114,21 +114,18 @@ def test_움라우트_검사는_Upstream_Subject에만_적용한다():
     msg = UPSTREAM_OK.replace(
         "독일어 리터럴이 박혀 있어", 'upstream 원문은 "Schließen"이다.'
     )
-    assert "C6" not in codes(msg, ["patches/x.patch"])
+    assert "C6" not in codes(msg, ["vendor/ff14-accessibility"])
 
 
 # --- C7 영역 혼합 금지 -----------------------------------------------------
+#
+# 한국전용 쪽 검사는 없다. 패치 파일이 사라지면서 업스트림에 보낼 것은
+# 경로가 아니라 vendor(kr-port) 커밋이 됐고, 그쪽 섞임은 C11이 본다.
 
 
 def test_업스트림_커밋이_overlay를_건드리면_거부한다():
     # 섞이는 순간 PR로 떼어낼 수 없다. 이게 이 검증기의 존재 이유다.
-    assert "C7" in codes(UPSTREAM_OK, ["patches/x.patch", "overlay/ko.json"])
-
-
-def test_한국전용_커밋이_patches를_건드리면_거부한다():
-    assert "C7" in codes(
-        "[한국전용] 한국어 문자열 초안", ["overlay/ko.json", "patches/x.patch"]
-    )
+    assert "C7" in codes(UPSTREAM_OK, ["vendor/ff14-accessibility", "overlay/ko.json"])
 
 
 def test_경로_목록이_비면_혼합_검사를_건너뛴다():
@@ -144,13 +141,13 @@ def test_경로_목록이_비면_혼합_검사를_건너뛴다():
 
 
 def test_한국전용_커밋이_현황판을_안_건드리면_거부한다():
-    assert "C8" in codes("[한국전용] 설치기를 KR 경로로", ["overlay/patches/0006.patch"])
+    assert "C8" in codes("[한국전용] 설치기를 KR 경로로", ["vendor/ff14-accessibility"])
 
 
 def test_현황판을_같이_건드리면_통과한다():
     assert "C8" not in codes(
         "[한국전용] 설치기를 KR 경로로",
-        ["overlay/patches/0006.patch", "docs/status.md"],
+        ["vendor/ff14-accessibility", "docs/status.md"],
     )
 
 
@@ -202,18 +199,61 @@ def test_올린_범위를_적으면_통과한다():
 def test_범위만_적고_이력을_안_남기면_거부한다():
     # 핀은 옮겼는데 무엇이 들어왔는지는 독일어로만 남은 상태.
     msg = f"[벤더] 업스트림 v5.87로 올림\n\n{VENDOR_RANGE}\n"
-    assert "C10" in codes(msg, ["upstream.json", "patches/0001-x.patch"])
+    assert "C10" in codes(msg, ["upstream.json", "vendor/ff14-accessibility"])
 
 
 def test_핀을_안_건드리는_벤더_커밋은_이력을_요구하지_않는다():
-    # 패치만 다시 뽑는 경우 같은 것.
-    msg = f"[벤더] 패치를 다시 뽑음\n\n{VENDOR_RANGE}\n"
-    assert "C10" not in codes(msg, ["patches/0001-x.patch"])
+    # 핀은 그대로 두고 vendor 포인터만 고치는 경우 같은 것.
+    msg = f"[벤더] vendor 포인터를 미러 팁으로 되돌림\n\n{VENDOR_RANGE}\n"
+    assert "C10" not in codes(msg, ["vendor/ff14-accessibility"])
 
 
 def test_다른_영역은_이_규칙을_안_받는다():
     assert "C9" not in codes("[문서] 동기화 절차 정리", ["docs/upstream-sync.md"])
     assert "C10" not in codes("[문서] 핀 설명 추가", ["upstream.json"])
+
+
+# --- C11 vendor 포인터 -----------------------------------------------------
+#
+# vendor/ff14-accessibility는 gitlink다 - 우리 저장소는 kr-port 커밋 하나를
+# 가리키는 포인터만 기록한다. 그 포인터가 엉뚱한 갈래에 섞여 움직이면
+# (`git add -A`가 제일 흔한 사고다) vendor가 왜 바뀌었는지 이력에 안 남는다.
+
+
+def test_문서_커밋이_vendor_포인터를_옮기면_거부한다():
+    assert "C11" in codes(
+        "[문서] 환경 문서 오타 수정",
+        ["docs/environment.md", "vendor/ff14-accessibility"],
+    )
+
+
+def test_검증_도구_커밋도_vendor_포인터를_못_옮긴다():
+    for area in ("검증", "도구"):
+        msg = f"[{area}] 무언가 바꿈\n\nStatus-Board: 해당 없음 - 테스트\n"
+        assert "C11" in codes(msg, ["vendor/ff14-accessibility"])
+
+
+def test_벤더_업스트림_한국전용_커밋은_vendor_포인터를_옮길_수_있다():
+    # kr-port에 커밋이 쌓이면 포인터가 같이 움직인다. 그게 정상 경로다.
+    assert "C11" not in codes(
+        f"[벤더] 업스트림 v5.89로 올림\n\n{VENDOR_RANGE}\n",
+        ["upstream.json", "docs/upstream-changes.md", "vendor/ff14-accessibility"],
+    )
+    assert "C11" not in codes(UPSTREAM_OK, ["vendor/ff14-accessibility"])
+    assert "C11" not in codes(
+        "[한국전용] 한국어 안내 문장 손질\n\nStatus-Board: W-11 진행\n",
+        ["vendor/ff14-accessibility"],
+    )
+
+
+def test_vendor_하위_경로도_잡는다():
+    # gitlink이 풀려 vendor 안의 파일이 직접 스테이징된 사고도 같은 취급이다.
+    assert "C11" in codes("[문서] 뭔가 고침", ["vendor/ff14-accessibility/File.cs"])
+
+
+def test_경로_목록이_비면_vendor_검사를_건너뛴다():
+    # C7·C8과 같은 취급 - 인덱스를 못 읽는 상황에서 오탐을 내면 안 된다.
+    assert "C11" not in codes("[문서] 뭔가 고침", [])
 
 
 # --- 주석줄 처리 -----------------------------------------------------------

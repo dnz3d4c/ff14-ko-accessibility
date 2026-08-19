@@ -25,8 +25,8 @@
 
 ## 어디를 보나
 
-`overlay/ko/ko.json`의 한국어와, 생성기가 못 읽어 손으로 쓴 자리
-(`overlay/patches/0009`)의 더해진 줄. 손 케이스도 봐야 한다 - `월드`가 거기
+`overlay/ko/ko.json`의 한국어와, 생성기가 못 읽어 손으로 쓴 자리(`kr-port`
+브랜치의 손 케이스 커밋)가 더한 줄. 손 케이스도 봐야 한다 - `월드`가 거기
 있었다.
 
 사용법:
@@ -38,18 +38,24 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 CATALOG = REPO / "overlay" / "ko" / "ko.json"
 TERMS = REPO / "overlay" / "ko" / "terms.json"
-HAND_CASES = REPO / "overlay" / "patches"
+VENDOR = REPO / "vendor" / "ff14-accessibility"
 DUMP = REPO / "tools" / "ko-terms" / "out" / "addon-Korean.tsv"
 GOLDEN = Path(__file__).resolve().parent / "golden" / "mod-words.json"
 
-#: 손 케이스 패치. 이름이 바뀌면 여기가 조용히 0줄을 읽으므로 존재를 검사한다.
-HAND_CASE_GLOB = "0009-*.patch"
+#: 손 케이스 커밋이 앉아 있는 브랜치.
+WORK_BRANCH = "kr-port"
+
+#: 손 케이스 커밋을 **제목으로** 찾는다 - `tools/ko-apply`가 생성 커밋을 찾는
+#: 수법 그대로다. 제목의 줄 수("the 36 lines")는 손 케이스가 늘면 움직이므로,
+#: 안 움직이는 꼬리만 건다.
+HAND_SUBJECT = "lines the generator cannot reach"
 
 #: 한 글자는 조사·의존명사라 신호가 없다.
 TOKEN = re.compile(r"[가-힣]{2,}")
@@ -75,21 +81,53 @@ def load_dump(path: Path = DUMP) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def korean_text(
-    catalog: Path = CATALOG, patches: Path = HAND_CASES
-) -> list[str]:
+def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", "-c", "core.hooksPath=", *args],
+        cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+        timeout=30,
+    )
+
+
+def hand_commit(vendor: Path = VENDOR) -> str:
+    """제목으로 손 케이스 커밋을 찾는다. 못 찾으면 소리를 낸다.
+
+    패치 glob 시절에는 이름이 바뀌면 조용히 0줄을 읽었다. 같은 실패 모드를
+    남기지 않으려고, 제목이 바뀌어도 침묵 대신 예외다.
+    """
+    found = _git(
+        "log", "--format=%H", "--fixed-strings", f"--grep={HAND_SUBJECT}",
+        WORK_BRANCH, cwd=vendor,
+    )
+    if found.returncode != 0:
+        raise LookupError(
+            f"{vendor}에서 {WORK_BRANCH}를 못 읽었다: {found.stderr.strip()}"
+        )
+    heads = found.stdout.split()
+    if not heads:
+        raise LookupError(
+            f"손 케이스 커밋을 못 찾았다 - {WORK_BRANCH}에 제목이 "
+            f"`{HAND_SUBJECT}`인 커밋이 없다"
+        )
+    return heads[0]
+
+
+def hand_lines(vendor: Path = VENDOR) -> list[str]:
+    """손 케이스 커밋이 더한 줄. `+` 접두는 걷어내고 `+++` 머리글은 버린다."""
+    shown = _git("show", "--format=", hand_commit(vendor), cwd=vendor)
+    if shown.returncode != 0:
+        raise LookupError(f"손 케이스 커밋을 못 읽었다: {shown.stderr.strip()}")
+    return [
+        line[1:]
+        for line in shown.stdout.splitlines()
+        if line.startswith("+") and not line.startswith("+++")
+    ]
+
+
+def korean_text(catalog: Path = CATALOG, vendor: Path = VENDOR) -> list[str]:
     """번역이 실제로 내보내는 한국어. 카탈로그와 손 케이스 둘 다."""
     rows = json.loads(catalog.read_text(encoding="utf-8"))["strings"]
-    out = [row["ko"] for row in rows]
-
-    hand = sorted(patches.glob(HAND_CASE_GLOB))
-    if not hand:
-        raise FileNotFoundError(f"손 케이스 패치를 못 찾았다: {patches / HAND_CASE_GLOB}")
-    for path in hand:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.startswith("+") and not line.startswith("+++"):
-                out.append(line[1:])
-    return out
+    return [row["ko"] for row in rows] + hand_lines(vendor)
 
 
 def known_terms(path: Path = TERMS) -> set[str]:
@@ -139,7 +177,7 @@ def main(argv: list[str]) -> int:
                             "모드가 지어야 하는 말이다 - 게임에 없는 개념이라 "
                             "게임 시트에 있을 리가 없다. 늘어날 때 왜인지 "
                             "커밋 본문에 적는다.",
-                    "source": "overlay/ko/ko.json + overlay/patches/0009",
+                    "source": "overlay/ko/ko.json + kr-port 손 케이스 커밋",
                     "words": now,
                 },
                 ensure_ascii=False,

@@ -1,11 +1,11 @@
 """The Korean signature we ship has to still match exactly once.
 
-`overlay/patches/0004` hands ClientStructs a hand-found address for
+The `kr-port` branch hands ClientStructs a hand-found address for
 `AtkResNode::IsVisible`, located by a byte signature. If a game patch moves or
 recompiles that function the signature goes ambiguous or missing, and the mod
 silently drops to the managed replica. This test is how that gets noticed: it
-reads the signature out of the shipped patch - not out of a copy - and checks it
-against the installed Korean binary.
+reads the signature out of the vendor source the build actually compiles - not
+out of a copy - and checks it against the installed Korean binary.
 
 Skipped when the game is not installed on this machine. Point FFXIV_KR_GAME at
 `...\\game\\ffxiv_dx11.exe` to run it elsewhere.
@@ -20,7 +20,8 @@ import pytest
 from sig_probe import Match, load_text_section
 
 REPO = Path(__file__).resolve().parents[3]
-PATCHES = REPO / "overlay" / "patches"
+SOURCE = (REPO / "vendor" / "ff14-accessibility" / "FF14Accessibility"
+          / "Compat" / "NodeVisibilityCompat.cs")
 DEFAULT_GAME = Path(
     r"C:\Program Files (x86)\FINAL FANTASY XIV - KOREA\game\ffxiv_dx11.exe")
 GAME = Path(os.environ.get("FFXIV_KR_GAME", DEFAULT_GAME))
@@ -30,21 +31,19 @@ _LITERAL_RE = re.compile(r'"([^"]*)"')
 
 
 def shipped_signature() -> str:
-    """The signature literal as the patch series actually ships it."""
-    for patch in sorted(PATCHES.glob("*.patch")):
-        added = [line[1:] for line in patch.read_text(encoding="utf-8").splitlines()
-                 if line.startswith("+")]
-        for index, line in enumerate(added):
-            if _CONSTANT not in line or "const string" not in line:
-                continue
-            parts: list[str] = []
-            for tail in added[index:]:
-                parts += _LITERAL_RE.findall(tail)
-                if tail.rstrip().endswith(";"):
-                    break
-            if parts:
-                return "".join(parts)
-    raise AssertionError(f"no {_CONSTANT} in {PATCHES}")
+    """The signature literal as the source we build actually declares it."""
+    lines = SOURCE.read_text(encoding="utf-8").splitlines()
+    for index, line in enumerate(lines):
+        if _CONSTANT not in line or "const string" not in line:
+            continue
+        parts: list[str] = []
+        for tail in lines[index:]:
+            parts += _LITERAL_RE.findall(tail)
+            if tail.rstrip().endswith(";"):
+                break
+        if parts:
+            return "".join(parts)
+    raise AssertionError(f"no {_CONSTANT} in {SOURCE}")
 
 
 class TestShippedSignature:

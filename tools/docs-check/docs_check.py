@@ -35,6 +35,12 @@ import re
 import sys
 from pathlib import Path
 
+# 손 케이스 커밋을 읽는 헬퍼는 ko-words가 갖고 있다 - 같은 일을 두 번 만들지
+# 않는다 (선례: tools/ko-apply가 strings_golden을 이렇게 가져다 쓴다).
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ko-words"))
+
+import ko_words  # noqa: E402 - 위에서 경로를 넣어야 찾는다
+
 REPO = Path(__file__).resolve().parents[2]
 
 BOARD = REPO / "docs" / "status.md"
@@ -44,9 +50,6 @@ TERMS = REPO / "overlay" / "ko" / "terms.json"
 LINT = REPO / "tools" / "commit-lint" / "commit_lint.py"
 HAND_CASES_DOC = REPO / "docs" / "ko-hand-cases.md"
 GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
-
-#: 손으로 옮긴 자리를 세는 패치. 이름이 바뀌면 0을 세므로 존재를 검사한다.
-HAND_PATCH_GLOB = "overlay/patches/0009-*.patch"
 
 #: 살아 있는 문서만 본다. 날짜가 박힌 기록(`ko-review-2026-08-18.md`)과 동결한
 #: 조사 문서(`ko-client-port-feasibility.md`)는 **그때 그대로가 맞다.**
@@ -60,20 +63,14 @@ def _json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def hand_patch(repo: Path = REPO) -> Path:
-    found = sorted(repo.glob(HAND_PATCH_GLOB))
-    if not found:
-        raise FileNotFoundError(f"손 케이스 패치를 못 찾았다: {HAND_PATCH_GLOB}")
-    return found[0]
-
-
 def hand_sites(repo: Path = REPO) -> int:
-    """손으로 한국어를 넣은 자리. 패치가 더한 줄 중 `IsKorean`이 있는 것."""
-    count = 0
-    for line in hand_patch(repo).read_text(encoding="utf-8").splitlines():
-        if line.startswith("+") and not line.startswith("+++") and "IsKorean" in line:
-            count += 1
-    return count
+    """손으로 한국어를 넣은 자리. 손 케이스 커밋이 더한 줄 중 `IsKorean`이 있는 것.
+
+    커밋을 못 찾으면 `ko_words.hand_commit`이 소리를 낸다 - 조용히 0을 세던
+    패치 glob 시절의 함정이 여기 없다.
+    """
+    lines = ko_words.hand_lines(repo / "vendor" / "ff14-accessibility")
+    return sum("IsKorean" in line for line in lines)
 
 
 def lint_rule_max(path: Path = LINT) -> int:
@@ -140,8 +137,6 @@ def facts(repo: Path = REPO) -> dict[str, int]:
         "대장 낱말": len(_json(repo / "overlay" / "ko" / "terms.json")["terms"]),
         "손으로 옮긴 자리": hand_sites(repo),
         "손으로 볼 자리": hand_type_sum(repo / "docs" / "ko-hand-cases.md"),
-        "업스트림 패치": len(list((repo / "patches").glob("*.patch"))),
-        "한국전용 패치": len(list((repo / "overlay" / "patches").glob("*.patch"))),
         "커밋 규칙 최대": lint_rule_max(repo / "tools" / "commit-lint" / "commit_lint.py"),
     }
 

@@ -1,12 +1,12 @@
 # 업스트림이 움직였는지 주마다 본다.
 #
 # 왜 CI인가: 업스트림은 거의 매일 릴리스를 낸다. 우리가 안 볼 때도 움직이고,
-# 눈치채는 시점이 늦을수록 패치를 다시 붙이는 비용이 커진다. 이 워크플로가
+# 눈치채는 시점이 늦을수록 kr-port를 다시 쌓는 비용이 커진다. 이 워크플로가
 # 하는 일은 **알리는 것뿐**이다 - 아무것도 옮기지 않는다.
 #
 # 왜 여기서 안 옮기나: 올리려면 KR Dalamud로 빌드하고 인게임에서 들어 봐야
 # 하는데, 러너에는 게임도 KR Dalamud도 없다. 여기서 판정할 수 있는 것은
-# "우리 패치가 새 태그에 아직 붙는가"까지다. 그게 조기 경보로는 충분하다.
+# "kr-port가 새 태그 위에 아직 올라가는가"까지다. 그게 조기 경보로는 충분하다.
 #
 # 번역은 여기서 못 한다. 업스트림 커밋은 독일어고 러너에는 옮길 수단이
 # 없다. 그래서 이슈에는 **원문을 그대로** 싣고, 한국어 이력은 로컬에서
@@ -16,6 +16,12 @@
 # 여기서 조립하면 개발 머신에서 돌려 볼 수가 없고, 못 돌려 보는 코드는
 # 처음 필요한 날 깨져 있는다. 이 파일은 도구를 부르고 결과를 옮기기만
 # 한다 - 이슈 본문은 `tools/upstream-sync/tests`가 검사한다.
+#
+# kr-port는 비공개 미러에만 있다(주소는 `.gitmodules`가 갖는다).
+# GITHUB_TOKEN은 이 저장소에만 통하므로 미러는 읽기 전용 deploy key로
+# 받는다 - secret `MIRROR_DEPLOY_KEY`(미러에 등록한 deploy key의 개인키).
+# 키가 없으면 판정을 못 하므로 **경고를 남기고 건너뛴다** - 초록불로
+# 조용히 지나가면 감시가 죽은 것을 아무도 모른다.
 
 name: 업스트림 감시
 
@@ -35,21 +41,63 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 업스트림 클론
+      - name: 열쇠 확인
+        id: key
+        env:
+          MIRROR_DEPLOY_KEY: ${{ secrets.MIRROR_DEPLOY_KEY }}
         run: |
+          if [ -n "$MIRROR_DEPLOY_KEY" ]; then
+            echo "has_key=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_key=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::MIRROR_DEPLOY_KEY secret이 없다 - kr-port를 못 받아와 업스트림 점검을 건너뛴다"
+            {
+              echo '## 업스트림 감시'
+              echo ''
+              echo 'MIRROR_DEPLOY_KEY secret이 없어 점검을 **건너뛰었다.**'
+              echo '미러의 읽기 전용 deploy key 개인키를 이 저장소 secret으로 등록해야 판정이 돌아간다.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: vendor 조립
+        if: steps.key.outputs.has_key == 'true'
+        env:
+          MIRROR_DEPLOY_KEY: ${{ secrets.MIRROR_DEPLOY_KEY }}
+        run: |
+          # 개발 머신과 같은 배치를 만든다 - origin이 업스트림(공개, 태그가
+          # 나오는 곳), mirror가 비공개 미러(kr-port가 사는 곳). 판정 도구는
+          # 로컬 kr-port 브랜치를 본다. 주소는 각각 upstream.json과
+          # .gitmodules가 갖는다 - 여기 다시 적지 않는다.
           REPO=$(python3 -c 'import json;print(json.load(open("upstream.json"))["repo"])')
+          MIRROR=$(git config -f .gitmodules submodule.vendor/ff14-accessibility.url)
+          BRANCH=$(git config -f .gitmodules submodule.vendor/ff14-accessibility.branch)
+
+          # deploy key는 SSH로만 통한다. .gitmodules의 https 주소를 바꾼다.
+          MIRROR_SSH=$(printf '%s' "$MIRROR" | sed -E 's#^https://github\.com/#git@github.com:#')
+          umask 077
+          printf '%s\n' "$MIRROR_DEPLOY_KEY" > "$RUNNER_TEMP/mirror_key"
+          export GIT_SSH_COMMAND="ssh -i $RUNNER_TEMP/mirror_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+
           git clone --no-checkout "$REPO" vendor/ff14-accessibility
           git -C vendor/ff14-accessibility fetch --tags origin
+          git -C vendor/ff14-accessibility remote add mirror "$MIRROR_SSH"
+          git -C vendor/ff14-accessibility fetch mirror "+refs/heads/$BRANCH:refs/remotes/mirror/$BRANCH"
+          # 판정 대상은 미러의 kr-port 팁이다. gitlink이 가리키는 커밋이
+          # 아니라 팁을 쓴다 - 둘이 다르면 팁이 더 새 작업이고, 조기 경보는
+          # 지금 작업이 붙는지를 물어야 한다.
+          git -C vendor/ff14-accessibility branch "$BRANCH" "mirror/$BRANCH"
 
       - name: 점검
+        if: steps.key.outputs.has_key == 'true'
         run: |
-          # 방금 클론했으므로 --offline. 종료 코드는 판정이 아니라 사고
+          # 방금 조립했으므로 --offline. 종료 코드는 판정이 아니라 사고
           # 신호로만 쓴다 - 새 태그가 있는 것은 사고가 아니다.
           TOOL=tools/upstream-sync/upstream_sync.py
           python3 "$TOOL" --offline | tee check.txt || true
           python3 "$TOOL" --issue-body --offline > body.md || true
 
       - name: 요약
+        if: steps.key.outputs.has_key == 'true'
         run: |
           {
             echo '## 업스트림 감시'
@@ -60,6 +108,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: 이슈 열기
+        if: steps.key.outputs.has_key == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

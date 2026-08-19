@@ -46,9 +46,9 @@ def test_손_케이스_숫자_셋의_관계():
     assert got["손으로 옮긴 자리"] == got["손으로 볼 자리"] - 5
 
 
-def test_손_케이스_패치가_아직_거기_있다():
-    # 이름이 바뀌면 0을 세고 조용히 통과한다. ko-words와 같은 함정이다.
-    assert docs_check.hand_patch().is_file()
+def test_손_케이스_커밋이_아직_거기_있다():
+    # 커밋 제목이 바뀌면 조용히 0을 세는 대신 ko_words.hand_commit이 소리를
+    # 낸다. 여기서는 세어진 값이 실재하는지만 못박는다.
     assert docs_check.hand_sites() > 0
 
 

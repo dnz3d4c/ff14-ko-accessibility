@@ -20,10 +20,18 @@ from pathlib import Path
 AREAS = ("업스트림", "한국전용", "검증", "문서", "벤더", "도구")
 
 #: 갈래별로 건드리면 안 되는 경로. 걸리면 커밋을 쪼개라는 뜻이다.
+#: 한국전용 항목이 없는 것은 반대쪽 경계가 경로가 아니게 돼서다 - 업스트림에
+#: 보낼 것은 이제 패치 파일이 아니라 vendor(kr-port) 커밋이고, 그쪽은 C11이 본다.
 FORBIDDEN_PATHS = {
     "업스트림": ("overlay/",),
-    "한국전용": ("patches/",),
 }
+
+#: vendor 포인터(gitlink). 우리 저장소는 kr-port 커밋 하나를 이 경로로 가리킨다.
+VENDOR_PATH = "vendor/ff14-accessibility"
+
+#: vendor 포인터를 옮겨도 되는 갈래. 나머지 갈래에서 포인터가 움직이면
+#: 실수(`git add -A`)다 - vendor가 왜 바뀌었는지 이력에 안 남는다.
+VENDOR_AREAS = ("업스트림", "한국전용", "벤더")
 
 #: `[업스트림]` 커밋에 반드시 있어야 하는 줄.
 REQUIRED_UPSTREAM_TRAILERS = ("Upstream-Files", "Upstream-Subject")
@@ -196,6 +204,22 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
                     "C7",
                     f"[{area}] 커밋이 {', '.join(hits)}를 건드린다. "
                     "섞이면 보낼 것만 떼어낼 수 없다 - 커밋을 쪼개라",
+                )
+            )
+
+    if area and area not in VENDOR_AREAS and changed_paths:
+        moved = [
+            path
+            for path in changed_paths
+            if path == VENDOR_PATH or path.startswith(f"{VENDOR_PATH}/")
+        ]
+        if moved:
+            violations.append(
+                Violation(
+                    "C11",
+                    f"[{area}] 커밋이 vendor 포인터를 옮긴다. 이 갈래로는 "
+                    "vendor가 왜 바뀌었는지 이력에 안 남는다 - "
+                    f"{', '.join(f'[{a}]' for a in VENDOR_AREAS)} 커밋으로 떼어내라",
                 )
             )
 

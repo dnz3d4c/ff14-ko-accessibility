@@ -250,11 +250,45 @@ _OPEN = ("대기", "진행")
 #: 규약을 먼저 고친다.
 BOARD_STATES = ("대기", "진행", "막힘", "버림", "완료")
 
+#: 판의 절 제목. **절을 재편하면 여기부터 고친다.** 문자열 비교라 파일이
+#: 바뀌어도 저절로는 안 걸리므로, `_section`이 "못 찾음"을 실패로 센다.
+OPEN_HEADING = "## 2. 열린 작업"
+DONE_HEADING = "## 7. 끝난 것"
+
+#: §7이 ID를 닫는 자리. **여는 괄호 바로 뒤만 본다.**
+#:
+#: 절 전체에서 `W-\d+`를 긁으면 산문에 스쳐 지나간 ID까지 "닫힌 것"으로 세고,
+#: 그러면 열린 일이 완료 목록 안에 숨어도 결번 검사가 통과한다 - W-35가 실제로
+#: 그렇게 묻혔다(§4-6). 줄 끝 `)`로 고정하는 것도 안 된다: 항목이 마크다운
+#: 링크로 끝나면 `)`가 하나 더 붙어서 열아홉 줄이 통째로 안 잡힌다.
+_DONE_ID = re.compile(r"\(W-\d+(?:[·,]\s*W-\d+)*")
+
+
+def _section(text: str, heading: str) -> str:
+    """`heading` 아래부터 다음 `## `까지. **못 찾으면 실패다.**
+
+    `split(...)[-1]`을 쓰면 안 된다 - 구분자가 없을 때 문서 전체를 돌려주고,
+    그러면 결번 검사가 §2의 ID를 전부 "닫힌 것"으로 센다. 오류 없이 영원히
+    통과하는 실패라, 이 도구가 막으려던 바로 그 모양이다.
+    """
+    if heading not in text:
+        raise ValueError(f"판에서 `{heading}` 절을 못 찾았다. 절을 재편했으면 상수도 같이 고쳐라")
+    return text.split(heading, 1)[1].split("\n## ", 1)[0]
+
 
 def board_rows(text: str) -> list[tuple[str, str, str]]:
     """§2 표. (ID, 우선순위, 상태)."""
-    section = text.split("## 2. 열린 작업", 1)[1].split("\n## ", 1)[0]
+    section = _section(text, OPEN_HEADING)
     return [(m[1], m[3], m[4]) for m in (_ROW.match(line) for line in section.splitlines()) if m]
+
+
+def done_ids(text: str) -> set[str]:
+    """§7이 닫았다고 말하는 ID."""
+    found: set[str] = set()
+    for line in _section(text, DONE_HEADING).splitlines():
+        if line.startswith("- ") and (m := _DONE_ID.search(line)):
+            found.update(re.findall(r"W-\d+", m.group(0)))
+    return found
 
 
 def _line(text: str, prefix: str) -> str:
@@ -322,13 +356,22 @@ def check_board(path: Path = BOARD) -> list[str]:
                 f"§1이 {wid}를 막힘이라고 적었는데 §2 상태는 `{state_of.get(wid, '없음')}`이다"
             )
 
-    # ID가 조용히 사라지지 않았나. §2 ∪ §9가 W-01..W-max를 전부 덮어야 한다.
-    done = set(re.findall(r"W-\d+", text.split("## 9. 끝난 것", 1)[-1]))
+    # ID가 조용히 사라지지 않았나. §2 ∪ §7이 W-01..W-max를 전부 덮어야 한다.
+    done = done_ids(text)
     have = set(ids) | done
     top_num = max(int(i.split("-")[1]) for i in have)
     lost = [f"W-{n:02d}" for n in range(1, top_num + 1) if f"W-{n:02d}" not in have]
     if lost:
-        bad.append(f"§2에도 §9에도 없는 ID: {', '.join(lost)}. ID는 재사용하지 않는다")
+        bad.append(f"§2에도 §7에도 없는 ID: {', '.join(lost)}. ID는 재사용하지 않는다")
+
+    # 한 ID가 양쪽에 닫혀 있으면 §2만 읽는 사람과 §7만 읽는 사람이 다른 답을
+    # 듣는다. 마일스톤이 끝났어도 §2에 남았으면 §7에서 괄호로 닫지 않는다(§8).
+    both = sorted(set(ids) & done)
+    if both:
+        bad.append(
+            f"§2에 열려 있는데 §7이 닫았다고 적은 ID: {', '.join(both)}. "
+            f"§8대로 §7에서는 괄호를 빼고 `남은 것은 §2 W-NN`으로 가리켜라"
+        )
 
     return bad
 
@@ -392,7 +435,7 @@ _MD_LINK = re.compile(r"\[([^\]]+)\]\(([^)#]+?)(?:#[^)]*)?\)")
 RETIRED_VALUES = (("골든 쌍", "688"),)
 
 #: 폐기값을 안 보는 자리. 날짜가 박힌 기록과 동결 문서는 **그때 그대로가
-#: 맞다**(`CLAUDE.md`의 현황판 규약). `docs/status.md`는 §9(끝난 것)만 뺀다.
+#: 맞다**(`CLAUDE.md`의 현황판 규약). `docs/status.md`는 §7(끝난 것)만 뺀다.
 RETIRED_SKIP = ("docs/frozen/", "docs/upstream/changes.md")
 
 
@@ -451,7 +494,7 @@ def check_retired(repo: Path = REPO) -> list[str]:
 
             text = path.read_text(encoding="utf-8")
             if rel == "docs/status.md":
-                text = text.split("## 9. 끝난 것", 1)[0]  # 이력은 그때 그대로다
+                text = text.split(DONE_HEADING, 1)[0]  # 이력은 그때 그대로다
 
             for match in pattern.finditer(text):
                 line = text.count("\n", 0, match.start()) + 1

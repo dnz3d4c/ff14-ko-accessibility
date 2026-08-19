@@ -123,7 +123,7 @@ public static string Counter(int index, int count) => $"{index} {CounterConnecto
 
 ### 기타 2곳
 
-**버전 안내** — `version.Replace(".", " Punkt ")`. 소수점을 말로 읽는다. `5 점 87`로 나가고, **이대로 두기로 정해졌다**(2026-08-18, 현황판 §7 D-4).
+**버전 안내** — `version.Replace(".", " Punkt ")`. 소수점을 말로 읽는다. `5 점 87`로 나가고, **이대로 두기로 정해졌다**(2026-08-18, 현황판 §3 D-4).
 
 **속성 보정값** — `AttributeValue`는 **독일어와 영어 분기가 글자까지 똑같다.**
 

@@ -45,6 +45,9 @@ def test_손_케이스_커밋이_아직_거기_있다():
 
 # --- 어긋났을 때 정말 걸리나 - 합성 문서 -----------------------------------
 
+#: 절 제목은 **도구가 가진 상수를 쓴다.** 판을 재편하면 번호가 바뀌는데
+#: (실제로 §9가 §7이 됐다), 여기 손으로 적어 두면 그날 합성 판 테스트가
+#: 통째로 죽는다 - 검사한 적도 없는 것을 고치느라 시간을 쓰게 된다.
 HEAD = """# 판
 
 ## 1. 지금
@@ -52,13 +55,13 @@ HEAD = """# 판
 - 다음: {next}
 - 막힘: {blocked}
 
-## 2. 열린 작업
+""" + docs_check.OPEN_HEADING + """
 
 | ID | 제목 | 우선 | 상태 | 비고 |
 |----|------|------|------|------|
 {rows}
 
-## 9. 끝난 것
+""" + docs_check.DONE_HEADING + """
 
 {done}
 """
@@ -292,3 +295,52 @@ def test_동결_문서의_폐기값은_그때_그대로다(tmp_path, monkeypatch
 def test_지금_문서에_제어_문자가_없다():
     bad = docs_check.check_control_chars()
     assert bad == [], "\n".join(bad)
+
+
+# --- 절 제목·닫힌 ID·양쪽 중복 (W-49 재편에서 붙었다) ----------------------
+
+
+def test_절_제목을_못_찾으면_소리를_낸다():
+    """`split(...)[-1]`은 못 찾을 때 문서 전체를 돌려준다.
+
+    그러면 결번 검사가 §2의 ID를 전부 "닫힌 것"으로 세고 **오류 없이 영원히
+    통과한다.** 이 도구가 막으려던 실패와 같은 모양이라, 조용히 넘어가면 안 된다.
+    """
+    with pytest.raises(ValueError, match="절을 못 찾았다"):
+        docs_check._section("# 판\n\n## 1. 지금\n\n아무것도 없다\n", docs_check.DONE_HEADING)
+
+
+def test_닫힌_ID는_여는_괄호_뒤만_센다():
+    """산문에 스쳐 지나간 ID는 안 닫는다. W-35가 그렇게 묻혔다."""
+    text = (
+        "# 판\n\n"
+        + docs_check.DONE_HEADING
+        + "\n\n"
+        "- **2026-08-19** 무엇을 했다 (W-11, [vendor.md](upstream/vendor.md))\n"
+        "- **2026-08-19** 둘을 했다 (W-33·W-34, `overlay/patches/0015`)\n"
+        "- **2026-08-19** 문제를 찾아 `W-35`로 올렸다\n"
+        "- **2026-08-19** 커밋 강제(C8) — 이 문서\n"
+    )
+    # 마크다운 링크로 끝나는 줄도 잡혀야 한다. 줄 끝 `)`로 고정하면 링크의
+    # 괄호 때문에 통째로 안 잡힌다 - 실제로 열아홉 줄이 그렇게 샜다.
+    assert docs_check.done_ids(text) == {"W-11", "W-33", "W-34"}
+
+
+def test_열린_ID를_끝난것절이_닫았다고_적으면_걸린다(tmp_path):
+    text = board(
+        ["| W-01 | 하나 | P1 | 진행 | |", "| W-02 | 둘 | P2 | 막힘 | |"],
+        next_="**W-01**",
+        done="- 무엇을 했다 (W-01, 링크)\n- 또 했다 (W-02, 링크)",
+    )
+    bad = docs_check.check_board(write(tmp_path, text))
+    assert any("§2에 열려 있는데 §7이 닫았다" in b and "W-01" in b for b in bad), bad
+
+
+def test_마일스톤을_본문으로_가리키면_통과한다(tmp_path):
+    """§8의 규약대로 괄호를 빼면 §2와 §7이 안 부딪힌다."""
+    text = board(
+        ["| W-01 | 하나 | P1 | 진행 | |", "| W-02 | 둘 | P2 | 막힘 | |"],
+        next_="**W-01**",
+        done="- 1단계를 끝냈다. 남은 것은 §2 W-01\n- 둘도 했다. 남은 것은 §2 W-02",
+    )
+    assert docs_check.check_board(write(tmp_path, text)) == []

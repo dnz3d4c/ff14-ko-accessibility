@@ -100,4 +100,4 @@ without a habitat keep exactly the wording they had before.
 
 ## 6. 안 보내는 것
 
-같이 검토했던 나머지는 전부 뺐다. 이유는 [README.md](README.md)의 기준 4·5와 [docs/status.md](../docs/status.md) §6에 있다. 요약하면 `0001`은 클라를 켜야 판정되고, `0002`는 고친 오류가 없고, "빈 갈림길 정리"는 전제가 틀렸다.
+같이 검토했던 나머지는 전부 뺐다. 이유는 [README.md](README.md)의 기준 4·5와 [docs/status.md](../docs/status.md) §6-4에 있다. 요약하면 `0001`은 클라를 켜야 판정되고, `0002`는 고친 오류가 없고, "빈 갈림길 정리"는 전제가 틀렸다.

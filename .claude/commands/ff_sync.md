@@ -63,7 +63,7 @@ argument-hint: check | up <태그> | notes | patches
 
    **쌍 수만 보면 놓친다.** 갈림길이 보간 문자열 안에 들어 있으면 파서가 아예 못 세서, 문장이 늘어도 쌍은 그대로다(v5.88 `ConfigPageWithCount`가 그랬다). `unparsed`가 움직였는지 같이 본다 — 늘었으면 손 케이스이고, [ko-localization 스킬](../skills/ko-localization/SKILL.md)과 [docs/korean/hand-cases.md](../../docs/korean/hand-cases.md)를 따라 손 케이스 커밋(`0009`)에 넣는다.
 8. `cmd //c "set FF14_NOPAUSE=1 && run\check.bat"` — 전부 통과할 것.
-9. **문서를 옮긴다.** [docs/status.md](../../docs/status.md)(핀, §1 직전, §9 한 줄, 인용 숫자), `docs/upstream/changes.md`, 손 케이스가 늘었으면 `docs/korean/hand-cases.md`·`README.md`. 숫자를 새로 손으로 적으면 `tools/docs-check`의 `CITATIONS`에 등록한다.
+9. **문서를 옮긴다.** [docs/status.md](../../docs/status.md)(핀, §1 직전, §7 한 줄, 인용 숫자), `docs/upstream/changes.md`, 손 케이스가 늘었으면 `docs/korean/hand-cases.md`·`README.md`. 숫자를 새로 손으로 적으면 `tools/docs-check`의 `CITATIONS`에 등록한다.
 10. **배포물이 뒤졌으면 다시 낸다.** 소스 판이 올라갔는데 `dist/`가 옛 판이면 그 자체가 결함이다(실제로 5.85 압축을 5.87 소스라고 들고 있었다).
 
         cmd //c "set FF14_NOPAUSE=1 && run\pack.bat"

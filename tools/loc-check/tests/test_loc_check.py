@@ -253,8 +253,54 @@ def test_골든이_정렬돼_있고_중복이_없다():
 
 @needs_source
 def test_실물에서_사전을_실제로_읽는다():
-    # 파서가 배선만 되고 0개를 읽으면 위 검사들이 전부 조용히 통과한다.
+    """파서가 배선만 되고 0개를 읽으면 위 검사들이 전부 조용히 통과한다.
+
+    **README `## 한계` 4가 기대는 자리다.** 사전과 호출부를 동시에 못 읽으면
+    0 대 0이라 아무 말도 안 나오는데, 그걸 막는 것이 이 테스트뿐이다.
+    지우면 위 검사 넷이 조용히 무의미해진다.
+    """
     entries = loc_check.dictionaries()
     assert len(entries["Korean"]) > 100
     assert len(entries["English"]) >= len(entries["Korean"])
     assert len(loc_check.called()) > 100
+
+
+# --- 한계가 정말 그 모양인가 (README `## 한계`) -----------------------------
+#
+# 한계를 글로만 적어 두면 낡는다. 이 저장소는 그걸 겪었다 - `ko-words`
+# README의 한계를 검수가 인용까지 해 놓고 결론에 반영하지 않았다. 여기서는
+# 적어 둔 것이 지금도 사실인지를 검사가 지킨다.
+
+
+def test_한계1_말하는_호출_밖은_안_본다():
+    # README 1: `MessageBox`·`Text`·`AccessibleName`은 이 검사 밖이다.
+    # 초록이라고 "안내가 다 한국어다"가 아니라는 근거.
+    for source in (
+        'class C { void M() { MessageBox.Show("Fertig"); } }',
+        'class C { void M() { var b = new Button { Text = "설치" }; } }',
+        'class C { void M() { var b = new Button { AccessibleName = "설치" }; } }',
+    ):
+        assert loc_check.scan_text(source, "C.cs") == [], source
+
+
+def test_한계3_변수로_넘긴_키는_집계에서_빠진다(world, golden):
+    # README 3: `Loc.Get(key)`는 "안 불린다"로 분류되고, 한국어가 없어도
+    # 죽은 키 골든이 통과시킨다. **조용히 새는 유일한 갈래다.**
+    root = world(english='["A"] = "one",', korean="", caller="Info(Loc.Get(key));")
+    assert loc_check.called(root) == {}
+    assert loc_check.check(root, golden(["A"])) == []
+
+
+def test_한계4_사전_블록을_못_찾으면_죽는다(tmp_path):
+    # README 4: 조용히 0개가 되는 게 아니라 예외로 죽는다.
+    (tmp_path / "Loc.cs").write_text("public static class Loc { }", encoding="utf-8")
+    with pytest.raises(ValueError):
+        loc_check.dictionaries(tmp_path / "Loc.cs")
+
+
+def test_한계4_항목_모양만_바뀌면_전부_정의없음으로_걸린다(world, golden):
+    # README 4: 사전이 0개가 돼도 부르는 키가 있으면 시끄럽다.
+    root = world(english='{ "A", "one" },', korean="", caller='Info(Loc.Get("A"));')
+    assert loc_check.dictionaries(root / "Loc.cs")["English"] == {}
+    bad = loc_check.check(root, golden([]))
+    assert any("어느 사전에도 없다" in line for line in bad), bad

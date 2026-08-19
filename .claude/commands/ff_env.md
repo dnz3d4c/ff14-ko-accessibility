@@ -39,7 +39,7 @@ argument-hint: check | dalamud | vnavmesh | game
 
        cmd //c "set FF14_NOPAUSE=1 && run\log.bat"
 
-   `pluginConfigs\vnavmesh.json` FileNotFound 오류 **1건은 정상**이다(현황판 §4-3, 안 고치기로 한 것). 그 수가 늘었으면 그때가 볼 시점이다.
+   `pluginConfigs\vnavmesh.json` FileNotFound 오류 **1건은 정상**이다(현황판 §5-7, 안 고치기로 한 것). 그 수가 늘었으면 그때가 볼 시점이다.
 5. 어긋난 것이 있으면 위 "멈추는 조건"대로 보고하고 멈춘다. 없으면 한 줄로 성하다고 말한다.
 
 ## dalamud
@@ -58,7 +58,7 @@ KR 달라무드(`MiqoKR/kr-dalamud-updater`) 갱신. **버스 팩터 1인 계층
 
 1. 설치돼 있나. 없으면 결함이 아니라 미설치다(넘패드3에서 `Auto-walk not available`).
 2. 어셈블리 참조와 시그니처를 다시 잰다. 절차와 지난 실측(참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/dev/environment.md` §7.
-3. **설정 파일을 만들어 주지 않는다.** 그쪽 스키마에 우리가 묶인다(현황판 §4-3). 기동마다 뜨는 FileNotFound 1건이 정상 상태다.
+3. **설정 파일을 만들어 주지 않는다.** 그쪽 스키마에 우리가 묶인다(현황판 §5-7). 기동마다 뜨는 FileNotFound 1건이 정상 상태다.
 4. 설치 프로그램이 받아오므로, 판이 올라갔으면 `run\pack.bat`으로 다시 내고 `--check`로 확인한다.
 
 ## game

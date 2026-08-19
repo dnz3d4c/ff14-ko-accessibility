@@ -10,6 +10,7 @@
 
 - [environment.md](dev/environment.md) — 경로·버전·빌드 함정. KR 클라이언트와 글로벌이 갈리는 자리
 - [kr-runtime.md](dev/kr-runtime.md) — KR 실행 환경을 손으로 세우는 절차. 설치 프로그램이 이 절차를 대신한다
+- [release.md](dev/release.md) — **내는 절차.** 릴리스 자산, 태그 규약, 그리고 **공개 전환과 첫 릴리스의 순서.** 순서를 틀리면 오류가 안 나고 받는 사람 화면에서만 이상해진다
 - [commit-rules.md](dev/commit-rules.md) — 커밋 갈래와 트레일러, 검사기가 막는 것
 
 ## korean/ — 한국어로 옮기는 것

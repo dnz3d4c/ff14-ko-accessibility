@@ -1,9 +1,9 @@
 # 업스트림 동기화
 
 - 작성: 2026-08-18
-- 이 문서가 **동기화 규칙의 단일 원천**이다. [status.md](../status.md)와 [ko-client-port-feasibility.md](../frozen/port-feasibility.md) §12는 여기를 가리키기만 한다.
-- 한국어 변경 이력은 [upstream-changes.md](changes.md)가 따로 갖는다.
-- 2026-08-19에 패치 파일을 없앴다(W-11). 원본은 vendor의 `kr-port` 브랜치 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. **왜 이 구조인지는 [vendor-submodule.md](vendor.md)가 갖는다** — 여기는 절차만 갖는다.
+- 이 문서가 **동기화 규칙의 단일 원천**이다. [status.md](../status.md)와 [port-feasibility.md](../frozen/port-feasibility.md) §12는 여기를 가리키기만 한다.
+- 한국어 변경 이력은 [changes.md](changes.md)가 따로 갖는다.
+- 2026-08-19에 패치 파일을 없앴다(W-11). 원본은 vendor의 `kr-port` 브랜치 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. **왜 이 구조인지는 [vendor.md](vendor.md)가 갖는다** — 여기는 절차만 갖는다.
 
 ## 1. 문제가 무엇인가
 
@@ -136,7 +136,7 @@ rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 *
 
     uv run --no-project python tools/upstream-sync/upstream_sync.py --notes
 
-도구가 [upstream-changes.md](changes.md)에 **원문과 함께 `(미번역)` 자리**를 만든다. 채우는 것은 사람이다. 기계 번역을 붙이지 않는다 — 이 저장소는 게임 용어를 지어낸 전례로 한 번 다쳤다(2026-08-18 `Aetheryte`).
+도구가 [changes.md](changes.md)에 **원문과 함께 `(미번역)` 자리**를 만든다. 채우는 것은 사람이다. 기계 번역을 붙이지 않는다 — 이 저장소는 게임 용어를 지어낸 전례로 한 번 다쳤다(2026-08-18 `Aetheryte`).
 
 **핀을 옮기기 전에 돌리든 뒤에 돌리든 된다.** 자리를 만들 대상에는 **핀 태그 자신**이 들어간다 — §5.2가 끝나면 핀은 이미 새 태그라 "새 태그"는 0개인데, 정작 없는 것이 그 판의 이력이기 때문이다. 한때 새것만 세서, `--check`는 "변경 이력에 없는 판"이라고 하는데 `--notes`는 "만들 자리가 없다"고 답했다(v5.88에서 실제로 걸렸다). 지금은 두 명령이 같은 목록을 본다.
 
@@ -233,7 +233,7 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 - **자동 병합·자동 커밋.** 인게임 확인 없이 올린 것은 확인된 게 아니다. 도구는 로컬에서 사람이 부를 때만 옮긴다
 - **커밋 단위 추종.** 태그 단위다(§4)
 - **기계 번역으로 이력 채우기.** 용어를 지어내는 것보다 `(미번역)`이 낫다
-- **업스트림 fork에 이력을 쌓지 않는다.** 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 표시해 두고, PR 시점에 fork 브랜치로 조립한다([commit-rules.md](../dev/commit-rules.md) §5). 비공개 미러는 fork가 아니다 — fork 네트워크 밖이고, PR 재료를 담지 않는다([vendor-submodule.md](vendor.md) §5)
+- **업스트림 fork에 이력을 쌓지 않는다.** 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 표시해 두고, PR 시점에 fork 브랜치로 조립한다([commit-rules.md](../dev/commit-rules.md) §5). 비공개 미러는 fork가 아니다 — fork 네트워크 밖이고, PR 재료를 담지 않는다([vendor.md](vendor.md) §5)
 
 ## 12. 건강 지표
 

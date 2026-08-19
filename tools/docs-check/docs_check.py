@@ -244,6 +244,12 @@ def check_citations(repo: Path = REPO) -> list[str]:
 _ROW = re.compile(r"^\|\s*(W-\d+)\s*\|(.+?)\|\s*(P\d)\s*\|\s*(\S+)\s*\|")
 _OPEN = ("대기", "진행")
 
+#: §2 표가 쓸 수 있는 상태값 전부. **동의어를 열어 두면 규약이 조용히
+#: 우회된다** - `완료`는 §9로 옮기라고 아래에서 막는데, `끝`이라고 적으면
+#: 그 검사도 `_OPEN` 검사도 안 걸리고 표에 남는다. 값을 늘릴 때는 §8의
+#: 규약을 먼저 고친다.
+BOARD_STATES = ("대기", "진행", "막힘", "버림", "완료")
+
 
 def board_rows(text: str) -> list[tuple[str, str, str]]:
     """§2 표. (ID, 우선순위, 상태)."""
@@ -270,6 +276,17 @@ def check_board(path: Path = BOARD) -> list[str]:
     if len(ids) != len(set(ids)):
         dup = sorted({i for i in ids if ids.count(i) > 1})
         bad.append(f"§2에 같은 ID가 두 번 있다: {', '.join(dup)}")
+
+    # 아래 `완료` 검사가 §9로 옮기라고 막는데, 같은 뜻을 다른 낱말로 적으면
+    # 그 검사도 `_OPEN` 검사도 안 걸린다. 값 자체를 막는다.
+    unknown = [(i, s) for i, _, s in rows if s not in BOARD_STATES]
+    if unknown:
+        bad.append(
+            "§2에 모르는 상태값이 있다: "
+            + ", ".join(f"{i}({s})" for i, s in unknown)
+            + f". 쓸 수 있는 것은 {', '.join(BOARD_STATES)}뿐이다 - "
+            f"동의어를 쓰면 규약이 조용히 우회된다"
+        )
 
     done_in_table = [i for i, _, state in rows if state == "완료"]
     if done_in_table:
@@ -357,11 +374,106 @@ def check_keys() -> list[str]:
     return bad
 
 
+# ------------------------------------------------------------- 문서 위생
+
+#: 마크다운에 있으면 안 되는 제어 문자. 탭(`0x09`)·줄바꿈(`0x0A`)·복귀(`0x0D`)는
+#: 뺀다. 나머지는 **화면에 아무것도 안 그리면서** diff·검색·스크린리더를
+#: 어긋나게 한다 - 눈으로 봐서는 절대 못 찾는 부류다.
+_CONTROL = re.compile(r"[\x00-\x08\x0B\x0C]")
+
+#: 마크다운 링크. 앵커(`#...`)는 대상에서 뗀다.
+_MD_LINK = re.compile(r"\[([^\]]+)\]\(([^)#]+?)(?:#[^)]*)?\)")
+
+#: 산출물이 움직였는데 문서에 남은 옛 값. `(사실 이름, 옛값)`.
+#:
+#: `CITATIONS`는 **등록한 자리 하나**만 본다. 같은 숫자가 산문 여기저기에
+#: 흩어져 있으면 거기까지는 안 간다 - `688`이 실제로 그렇게 세 자리에 남아
+#: 지금 값 691과 갈렸다. 값이 움직이면 여기 옛 값을 적는다.
+RETIRED_VALUES = (("골든 쌍", "688"),)
+
+#: 폐기값을 안 보는 자리. 날짜가 박힌 기록과 동결 문서는 **그때 그대로가
+#: 맞다**(`CLAUDE.md`의 현황판 규약). `docs/status.md`는 §9(끝난 것)만 뺀다.
+RETIRED_SKIP = ("docs/frozen/", "docs/upstream/changes.md")
+
+
+def living_docs(repo: Path = REPO) -> list[Path]:
+    """살아 있는 문서. `docs/` 아래 마크다운 전부."""
+    return sorted((repo / "docs").rglob("*.md"))
+
+
+def check_control_chars(repo: Path = REPO) -> list[str]:
+    """제어 문자가 섞였나. 눈으로는 못 찾고 검색·비교만 조용히 어긋난다."""
+    bad = []
+    for path in living_docs(repo):
+        text = path.read_text(encoding="utf-8")
+        for match in _CONTROL.finditer(text):
+            line = text.count("\n", 0, match.start()) + 1
+            bad.append(
+                f"{path.relative_to(repo).as_posix()}:{line}: "
+                f"제어 문자 {hex(ord(match.group(0)))}가 있다. 화면에 안 보이면서 "
+                f"검색과 비교를 어긋나게 한다"
+            )
+    return bad
+
+
+def check_link_names(repo: Path = REPO) -> list[str]:
+    """링크 글자가 파일 이름인데 실제 대상과 다른 자리.
+
+    문서를 옮기면 대상 경로는 고치는데 **글자는 안 고친다.** 그러면 링크는
+    멀쩡히 열리면서 본문은 없는 파일 이름을 부르고, 그 이름으로 검색하는
+    사람은 아무것도 못 찾는다.
+    """
+    bad = []
+    for path in living_docs(repo):
+        rel = path.relative_to(repo).as_posix()
+        for text, target in _MD_LINK.findall(path.read_text(encoding="utf-8")):
+            label = text.strip()
+            if not label.endswith(".md") or target.startswith(("http", "mailto")):
+                continue
+            if Path(label).name != Path(target).name:
+                bad.append(
+                    f"{rel}: 링크 글자가 `{label}`인데 가리키는 것은 `{target}`이다. "
+                    f"글자를 대상 이름으로 고쳐라"
+                )
+    return bad
+
+
+def check_retired(repo: Path = REPO) -> list[str]:
+    """폐기된 값이 살아 있는 문서에 남아 있나."""
+    bad = []
+    for name, old in RETIRED_VALUES:
+        # 앞뒤에 숫자나 쉼표가 붙은 것은 다른 수다(`46,688색`).
+        pattern = re.compile(rf"(?<![\d,]){re.escape(old)}(?![\d])")
+        for path in living_docs(repo):
+            rel = path.relative_to(repo).as_posix()
+            if any(rel.startswith(skip) for skip in RETIRED_SKIP):
+                continue
+
+            text = path.read_text(encoding="utf-8")
+            if rel == "docs/status.md":
+                text = text.split("## 9. 끝난 것", 1)[0]  # 이력은 그때 그대로다
+
+            for match in pattern.finditer(text):
+                line = text.count("\n", 0, match.start()) + 1
+                bad.append(
+                    f"{rel}:{line}: 폐기된 값 `{old}`이 남아 있다(`{name}`). "
+                    f"지금 값으로 고쳐라"
+                )
+    return bad
+
+
 # ------------------------------------------------------------------- 실행
 
 
 def main(argv: list[str]) -> int:
-    bad = check_citations() + check_board() + check_keys()
+    bad = (
+        check_citations()
+        + check_board()
+        + check_keys()
+        + check_control_chars()
+        + check_link_names()
+        + check_retired()
+    )
     if bad:
         print("문서가 실제와 어긋난다:", file=sys.stderr)
         for item in bad:

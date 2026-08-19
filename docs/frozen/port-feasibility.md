@@ -693,7 +693,7 @@ ff14-ko-accessibility/            (이 저장소, AGPL-3.0)
 
 ### 업데이트 추종 전략
 
-**여기서 결론만 냈고, 실제 규칙과 절차는 [upstream-sync.md](../upstream/sync.md)가 소유한다.** 이 조사가 세운 방침 셋은 그대로 살아 있다.
+**여기서 결론만 냈고, 실제 규칙과 절차는 [sync.md](../upstream/sync.md)가 소유한다.** 이 조사가 세운 방침 셋은 그대로 살아 있다.
 
 - vendor는 **업스트림 태그 단위로만** 이동 → `docs/upstream/sync.md` §4
 - 이동할 때마다 회귀 검사 → §5.2, §7

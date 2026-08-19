@@ -11,7 +11,7 @@
 정말 걸리나**(합성 문서로 실증). 둘째가 없으면 검사가 죽었는지 알 수 없다.
 """
 
-import re
+from pathlib import Path
 
 import docs_check
 import pytest
@@ -30,19 +30,10 @@ def test_현황판_절끼리_안_어긋난다():
     assert bad == [], "\n".join(bad)
 
 
-def test_인용_자리가_하나도_안_비어_있다():
-    # 문장을 고쳐 쓰다 인용 자리가 사라지면 검사가 조용히 죽는다. 그게 제일
-    # 나쁜 실패라 여기서 따로 못박는다.
-    for rel, name, pattern in docs_check.CITATIONS:
-        text = (docs_check.REPO / rel).read_text(encoding="utf-8")
-        assert len(re.findall(pattern, text)) == 1, f"{rel}: `{name}` 인용 자리"
-
-
 def test_손_케이스_숫자_셋의_관계():
+    # 41 = 40 + 1(`Pick` 헬퍼 선언)은 `check_citations`가 이미 본다. 여기는
+    # 도구에 없는 관계만 남긴다 - 40(볼 자리) = 35(옮긴 자리) + 5(W-12 몫).
     got = docs_check.facts()
-    # 41(파서가 못 읽음) = 40(진짜 손으로 볼 자리) + 1(`Pick` 헬퍼 선언)
-    assert got["손으로 볼 자리"] == got["골든 미해석"] - 1
-    # 40(볼 자리) = 35(옮긴 자리) + 5(데이터 표 참조 = W-12)
     assert got["손으로 옮긴 자리"] == got["손으로 볼 자리"] - 5
 
 
@@ -206,3 +197,98 @@ def test_vendor가_없으면_문서끼리만_본다(monkeypatch):
     # 한다 - 소스를 못 봐도 문서끼리 갈라진 것은 잡을 수 있다.
     monkeypatch.setattr(docs_check, "source_keys", lambda: None)
     assert docs_check.check_keys() == []
+
+
+# --- 상태값 화이트리스트 ----------------------------------------------------
+
+
+def test_모르는_상태값을_잡는다(tmp_path):
+    # `완료`는 §9로 옮기라고 막는데, 같은 뜻을 `끝`이라고 적으면 그 검사도
+    # 열림 검사도 안 걸리고 표에 남는다. 값 자체를 막아야 우회가 안 된다.
+    text = board(["| W-01 | 하나 | P1 | 끝 | |", "| W-02 | 둘 | P2 | 막힘 | |"])
+    bad = docs_check.check_board(write(tmp_path, text))
+    assert any("모르는 상태값" in item and "W-01" in item for item in bad), bad
+
+
+def test_아는_상태값은_통과한다(tmp_path):
+    rows = [f"| W-0{n} | 것 | P{n} | {state} | |"
+            for n, state in enumerate(("대기", "진행", "막힘", "버림"), start=1)]
+    text = board(rows, next_="**W-01**", blocked="`W-03`", done="- 없음")
+    assert [b for b in docs_check.check_board(write(tmp_path, text))
+            if "모르는 상태값" in b] == []
+
+
+# --- 문서 위생 --------------------------------------------------------------
+
+
+def _docs(tmp_path, name, body):
+    root = tmp_path / "docs"
+    (root / Path(name).parent).mkdir(parents=True, exist_ok=True)
+    (root / name).write_text(body, encoding="utf-8")
+    return tmp_path
+
+
+def test_제어_문자를_잡는다(tmp_path):
+    # 화면에 아무것도 안 그리면서 검색과 비교만 어긋나게 한다.
+    bad = docs_check.check_control_chars(_docs(tmp_path, "a.md", "앞\x0c뒤\n"))
+    assert any("제어 문자" in item and "a.md:1" in item for item in bad), bad
+
+
+def test_탭과_줄바꿈은_제어_문자가_아니다(tmp_path):
+    assert docs_check.check_control_chars(_docs(tmp_path, "a.md", "앞\t뒤\r\n")) == []
+
+
+def test_링크_글자가_대상과_다르면_잡는다(tmp_path):
+    # 문서를 옮기면 경로는 고치는데 글자는 안 고친다. 링크는 열리고 본문만
+    # 없는 이름을 부른다.
+    root = _docs(tmp_path, "a.md", "[옛이름.md](sub/새이름.md)를 본다\n")
+    bad = docs_check.check_link_names(root)
+    assert any("옛이름.md" in item for item in bad), bad
+
+
+def test_이름이_같으면_경로가_달라도_통과한다(tmp_path):
+    root = _docs(tmp_path, "a.md", "[status.md](../docs/status.md)\n")
+    assert docs_check.check_link_names(root) == []
+
+
+def test_앵커가_붙어도_이름으로_본다(tmp_path):
+    root = _docs(tmp_path, "a.md", "[sync.md](upstream/sync.md#3-절)\n")
+    assert docs_check.check_link_names(root) == []
+
+
+def test_파일_이름이_아닌_링크_글자는_안_본다(tmp_path):
+    root = _docs(tmp_path, "a.md", "[동기화 절차](upstream/sync.md)\n")
+    assert docs_check.check_link_names(root) == []
+
+
+def test_바깥_주소는_안_본다(tmp_path):
+    root = _docs(tmp_path, "a.md", "[README.md](https://example.invalid/x.md)\n")
+    assert docs_check.check_link_names(root) == []
+
+
+def test_폐기값이_남아_있으면_잡는다(tmp_path, monkeypatch):
+    monkeypatch.setattr(docs_check, "RETIRED_VALUES", (("골든 쌍", "688"),))
+    bad = docs_check.check_retired(_docs(tmp_path, "a.md", "골든 688쌍을 대조한다\n"))
+    assert any("688" in item for item in bad), bad
+
+
+def test_다른_수에_섞인_폐기값은_안_잡는다(tmp_path, monkeypatch):
+    # `46,688색`의 688은 다른 수다. 앞뒤에 숫자나 쉼표가 붙으면 건너뛴다.
+    monkeypatch.setattr(docs_check, "RETIRED_VALUES", (("골든 쌍", "688"),))
+    assert docs_check.check_retired(_docs(tmp_path, "a.md", "팔레트 46,688색\n")) == []
+    assert docs_check.check_retired(_docs(tmp_path, "a.md", "6885개\n")) == []
+
+
+def test_동결_문서의_폐기값은_그때_그대로다(tmp_path, monkeypatch):
+    # 날짜가 박힌 기록과 동결 문서는 지금 값으로 맞추면 기록이 아니게 된다.
+    monkeypatch.setattr(docs_check, "RETIRED_VALUES", (("골든 쌍", "688"),))
+    root = _docs(tmp_path, "frozen/old.md", "그때는 688쌍이었다\n")
+    assert docs_check.check_retired(root) == []
+
+
+# --- 지금 저장소 ------------------------------------------------------------
+
+
+def test_지금_문서에_제어_문자가_없다():
+    bad = docs_check.check_control_chars()
+    assert bad == [], "\n".join(bad)

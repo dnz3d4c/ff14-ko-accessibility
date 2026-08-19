@@ -206,20 +206,30 @@ def test_캐릭터_생성_묘사는_범위_밖이다():
     }
 
 
-@pytest.mark.skipif(not SOURCE_ROOT.is_dir(), reason="vendor 클론이 없다")
-def test_새_자리가_말없이_들어오지_않는다():
+@pytest.fixture(scope="module")
+def 실물():
+    """소스 전체를 훑은 결과. **한 번만 훑는다.**
+
+    아래 둘이 각각 `scan()`을 부르면 같은 일을 두 번 하고 그것만으로 18초가
+    더 든다(`run\\check.bat` 전체의 17%였다). 검사는 그대로 두고 준비 과정만
+    나눠 쓴다.
+    """
+    if not SOURCE_ROOT.is_dir():
+        pytest.skip("vendor 클론이 없다")
+    return ko_speech.scan()
+
+
+def test_새_자리가_말없이_들어오지_않는다(실물):
     # 빨개지면 둘 중 하나다. 발화에 외국어가 새기 시작했거나(고친다), 통과시킬
     # 자리가 새로 생겼거나(--write로 갱신하고 `why`를 적는다).
-    added, dropped = ko_speech.compare(ko_speech.scan(), ko_speech.load_golden())
+    added, dropped = ko_speech.compare(실물, ko_speech.load_golden())
     assert not added, f"발화 경로에 외국어 리터럴이 새로 들어왔다: {added}"
     assert not dropped, f"골든에만 남은 자리가 있다 - --write로 갱신해라: {dropped}"
 
 
-@pytest.mark.skipif(not SOURCE_ROOT.is_dir(), reason="vendor 클론이 없다")
-def test_실물에서_형제_대조가_돈다():
+def test_실물에서_형제_대조가_돈다(실물):
     # 규칙이 배선만 되고 실물에서 0건이면 살아 있는지 알 수 없다. 실제로
     # `PlacesService.cs`의 `type = "Übergang"`이 잡혀야 한다.
-    found = ko_speech.scan()
     assert any(
-        f.text == "Übergang" and f.file.endswith("PlacesService.cs") for f in found
+        f.text == "Übergang" and f.file.endswith("PlacesService.cs") for f in 실물
     ), "PlacesService의 맨 리터럴을 못 잡았다 - 검사가 실물에서 안 돈다"

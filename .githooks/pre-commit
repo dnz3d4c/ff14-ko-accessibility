@@ -7,11 +7,12 @@
 #
 # 검사하는 것 둘.
 #
-# 1) vendor의 kr-port 커밋 수와 패치 파일 수가 같은가.
+# 1) 저장소가 기록한 vendor 자리(gitlink)가 실물과 맞는가.
 #
-# vendor/는 버전 관리 밖이다. 거기 커밋해 놓고 떼어내지 않으면 **우리 저장소에는
-# 아무 증상도 안 나타난다** - 다음에 클론한 사람이 빌드했을 때 조용히 다른
-# 물건이 나온다. 그걸 여기서 막는다.
+# 소스 변경의 원본은 vendor의 kr-port 브랜치 하나다. 거기 커밋해 놓고
+# `git add vendor/ff14-accessibility`를 안 하면 우리 커밋에는 옛 자리가 남고,
+# 다음에 클론한 사람이 조용히 옛 물건을 받는다. 핀(upstream.json)이 그 이력의
+# 조상인지도 같이 본다. 전부 git 조회라 순간에 끝난다.
 #
 # 2) 문서가 인용한 숫자와 현황판의 절끼리 정합.
 #
@@ -22,8 +23,8 @@
 #   - 배치 인코딩 -> git이 이미 막는다. .gitattributes의 working-tree-encoding=CP949가
 #     CP949로 못 읽는 파일을 `git add`에서 거부한다("fatal: failed to encode").
 #     UTF-8 저장도 BOM도 거기서 걸리는 걸 확인했다(2026-08-18)
-#   - 패치가 실제로 붙는지 -> 임시 워크트리에 git am을 돌리므로 몇 초 걸린다.
-#     `run\check.bat`이 한다
+#   - kr-port가 새 업스트림 태그에 얹히는지 -> 태그를 올리는 날의 일이다.
+#     tools/upstream-sync가 임시 워크트리에 rebase를 돌려 본다
 #
 # --no-project: 상위 디렉토리의 pyproject.toml을 상속하지 않게 한다.
 

@@ -1,118 +1,106 @@
-"""패치 묶음이 아직 성립하는지 검사한다.
+"""저장소가 기록한 vendor 자리(gitlink)가 성립하는지 검사한다.
 
 이 저장소의 소스 변경은 전부 `vendor/` 클론의 `kr-port` 브랜치에 있고, 우리
-저장소에는 **패치 파일로만** 남는다. `vendor/`는 버전 관리 밖이라, 둘이
-어긋나면 우리 저장소에는 아무 증상도 안 나타난다 - 다음에 클론하는 사람이
-빌드했을 때 조용히 다른 물건이 나온다.
+저장소는 그 팁을 gitlink(서브모듈 항목)으로 기록한다. **원본은 `kr-port`
+하나다** - 전에는 패치 파일이 두 번째 원본이라 이 도구가 "패치와 `kr-port`가
+어긋났는가"를 붙여 보며 검사했지만, 원본이 하나가 된 지금 그 사고는 존재하지
+않는다. 대신 **기록이 실물을 가리키는가**를 본다.
 
 세 가지를 본다.
 
-1. **개수** - `kr-port`의 커밋 수와 패치 파일 수가 같은가. 다르면 vendor에
-   커밋해 놓고 떼어내지 않은 것이다
-2. **적용** - 문서에 적힌 순서(`patches/` 먼저, `overlay/patches/` 나중)로
-   핀이 가리키는 커밋에 깨끗이 붙는가. 업스트림 태그를 올릴 때 여기가 먼저 깨진다
-3. **동등** - 붙인 결과가 `kr-port`와 같은 트리인가. 패치를 뽑은 뒤 vendor에서
-   더 손댔으면 여기서 잡힌다
+1. **기록** - 저장소의 gitlink이 vendor의 `kr-port` 팁과 같은가. vendor에
+   커밋해 놓고 `git add vendor/ff14-accessibility`를 안 하면 여기서 잡힌다 -
+   안 잡으면 다음에 클론하는 사람이 조용히 옛 물건을 받는다
+2. **핀** - 핀(`upstream.json`)이 가리키는 업스트림 커밋이 기록된 이력의
+   조상인가. 핀만 옮기고 kr-port를 다시 얹지 않았거나 핀을 손으로 고치면
+   잡힌다 - 핀은 tools/upstream-sync가 옮긴다
+3. **작업 트리** - vendor에 커밋되지 않은 변경이 있는가. 작업 중일 수
+   있으므로 경고만 한다
 
-**붙는 자리는 `main`이 아니라 핀(`upstream.json`)이다.** `main`은 클론한
-날짜에 따라 다른 커밋을 가리킨다 - 업스트림이 거의 매일 릴리스를 내므로,
-어제 클론한 사람과 오늘 클론한 사람의 `main`이 다르고 그러면 이 검사가
-서로 다른 것을 검사하게 된다. 그걸 조용히 지나가지 않으려고 핀에 못박는다.
-핀을 옮기는 것은 `tools/upstream-sync`다.
+gitlink은 **스테이징(index)을 먼저** 읽고 없으면 HEAD로 물러선다. `git add`를
+막 마친 커밋 직전 상태에서 HEAD를 먼저 보면, 방금 옮긴 기록을 어긋났다고 잡는다.
 
-**`git am -3`으로 붙인다.** 업스트림은 8일에 릴리스를 7개 내면서 우리가 고치는
-줄 바로 옆에 새 문장을 끼워 넣는다 - 그러면 패치에 딸린 문맥 세 줄이 안 맞는다.
-3-way 없이 붙이면 그 hunk 하나 때문에 시리즈 전체가 죽고, 어디까지 멀쩡했는지도
-안 남는다. 패치의 `index` 줄이 가리키는 원본 blob이 저장소에 있으므로 3-way면
-합쳐진다. **같은 줄을 양쪽이 다르게 고친 진짜 충돌은 3-way도 못 합치고 그대로
-실패한다** - 통과 범위가 넓어지는 게 아니라, 안 겹치는 변경을 충돌로 안 세게 된다.
-
-3번(동등) 검사가 이걸 받친다. 3-way가 합쳐 낸 결과가 `kr-port`와 다르면 거기서
-잡힌다.
-
-`vendor/` 클론이 없으면 검사를 건너뛴다(오류가 아니다). 있는데 깨졌으면 막는다.
+vendor가 아직 안 받아졌으면(빈 디렉토리) 검사를 건너뛴다(오류가 아니다).
+받다 말았으면 막는다. 서브모듈로 받으면 `.git`이 디렉토리가 아니라 **파일**이라,
+`.git`의 존재만 봐서는 두 상태를 못 가른다.
 
 사용법:
     uv run --no-project python tools/patch-check/patch_check.py [--quick]
 
-`--quick`은 1번만 본다. 2·3번은 임시 워크트리에 `git am`을 돌리므로 몇 초 걸린다.
+`--quick`은 이제 전체와 같다 - 전부 순간에 끝나는 git 조회다. 부르는 자리
+(`.githooks/pre-commit`, `run\\check.bat`)를 안 바꾸려고 받기만 한다.
 """
 
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 VENDOR = REPO / "vendor" / "ff14-accessibility"
 
-#: 적용 순서. `patches/`가 먼저다 - 근거는 patches/README.md.
-#: 업스트림에 병합되면 앞쪽이 사라지고 뒤쪽은 그대로 붙어야 한다.
-PATCH_DIRS = ("patches", "overlay/patches")
-
-#: 우리 패치가 어느 판 위에 얹혀 있는지. tools/upstream-sync가 옮긴다.
-PIN = REPO / "upstream.json"
+#: 저장소가 vendor를 기록하는 자리. `git add`가 옮기는 그 경로다.
+GITLINK = "vendor/ff14-accessibility"
 
 WORK_BRANCH = "kr-port"
 
-
-def ordered_patches(repo: Path = REPO) -> list[Path]:
-    """적용 순서대로 정렬한 패치 파일 목록.
-
-    디렉토리 사이는 `PATCH_DIRS` 순서, 디렉토리 안에서는 이름순이다
-    (`git format-patch`가 번호를 앞에 붙이므로 이름순이 곧 번호순).
-    """
-    found: list[Path] = []
-    for name in PATCH_DIRS:
-        directory = repo / name
-        if directory.is_dir():
-            found.extend(sorted(directory.glob("*.patch")))
-    return found
+#: 기록이나 핀이 가리키는 커밋이 vendor에 없을 때의 안내. 원격 이름이 클론
+#: 방법에 따라 다르므로(전체 클론은 mirror, 서브모듈은 origin) 전부 받는다.
+_FETCH = "cd vendor/ff14-accessibility && git fetch --all --tags"
 
 
 def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        # 훅을 끈다. 우리 저장소의 core.hooksPath가 새 나가면 am이 죽는다.
-        ["git", "-c", "core.hooksPath=", *args],
+        ["git", *args],
         cwd=cwd,
         capture_output=True,
         text=True,
         encoding="utf-8",
         errors="replace",
+        timeout=30,
     )
 
 
-def base_commit(repo: Path = REPO) -> str:
-    """패치가 붙는 자리.
+def vendor_state(vendor: Path = VENDOR) -> str:
+    """vendor가 어떤 상태인지: "ok" | "absent" | "broken".
 
-    핀이 없으면 `main`으로 물러선다 - 핀을 도입하기 전에 만든 클론에서도
-    검사가 죽지 않게 한다. 다만 그때는 클론 시점에 따라 자리가 달라진다.
+    absent(안 받아짐)는 건너뛸 일이고 broken(받다 맒)은 막을 일이라 갈라야
+    한다. 서브모듈로 받으면 `.git`이 파일이고 전체 클론이면 디렉토리다 -
+    형태가 아니라 **git이 실제로 응답하는지**로 본다.
+    """
+    if not vendor.is_dir():
+        return "absent"
+    entries = [path.name for path in vendor.iterdir()]
+    if not entries:
+        return "absent"
+    if not (vendor / ".git").exists() or entries == [".git"]:
+        return "broken"
+    if _git("rev-parse", "--git-dir", cwd=vendor).returncode != 0:
+        # `.git` 파일이 가리키는 곳이 사라진 경우. 존재 검사는 통과한다.
+        return "broken"
+    return "ok"
+
+
+def gitlink_commit(repo: Path = REPO) -> str | None:
+    """저장소가 기록한 vendor 자리. 스테이징 먼저, 없으면 HEAD, 그마저 없으면 None."""
+    for ref in (f":{GITLINK}", f"HEAD:{GITLINK}"):
+        result = _git("rev-parse", ref, cwd=repo)
+        if result.returncode == 0:
+            return result.stdout.strip()
+    return None
+
+
+def base_commit(repo: Path = REPO) -> str | None:
+    """핀(`upstream.json`)이 가리키는 업스트림 커밋. 핀이 없으면 None.
+
+    우리 커밋이 어느 업스트림 판 위에 얹혀 있는지다. tools/upstream-sync가 옮긴다.
     """
     pin = repo / "upstream.json"
     if not pin.is_file():
-        return "main"
-    return json.loads(pin.read_text(encoding="utf-8"))["commit"]
-
-
-def vendor_present(vendor: Path = VENDOR) -> bool:
-    return (vendor / ".git").exists()
-
-
-def vendor_commit_count(vendor: Path = VENDOR, base: str | None = None) -> int:
-    """핀에서 `kr-port`까지의 커밋 수."""
-    base = base or base_commit()
-    result = _git("rev-list", "--count", f"{base}..{WORK_BRANCH}", cwd=vendor)
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"핀({base[:7]})에서 kr-port까지를 셀 수 없다: {result.stderr.strip()}\n"
-            "  핀이 가리키는 커밋이 vendor에 없으면 받아온다: "
-            "cd vendor/ff14-accessibility && git fetch --tags origin"
-        )
-    return int(result.stdout.strip())
+        return None
+    return str(json.loads(pin.read_text(encoding="utf-8"))["commit"])
 
 
 def vendor_dirty(vendor: Path = VENDOR) -> list[str]:
@@ -121,104 +109,113 @@ def vendor_dirty(vendor: Path = VENDOR) -> list[str]:
     return [line for line in result.stdout.splitlines() if line.strip()]
 
 
-def check_counts(patches: list[Path], commits: int) -> list[str]:
-    """개수 검사. 문제 목록을 돌려준다 - 비면 통과."""
-    if len(patches) == commits:
+def _exists(sha: str, vendor: Path) -> bool:
+    return _git("cat-file", "-e", f"{sha}^{{commit}}", cwd=vendor).returncode == 0
+
+
+def _count(base: str, tip: str, vendor: Path) -> int:
+    result = _git("rev-list", "--count", f"{base}..{tip}", cwd=vendor)
+    return int(result.stdout.strip() or 0)
+
+
+def check_recorded(recorded: str | None, vendor: Path = VENDOR) -> list[str]:
+    """기록 검사. 문제 목록을 돌려준다 - 비면 통과."""
+    if recorded is None:
+        return [
+            "저장소에 vendor 기록(gitlink)이 없다. "
+            "`git add vendor/ff14-accessibility`로 기록하고 같이 커밋한다"
+        ]
+    if not _exists(recorded, vendor):
+        return [f"기록된 자리({recorded[:7]})가 vendor에 없다. 받아온다: {_FETCH}"]
+    tip = _git("rev-parse", WORK_BRANCH, cwd=vendor)
+    if tip.returncode != 0:
+        return [f"vendor에 {WORK_BRANCH} 브랜치가 없다: {tip.stderr.strip()}"]
+    tip_sha = tip.stdout.strip()
+    if recorded == tip_sha:
         return []
+    ahead = _count(recorded, tip_sha, vendor)
+    behind = _count(tip_sha, recorded, vendor)
+    if ahead and not behind:
+        return [
+            f"vendor의 {WORK_BRANCH}가 기록된 자리보다 {ahead}커밋 앞서 있다. "
+            "`git add vendor/ff14-accessibility`로 기록을 옮겨 같이 커밋한다"
+        ]
+    if behind and not ahead:
+        return [
+            f"기록된 자리가 {WORK_BRANCH}보다 {behind}커밋 앞서 있다. "
+            f"{WORK_BRANCH}를 되감았으면 기록도 옮긴다: "
+            "`git add vendor/ff14-accessibility`"
+        ]
     return [
-        f"vendor의 kr-port 커밋은 {commits}건인데 패치 파일은 {len(patches)}개다. "
-        "vendor에 커밋하고 떼어내지 않았으면 "
-        "`git format-patch`로 뽑아 patches/ 또는 overlay/patches/에 넣어라"
+        f"{WORK_BRANCH}와 기록된 자리가 갈라졌다"
+        f"(공통 조상 뒤로 {WORK_BRANCH} {ahead}커밋, 기록 {behind}커밋). "
+        f"{WORK_BRANCH}를 다시 얹었으면(rebase) 기록을 옮긴다: "
+        "`git add vendor/ff14-accessibility`"
     ]
 
 
-def check_applies_and_matches(
-    patches: list[Path], vendor: Path = VENDOR, base: str | None = None
+def check_pin_ancestry(
+    pin_commit: str | None, recorded: str | None, vendor: Path = VENDOR
 ) -> list[str]:
-    """임시 워크트리에서 실제로 붙여 보고 결과 트리를 비교한다."""
-    if not patches:
+    """핀 검사. 핀이 기록된 이력의 조상인가."""
+    if pin_commit is None:
+        return ["upstream.json이 없다 - 어느 판 위에 있는지 아무 데도 안 적혀 있다"]
+    if recorded is None:
+        return []  # 기록 검사가 이미 잡았다. 같은 문제를 두 번 말하지 않는다.
+    if not _exists(pin_commit, vendor):
+        return [
+            f"핀({pin_commit[:7]})이 가리키는 커밋이 vendor에 없다. 받아온다: {_FETCH}"
+        ]
+    result = _git("merge-base", "--is-ancestor", pin_commit, recorded, cwd=vendor)
+    if result.returncode == 0:
         return []
-
-    base = base or base_commit()
-    problems: list[str] = []
-    workdir = Path(tempfile.mkdtemp(prefix="patch-check-"))
-    tree = workdir / "tree"
-    try:
-        added = _git("worktree", "add", "--detach", str(tree), base, cwd=vendor)
-        if added.returncode != 0:
-            return [f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"]
-
-        applied = _git("am", "-3", *(str(p) for p in patches), cwd=tree)
-        if applied.returncode != 0:
-            # 붙이다 만 상태를 남기지 않는다 - 워크트리를 지우기 전에 중단한다.
-            _git("am", "--abort", cwd=tree)
-            failing = _first_failing(applied.stdout)
-            problems.append(
-                f"패치가 핀({base[:7]})에 붙지 않는다"
-                + (f" (처음 실패: {failing})" if failing else "")
-                + ". 업스트림이 움직였으면 여기가 먼저 깨진다 - "
-                "patches/README.md의 순서대로 손으로 붙여 충돌을 본다"
-            )
-            return problems
-
-        got = _git("rev-parse", "HEAD^{tree}", cwd=tree).stdout.strip()
-        want = _git("rev-parse", f"{WORK_BRANCH}^{{tree}}", cwd=vendor).stdout.strip()
-        if got != want:
-            problems.append(
-                "패치를 다 붙인 결과가 kr-port와 다르다. "
-                "패치를 뽑은 뒤 vendor에서 더 손댔을 가능성이 높다 - "
-                "그 변경을 커밋하고 패치를 다시 뽑아라"
-            )
-    finally:
-        _git("worktree", "remove", "--force", str(tree), cwd=vendor)
-        shutil.rmtree(workdir, ignore_errors=True)
-
-    return problems
-
-
-def _first_failing(am_output: str) -> str | None:
-    """`git am` 출력에서 마지막으로 시도한 패치 제목을 뽑는다."""
-    tried = [
-        line[len("Applying: ") :].strip()
-        for line in am_output.splitlines()
-        if line.startswith("Applying: ")
-    ]
-    return tried[-1] if tried else None
+    if result.returncode == 1:
+        return [
+            f"핀({pin_commit[:7]})이 기록된 {WORK_BRANCH} 이력에 없다. "
+            "핀만 옮기고 kr-port를 다시 얹지 않았거나 핀을 손으로 고친 것이다 - "
+            "핀은 run\\sync.bat이 옮긴다"
+        ]
+    return [f"핀 조상 검사가 실패했다: {result.stderr.strip()}"]
 
 
 def main(argv: list[str]) -> int:
-    quick = "--quick" in argv
+    del argv  # --quick도 전체와 같다. 옛 인터페이스라 받기만 한다.
 
-    if not vendor_present():
-        print("vendor 클론이 없다 - 패치 검사를 건너뛴다.")
+    state = vendor_state()
+    if state == "absent":
+        print("vendor가 아직 안 받아졌다 - 기록 검사를 건너뛴다.")
+        print("  받기: git submodule update --init")
         return 0
+    if state == "broken":
+        print(
+            "vendor가 받다 말았거나 깨졌다 - 검사도 빌드도 성립하지 않는다.",
+            file=sys.stderr,
+        )
+        print("  다시 받기: git submodule update --init --force", file=sys.stderr)
+        return 1
 
-    base = base_commit()
-    print(f"붙는 자리: {base[:7]} (upstream.json)")
-    patches = ordered_patches()
-    print(f"패치 {len(patches)}개:")
-    for path in patches:
-        print(f"  {path.relative_to(REPO).as_posix()}")
+    recorded = gitlink_commit()
+    print(f"기록된 자리: {recorded[:7] if recorded else '없음'} (gitlink)")
+    pin = base_commit()
+    print(f"핀: {pin[:7] if pin else '없음'} (upstream.json)")
 
-    problems = check_counts(patches, vendor_commit_count())
+    problems = check_recorded(recorded)
+    problems += check_pin_ancestry(pin, recorded)
 
     dirty = vendor_dirty()
     if dirty:
         print(f"\n주의: vendor에 커밋되지 않은 변경 {len(dirty)}건이 있다.")
-        print("우리 저장소에서는 안 보이는 작업이다. 커밋하고 패치를 뽑아라.")
+        print("우리 저장소에서는 안 보이는 작업이다. kr-port에 커밋하고 기록을 옮긴다.")
         for line in dirty[:10]:
             print(f"  {line}")
 
-    if not quick:
-        problems += check_applies_and_matches(patches)
-
     if problems:
-        print("\n패치 묶음이 깨졌다:", file=sys.stderr)
+        print("\nvendor 기록이 어긋났다:", file=sys.stderr)
         for problem in problems:
             print(f"  - {problem}", file=sys.stderr)
         return 1
 
-    print("\n통과" + (" (개수만 봤다)" if quick else " - 순서대로 붙고 kr-port와 같다"))
+    print("\n통과 - 기록이 kr-port 팁이고 핀이 그 이력의 조상이다")
     return 0
 
 

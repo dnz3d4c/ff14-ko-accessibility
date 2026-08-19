@@ -1,24 +1,25 @@
 """업스트림을 따라잡는 도구.
 
 업스트림(`derbruedi/ff14-accessibility`)은 **주 30커밋에 거의 매일 릴리스**다.
-우리 패치는 그 위에 얹혀 있고, 우리가 안 보는 동안에도 밑바닥이 움직인다.
-그걸 손으로 쫓으면 따라잡는 일이 본업이 된다.
+우리 커밋(`vendor/`의 `kr-port` 브랜치)은 그 위에 얹혀 있고, 우리가 안 보는
+동안에도 밑바닥이 움직인다. 그걸 손으로 쫓으면 따라잡는 일이 본업이 된다.
 
 이 도구가 하는 일은 셋이다.
 
-1. **얼마나 벌어졌는지 잰다** (`--check`) - 새 태그, 바뀐 파일이 우리 패치와
-   겹치는지, 우리 패치가 새 태그에 아직 붙는지, 안내 문장이 몇 개 늘었는지
+1. **얼마나 벌어졌는지 잰다** (`--check`) - 새 태그, 바뀐 파일이 우리 변경과
+   겹치는지, kr-port가 새 태그에 아직 얹히는지, 안내 문장이 몇 개 늘었는지
 2. **변경 이력을 한국어로 남길 자리를 만든다** (`--notes`) - 업스트림은
    **독일어로 개발된다.** 커밋도 릴리스 노트도 독일어라 그대로는 못 읽는다.
    원문과 함께 `(미번역)` 자리를 만들고, 그 자리가 채워지기 전에는 검사가
    통과하지 않는다
-3. **깨끗한 경우에 한해 실제로 올린다** (`--to <태그>`) - 패치가 충돌 없이
-   붙을 때만. 하나라도 어긋나면 아무것도 건드리지 않고 멈춘다
+3. **깨끗한 경우에 한해 실제로 올린다** (`--to <태그>`) - kr-port가 충돌 없이
+   얹힐 때만. 하나라도 어긋나면 아무것도 건드리지 않고 멈춘다. 얹은 뒤에는
+   미러(`mirror` 원격)로 민다 - gitlink이 가리킬 커밋이 원격에 없으면 다음에
+   클론하는 사람이 못 받는다
 
-**핀(`upstream.json`)이 이 저장소의 기준이다.** `vendor/`는 버전 관리 밖이라
-우리 저장소에는 "지금 어느 판 위에 있는지"가 아무 데도 안 적혀 있었다. 그러면
-다른 머신에서 클론한 사람은 그날의 최신 `main` 위에 패치를 붙이게 되고, 붙는
-자리가 다른 것을 아무도 모른다. 핀이 그 자리를 못박는다.
+**핀(`upstream.json`)이 붙는 자리의 기준이다.** 저장소의 gitlink은 `kr-port`
+팁을 가리키지, 그 밑동(어느 업스트림 판 위인지)은 안 가리킨다 - 태그명과
+동기화 날짜도 gitlink에는 없다. 핀이 그 자리를 못박고, `--to`가 옮긴다.
 
 사용법:
     run\\sync.bat            점검 (아무것도 안 옮긴다)
@@ -61,8 +62,9 @@ _VERSION_RE = re.compile(r"(\d+)")
 
 WORK_BRANCH = "kr-port"
 
-#: 패치를 다시 뽑을 때 쓰는 디렉토리. 순서가 곧 적용 순서다.
-PATCH_DIRS = ("patches", "overlay/patches")
+#: gitlink이 가리킬 커밋을 밀어 두는 원격. 비공개 미러다 - 업스트림(origin)에
+#: 우리 브랜치를 밀지 않는다.
+MIRROR = "mirror"
 
 
 @dataclass(frozen=True)
@@ -251,55 +253,82 @@ def changed_files(base: str, head: str, vendor: Path = VENDOR) -> list[str]:
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
 
 
-def ordered_patches(repo: Path = REPO) -> list[Path]:
-    """적용 순서대로. `patches/`가 먼저다 - 근거는 patches/README.md."""
-    found: list[Path] = []
-    for name in PATCH_DIRS:
-        directory = repo / name
-        if directory.is_dir():
-            found.extend(sorted(directory.glob("*.patch")))
-    return found
+def patched_files(base: str, vendor: Path = VENDOR) -> set[str]:
+    """우리 변경(`kr-port`)이 건드리는 업스트림 파일. 겹치면 충돌 위험이 있다."""
+    result = _git("diff", "--name-only", f"{base}..{WORK_BRANCH}", cwd=vendor)
+    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
 
 
-def patched_files(repo: Path = REPO) -> set[str]:
-    """우리 패치가 건드리는 업스트림 파일. 겹치면 충돌 위험이 있다."""
-    files: set[str] = set()
-    for patch in ordered_patches(repo):
-        for line in patch.read_text(encoding="utf-8", errors="replace").splitlines():
-            if line.startswith("+++ b/"):
-                files.add(line[len("+++ b/") :].strip())
-    return files
+def applies_onto(onto: str, base: str, vendor: Path = VENDOR) -> str | None:
+    """임시 워크트리에서 kr-port(`base` 이후)를 `onto` 위에 얹어 본다.
 
+    얹히면 None, 아니면 멈춘 커밋. **kr-port를 건드리지 않는다** - 떼어낸
+    HEAD에서 rebase하므로 브랜치는 그대로다. 얹어 보는 것과 옮기는 것은
+    다른 일이다.
 
-def applies_onto(base: str, patches: list[Path], vendor: Path = VENDOR) -> str | None:
-    """임시 워크트리에서 붙여 본다. 붙으면 None, 아니면 실패한 자리.
-
-    **vendor를 건드리지 않는다.** 붙여 보는 것과 옮기는 것은 다른 일이다.
+    rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 옆에 새
+    문장을 끼워 문맥이 밀려도 합쳐지고, **같은 줄을 양쪽이 다르게 고친
+    진짜 충돌은 그대로 실패한다** - 통과 범위가 넓어지는 게 아니라,
+    안 겹치는 변경을 충돌로 안 세게 된다.
     """
-    if not patches:
-        return None
-
     workdir = Path(tempfile.mkdtemp(prefix="upstream-sync-"))
     tree = workdir / "tree"
     try:
-        added = _git("worktree", "add", "--detach", str(tree), base, cwd=vendor)
+        added = _git("worktree", "add", "--detach", str(tree), WORK_BRANCH, cwd=vendor)
         if added.returncode != 0:
             return f"임시 워크트리를 못 만들었다: {added.stderr.strip()}"
 
-        applied = _git("am", "-3", *(str(p) for p in patches), cwd=tree)
-        if applied.returncode == 0:
+        rebased = _git("rebase", "--onto", onto, base, cwd=tree)
+        if rebased.returncode == 0:
             return None
 
-        _git("am", "--abort", cwd=tree)
-        tried = [
-            line[len("Applying: ") :].strip()
-            for line in applied.stdout.splitlines()
-            if line.startswith("Applying: ")
-        ]
-        return tried[-1] if tried else "첫 패치부터 안 붙는다"
+        _git("rebase", "--abort", cwd=tree)
+        return _rebase_failure(rebased.stdout + rebased.stderr)
     finally:
         _git("worktree", "remove", "--force", str(tree), cwd=vendor)
         shutil.rmtree(workdir, ignore_errors=True)
+
+
+def _rebase_failure(output: str) -> str:
+    """rebase 출력에서 멈춘 커밋을 뽑는다."""
+    for line in reversed(output.splitlines()):
+        if "could not apply" in line:
+            return line.split("could not apply", 1)[1].strip()
+    return "첫 커밋부터 안 얹힌다"
+
+
+def rebase_kr_port(
+    onto: str, base: str, backup: str, vendor: Path = VENDOR
+) -> str | None:
+    """kr-port(`base` 이후)를 `onto` 위에 실제로 다시 얹는다.
+
+    먼저 `backup` 브랜치로 되돌릴 자리를 만든다. 실패하면 그 자리로 되돌리고
+    이유를 돌려준다 - 성공이면 None. `applies_onto`와 **같은 방식**(rebase의
+    merge 백엔드)이어야 한다. 한쪽만 다르면 "얹어 보기는 됐는데 실제 적용이
+    실패"가 상시로 뜬다.
+    """
+    _git("branch", "-f", backup, WORK_BRANCH, cwd=vendor)
+    rebased = _git("rebase", "--onto", onto, base, WORK_BRANCH, cwd=vendor)
+    if rebased.returncode != 0:
+        # 붙이다 만 상태를 남기지 않는다. abort가 못 돌려놓는 경우까지 대비해
+        # 백업 자리로 강제로 되돌린다.
+        _git("rebase", "--abort", cwd=vendor)
+        _git("checkout", WORK_BRANCH, cwd=vendor)
+        _git("reset", "--hard", backup, cwd=vendor)
+        return rebased.stderr.strip() or rebased.stdout.strip()
+    return None
+
+
+def push_mirror(backup: str, tag: str, vendor: Path = VENDOR) -> str | None:
+    """kr-port·백업 브랜치·태그를 미러로 민다. 실패하면 이유를 돌려준다.
+
+    kr-port는 rebase로 이력이 바뀌므로 force(`+`)가 필요하다. 옛 이력은 백업
+    브랜치가 핀 태그별로 붙잡고 있어서 잃는 것이 없다.
+    """
+    pushed = _git(
+        "push", MIRROR, f"+{WORK_BRANCH}", f"+{backup}", tag, cwd=vendor
+    )
+    return None if pushed.returncode == 0 else pushed.stderr.strip()
 
 
 # --- 명령 -----------------------------------------------------------------
@@ -361,9 +390,11 @@ def survey(offline: bool) -> dict:
         result["subjects"] = [{"sha": c.sha, "subject": c.subject} for c in commits]
         touched = set(changed_files(pin["commit"], newest))
         result["changed_files"] = len(touched)
-        result["overlap"] = sorted(touched & patched_files())
-        failing = applies_onto(newest, ordered_patches())
+        result["overlap"] = sorted(touched & patched_files(pin["commit"]))
+        failing = applies_onto(newest, pin["commit"])
         result["applies"] = failing is None
+        # 열쇠 이름은 CI(--json 소비자)와의 계약이라 그대로 둔다.
+        # 내용은 패치 파일명이 아니라 멈춘 커밋이다.
         result["failing_patch"] = failing
 
     if CHANGES.is_file():
@@ -401,13 +432,13 @@ def render_issue_body(found: dict) -> str | None:
         f"- 새 커밋 {found['commits']}건, 바뀐 파일 {found['changed_files']}개",
     ]
     if overlap:
-        lines.append(f"- 우리 패치가 건드리는 파일과 겹침: {', '.join(overlap)}")
+        lines.append(f"- 우리 변경이 건드리는 파일과 겹침: {', '.join(overlap)}")
     else:
-        lines.append("- 우리 패치와 겹치는 파일 없음")
+        lines.append("- 우리 변경과 겹치는 파일 없음")
     lines.append(
-        "- 우리 패치는 새 태그에 **깨끗이 붙는다**"
+        "- 우리 변경은 새 태그에 **깨끗이 붙는다**"
         if found["applies"]
-        else f"- **패치가 안 붙는다** (처음 실패: {found['failing_patch']})"
+        else f"- **우리 변경이 안 붙는다** (멈춘 곳: {found['failing_patch']})"
     )
 
     lines += ["", "## 원문 (독일어)", ""]
@@ -437,7 +468,7 @@ def cmd_check(offline: bool, fail_on_new: bool, as_json: bool) -> int:
             print(json.dumps({"vendor": False}, ensure_ascii=False))
             return 0
         print("vendor 클론이 없다 - 점검을 건너뛴다.")
-        print("  클론: overlay/patches/README.md")
+        print("  받기: git submodule update --init")
         return 0
 
     found = survey(offline)
@@ -485,18 +516,18 @@ def _render(found: dict) -> None:
         overlap = found["overlap"]
         print(f"바뀐 파일 {found['changed_files']}개", end="")
         if overlap:
-            print(f" - 우리 패치가 건드리는 것과 겹치는 것 {len(overlap)}개:")
+            print(f" - 우리 변경이 건드리는 것과 겹치는 것 {len(overlap)}개:")
             for name in overlap:
                 print(f"  {name}")
         else:
-            print(" - 우리 패치와 겹치는 것 없음")
+            print(" - 우리 변경과 겹치는 것 없음")
 
         if found["applies"]:
-            print(f"\n패치를 {newest}에 붙여 봤다: 깨끗하다")
+            print(f"\nkr-port를 {newest}에 얹어 봤다: 깨끗하다")
             print(f"\n다음: run\\sync.bat {newest}")
         else:
-            print(f"\n패치가 {newest}에 안 붙는다 (처음 실패: {found['failing_patch']})")
-            print("  손으로 붙여 충돌을 본다 - docs/upstream-sync.md §5")
+            print(f"\nkr-port가 {newest}에 안 얹힌다 (멈춘 곳: {found['failing_patch']})")
+            print("  손으로 얹어 충돌을 본다 - docs/upstream-sync.md §5")
 
     if found["missing_notes"]:
         print(f"\n변경 이력에 없는 판: {', '.join(found['missing_notes'])}")
@@ -574,45 +605,24 @@ def cmd_to(tag: str, offline: bool) -> int:
         return 1
 
     pin = read_pin()
-    patches = ordered_patches()
 
-    failing = applies_onto(tag, patches)
+    failing = applies_onto(tag, pin["commit"])
     if failing is not None:
-        print(f"패치가 {tag}에 안 붙는다 (처음 실패: {failing}).", file=sys.stderr)
-        print("아무것도 건드리지 않았다. 손으로 붙여 충돌을 본다 - "
+        print(f"kr-port가 {tag}에 안 얹힌다 (멈춘 곳: {failing}).", file=sys.stderr)
+        print("아무것도 건드리지 않았다. 손으로 얹어 충돌을 본다 - "
               "docs/upstream-sync.md §4", file=sys.stderr)
         return 1
 
     # 되돌릴 자리를 먼저 만든다. 여기서부터 vendor를 건드린다.
     backup = f"kr-port-{pin['tag']}"
-    _git("branch", "-f", backup, WORK_BRANCH)
     print(f"되돌릴 자리: {backup}")
-
-    _git("checkout", "--detach", tag)
-    _git("branch", "-f", "main", tag)
-    _git("branch", "-f", WORK_BRANCH, tag)
-    _git("checkout", WORK_BRANCH)
-
-    # 붙여 보기(`applies_onto`)와 같은 방식이어야 한다. 한쪽만 3-way면
-    # "붙여 보기는 됐는데 실제 적용이 실패"가 상시로 뜬다.
-    applied = _git("am", "-3", *(str(p) for p in patches))
-    if applied.returncode != 0:
-        _git("am", "--abort")
-        _git("branch", "-f", WORK_BRANCH, backup)
-        _git("checkout", WORK_BRANCH)
-        print("붙여 보기는 됐는데 실제 적용이 실패했다. 되돌렸다.", file=sys.stderr)
-        print(applied.stderr, file=sys.stderr)
+    problem = rebase_kr_port(tag, pin["commit"], backup)
+    if problem is not None:
+        print("얹어 보기는 됐는데 실제 적용이 실패했다. 되돌렸다.", file=sys.stderr)
+        print(problem, file=sys.stderr)
         return 1
 
-    # 패치를 다시 뽑는다. 부모가 바뀌었으므로 파일 내용도 바뀐다.
-    counts = [len(sorted((REPO / name).glob("*.patch"))) for name in PATCH_DIRS]
-    revisions = _git("rev-list", "--reverse", f"{tag}..{WORK_BRANCH}").stdout.split()
-    boundary = revisions[counts[0] - 1] if counts[0] else tag
-
-    for path in ordered_patches():
-        path.unlink()
-    _git("format-patch", f"{tag}..{boundary}", "-o", str(REPO / PATCH_DIRS[0]))
-    _git("format-patch", f"{boundary}..{WORK_BRANCH}", "-o", str(REPO / PATCH_DIRS[1]))
+    _git("branch", "-f", "main", tag)
 
     write_pin(
         {
@@ -622,17 +632,29 @@ def cmd_to(tag: str, offline: bool) -> int:
             "synced": datetime.date.today().isoformat(),
         }
     )
-    print(f"핀을 {tag}로 옮겼다. 패치 {len(patches)}건을 다시 뽑았다.")
+    print(f"핀을 {tag}로 옮기고 kr-port를 그 위에 다시 얹었다.")
+
+    # gitlink이 가리킬 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다.
+    pushed = push_mirror(backup, tag)
+    if pushed is not None:
+        print(f"\n미러에 못 밀었다: {pushed}", file=sys.stderr)
+        print("로컬은 다 옮겨졌다. 밀릴 때까지 gitlink을 커밋하지 않는다:",
+              file=sys.stderr)
+        print(f"  cd vendor/ff14-accessibility && "
+              f"git push {MIRROR} +{WORK_BRANCH} +{backup} {tag}", file=sys.stderr)
+        return 1
+    print(f"미러로 밀었다: {WORK_BRANCH}, {backup}, {tag}")
 
     count = _string_count()
     if count is not None:
         print(f"안내 문장: 지금 {count}쌍")
     print("\n남은 것 - 이 순서로 한다:")
-    print("  1. 변경 이력 한국어로: --notes 로 자리를 만들고 채운다")
-    print("  2. 골든 대조: uv run --no-project python "
+    print("  1. 새 자리를 저장소에 기록한다: git add vendor/ff14-accessibility")
+    print("  2. 변경 이력 한국어로: --notes 로 자리를 만들고 채운다")
+    print("  3. 골든 대조: uv run --no-project python "
           "tools/strings-golden/strings_golden.py")
-    print("  3. 빌드와 검사: run\\check.bat")
-    print("  4. 인게임 확인 - 사용자 몫이다")
+    print("  4. 빌드와 검사: run\\check.bat")
+    print("  5. 인게임 확인 - 사용자 몫이다")
     return 0
 
 

@@ -9,6 +9,7 @@ vendor 클론이 있을 때만 돌린다 - 클론이 없는 머신에서 빨간�
 영영 모른다. 그 상태를 통과시키지 않는 것이 이 파일의 첫 번째 책임이다.
 """
 
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -221,6 +222,196 @@ def test_핀을_읽고_쓴다(tmp_path: Path):
 def test_핀이_없으면_안_지어낸다(tmp_path: Path):
     with pytest.raises(FileNotFoundError):
         us.read_pin(tmp_path / "없다.json")
+
+
+# --- kr-port가 새 자리에 얹히는가 -------------------------------------------
+#
+# 이게 이 프로젝트에서 실제로 일어나는 일이다. 업스트림은 8일에 릴리스를 7개
+# 내고, 우리가 고치는 줄 바로 옆에 새 문장을 끼워 넣는다. rebase의 merge
+# 백엔드는 3-way라 문맥이 밀린 것은 합쳐야 하고, 같은 줄을 양쪽이 다르게
+# 고친 진짜 충돌은 그대로 실패해야 한다.
+
+
+def _run(*args: str, cwd: Path) -> None:
+    subprocess.run(
+        ["git", "-c", "core.hooksPath=", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+
+
+def _out(*args: str, cwd: Path) -> str:
+    result = subprocess.run(
+        ["git", "-c", "core.hooksPath=", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    return result.stdout.strip()
+
+
+def _lines(*changes: tuple[int, str]) -> str:
+    """1~10번 줄짜리 파일. `changes`로 지정한 줄만 바꾼다."""
+    rows = [f"line {i}" for i in range(1, 11)]
+    for number, text in changes:
+        rows[number - 1] = text
+    return "\n".join(rows) + "\n"
+
+
+def _drifted(root: Path) -> tuple[Path, str, str]:
+    """우리가 고친 줄의 문맥을 업스트림이 건드린 vendor.
+
+    돌려주는 것은 (vendor, 옛 밑동, 새 밑동)이다. kr-port는 옛 밑동 위에
+    커밋 하나(5번 줄)를 갖고, 새 밑동은 3번과 7번 줄 - 우리 hunk의 문맥
+    안이다 - 을 고쳤다.
+    """
+    vendor = root / "vendor"
+    vendor.mkdir()
+    _run("init", "-b", "main", cwd=vendor)
+    _run("config", "user.email", "t@example.invalid", cwd=vendor)
+    _run("config", "user.name", "t", cwd=vendor)
+
+    target = vendor / "a.txt"
+    target.write_text(_lines(), encoding="utf-8")
+    _run("add", "a.txt", cwd=vendor)
+    _run("commit", "-m", "upstream: base", cwd=vendor)
+    old_base = _out("rev-parse", "HEAD", cwd=vendor)
+
+    _run("checkout", "-b", us.WORK_BRANCH, cwd=vendor)
+    target.write_text(_lines((5, "line 5 - ours")), encoding="utf-8")
+    _run("commit", "-am", "ours: line 5", cwd=vendor)
+
+    _run("checkout", "main", cwd=vendor)
+    target.write_text(
+        _lines((3, "line 3 - upstream"), (7, "line 7 - upstream")), encoding="utf-8"
+    )
+    _run("commit", "-am", "upstream: moved", cwd=vendor)
+    new_base = _out("rev-parse", "HEAD", cwd=vendor)
+
+    _run("checkout", us.WORK_BRANCH, cwd=vendor)
+    return vendor, old_base, new_base
+
+
+def _clash(vendor: Path) -> str:
+    """우리와 같은 5번 줄을 업스트림도 고친 커밋. 진짜 충돌이다."""
+    _run("checkout", "--detach", "main", cwd=vendor)
+    (vendor / "a.txt").write_text(_lines((5, "line 5 - upstream")), encoding="utf-8")
+    _run("commit", "-am", "upstream: took line 5 too", cwd=vendor)
+    sha = _out("rev-parse", "HEAD", cwd=vendor)
+    _run("checkout", us.WORK_BRANCH, cwd=vendor)
+    return sha
+
+
+def test_문맥이_밀려도_3way로_얹힌다(tmp_path: Path):
+    vendor, old_base, new_base = _drifted(tmp_path)
+    assert us.applies_onto(new_base, old_base, vendor=vendor) is None
+
+
+def test_얹어_봐도_kr_port는_안_움직인다(tmp_path: Path):
+    # 얹어 보는 것과 옮기는 것은 다른 일이다.
+    vendor, old_base, new_base = _drifted(tmp_path)
+    before = _out("rev-parse", us.WORK_BRANCH, cwd=vendor)
+    us.applies_onto(new_base, old_base, vendor=vendor)
+    assert _out("rev-parse", us.WORK_BRANCH, cwd=vendor) == before
+
+
+def test_진짜_같은_줄이_충돌하면_그건_잡는다(tmp_path: Path):
+    # 3-way가 아무거나 통과시키면 검사기가 죽는다. 같은 줄을 양쪽이 다르게
+    # 고친 것은 사람이 봐야 한다.
+    vendor, old_base, _ = _drifted(tmp_path)
+    clash = _clash(vendor)
+    assert us.applies_onto(clash, old_base, vendor=vendor) is not None
+
+
+def test_patched_files가_우리가_건드린_파일을_센다(tmp_path: Path):
+    vendor, old_base, _ = _drifted(tmp_path)
+    (vendor / "b.txt").write_text("새 파일\n", encoding="utf-8")
+    _run("add", "b.txt", cwd=vendor)
+    _run("commit", "-m", "ours: b", cwd=vendor)
+    assert us.patched_files(old_base, vendor=vendor) == {"a.txt", "b.txt"}
+
+
+# --- 실제로 얹기와 되돌리기 -------------------------------------------------
+
+
+def test_rebase가_kr_port를_새_밑동에_얹고_백업을_남긴다(tmp_path: Path):
+    vendor, old_base, new_base = _drifted(tmp_path)
+    old_tip = _out("rev-parse", us.WORK_BRANCH, cwd=vendor)
+
+    assert us.rebase_kr_port(new_base, old_base, "kr-port-old", vendor=vendor) is None
+
+    # 밑동이 새 자리다.
+    assert _out("rev-parse", f"{us.WORK_BRANCH}~1", cwd=vendor) == new_base
+    # 옛 이력은 백업이 붙잡고 있다.
+    assert _out("rev-parse", "kr-port-old", cwd=vendor) == old_tip
+    # 3-way라 양쪽 변경이 다 남았다.
+    text = (vendor / "a.txt").read_text(encoding="utf-8")
+    assert "line 5 - ours" in text
+    assert "line 3 - upstream" in text
+
+
+def test_rebase가_실패하면_kr_port를_되돌린다(tmp_path: Path):
+    vendor, old_base, _ = _drifted(tmp_path)
+    clash = _clash(vendor)
+    old_tip = _out("rev-parse", us.WORK_BRANCH, cwd=vendor)
+
+    problem = us.rebase_kr_port(clash, old_base, "kr-port-old", vendor=vendor)
+
+    assert problem is not None
+    assert _out("rev-parse", us.WORK_BRANCH, cwd=vendor) == old_tip
+    # 붙이다 만 상태가 안 남는다.
+    assert _out("status", "--porcelain", cwd=vendor) == ""
+
+
+# --- 미러 push -------------------------------------------------------------
+#
+# gitlink이 가리킬 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다.
+
+
+def _with_mirror(tmp_path: Path) -> tuple[Path, str, Path]:
+    """미러(bare)와 백업 브랜치·태그까지 갖춘 vendor. (vendor, 새 밑동, 미러)."""
+    vendor, _, new_base = _drifted(tmp_path)
+    bare = tmp_path / "mirror.git"
+    _run("init", "--bare", str(bare), cwd=tmp_path)
+    _run("remote", "add", us.MIRROR, str(bare), cwd=vendor)
+    _run("branch", "kr-port-old", us.WORK_BRANCH, cwd=vendor)
+    _run("tag", "v9.99", new_base, cwd=vendor)
+    return vendor, new_base, bare
+
+
+def test_push_mirror가_세_ref를_민다(tmp_path: Path):
+    vendor, new_base, bare = _with_mirror(tmp_path)
+    assert us.push_mirror("kr-port-old", "v9.99", vendor=vendor) is None
+    assert _out("rev-parse", us.WORK_BRANCH, cwd=bare) == _out(
+        "rev-parse", us.WORK_BRANCH, cwd=vendor
+    )
+    assert _out("rev-parse", "kr-port-old", cwd=bare)
+    assert _out("rev-parse", "v9.99^{commit}", cwd=bare) == new_base
+
+
+def test_이력이_바뀌어도_민다(tmp_path: Path):
+    # rebase 뒤의 kr-port는 이력이 다르다. force가 아니면 여기서 막힌다.
+    vendor, _, bare = _with_mirror(tmp_path)
+    assert us.push_mirror("kr-port-old", "v9.99", vendor=vendor) is None
+    _run("commit", "--amend", "-m", "ours: rewritten", cwd=vendor)
+    assert us.push_mirror("kr-port-old", "v9.99", vendor=vendor) is None
+    assert _out("rev-parse", us.WORK_BRANCH, cwd=bare) == _out(
+        "rev-parse", us.WORK_BRANCH, cwd=vendor
+    )
+
+
+def test_미러가_없으면_이유를_돌려준다(tmp_path: Path):
+    vendor, _, new_base = _drifted(tmp_path)
+    _run("branch", "kr-port-old", us.WORK_BRANCH, cwd=vendor)
+    _run("tag", "v9.99", new_base, cwd=vendor)
+    assert us.push_mirror("kr-port-old", "v9.99", vendor=vendor) is not None
 
 
 # --- 실제 저장소 ----------------------------------------------------------

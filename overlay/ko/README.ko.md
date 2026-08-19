@@ -337,9 +337,9 @@ FF14AccessibilityInstaller-KR.exe --check
 
 메뉴 항목은 다음과 같습니다.
 
-- `소리` — 길안내 신호음, 경유지와 도착 알림음, 기술 준비됨의 켬·끔과 음량
-- `안내` — 방향 안내, 대상 변경, 대상 HP, 적 기술 시전, 지도 표식, 오류 메시지·알림 메시지의 켬·끔
-- `로그 채널` — 채널별로 읽어 줄지 말지
+- `소리` — 길안내 신호음, 경유지와 도착 알림음, 기술 준비됨을 켜고 끄기. 음량도 여기서 조절합니다
+- `안내` — 방향 안내, 대상 변경, 대상 HP, 적 기술 시전, 지도 표식, 오류 메시지, 알림 메시지를 켜고 끄기
+- `로그 채널` — 채널별로 읽어 줄지 정하기
 - `로그 탭` — 게임 탭을 따라가는 로그 시스템을 쓸 때만 나옵니다
 - `로그 시스템` — 두 로그 시스템 중 하나 고르기
 
@@ -405,22 +405,22 @@ FF14AccessibilityInstaller-KR.exe --check
 
 ### 3) 대상 찾기
 
-- **Page Down** — 다음 대상을 알려 주고 지정합니다 (`KeyNextObject`)
-- **Page Up** — 이전 대상 (`KeyPrevObject`)
-- **Ctrl+Page Down** — 다음 분류 (`KeyCategory`)
-- **Ctrl+Page Up** — 이전 분류 (`KeyCategoryPrev`)
+- **Page Down** — 다음 대상 알려 주고 지정하기 (`KeyNextObject`)
+- **Page Up** — 이전 대상 알려 주고 지정하기 (`KeyPrevObject`)
+- **Ctrl+Page Down** — 다음 분류로 옮기기 (`KeyCategory`)
+- **Ctrl+Page Up** — 이전 분류로 옮기기 (`KeyCategoryPrev`)
 
 ### 4) 이동과 길안내
 
-- **숫자패드 3** — 자동 이동 켬·끔. vnavmesh가 필요합니다 (`KeyAutoWalk`)
-- **Ctrl+숫자패드 3** — 길안내 켬·끔 (`KeyWalkGuide`)
-- **+** — 지정한 대상 따라가기 켬·끔. vnavmesh가 필요합니다 (`KeyFollowTarget`)
+- **숫자패드 3** — 자동 이동 켜고 끄기. vnavmesh가 필요합니다 (`KeyAutoWalk`)
+- **Ctrl+숫자패드 3** — 길안내 켜고 끄기 (`KeyWalkGuide`)
+- **+** — 지정한 대상 따라가기 켜고 끄기. vnavmesh가 필요합니다 (`KeyFollowTarget`)
 - **Ctrl+숫자패드 5** — 경로 미리 듣기 (`KeyRoutePreview`)
 - **숫자패드 5** — 길안내가 가리키는 쪽으로 한 번 돌기 (`KeyFaceWaypoint`)
-- **Ctrl+Shift+F1** — 클립보드에 복사해 둔 좌표로 이동 (`KeyGotoCoords`)
-- **Ctrl+Shift+F2** — 지금 서 있는 자리의 좌표를 클립보드로 복사 (`KeyCopyCoords`)
-- **Ctrl+Shift+F6** — 발자취 기록 켬·끔 (`KeyRecordTrail`)
-- **N** — 방향 안내 켬·끔 (`KeyToggleHeading`)
+- **Ctrl+Shift+F1** — 클립보드에 복사해 둔 좌표로 이동하기 (`KeyGotoCoords`)
+- **Ctrl+Shift+F2** — 지금 서 있는 자리의 좌표를 클립보드로 복사하기 (`KeyCopyCoords`)
+- **Ctrl+Shift+F6** — 발자취 기록 켜고 끄기 (`KeyRecordTrail`)
+- **N** — 방향 안내 켜고 끄기 (`KeyToggleHeading`)
 
 ※ `+`는 숫자패드의 `+`가 아니라 일반 자판의 `+`입니다.
 
@@ -430,26 +430,26 @@ FF14AccessibilityInstaller-KR.exe --check
 
 ### 5) 읽어 주기와 정보
 
-- **Ctrl+F1** — 도움말. 지금 쓸 수 있는 키와 명령을 말해 줍니다 (`KeyHelp`)
+- **Ctrl+F1** — 지금 쓸 수 있는 키와 명령 말해 주기 (`KeyHelp`)
 - **Ctrl+F2** — 지금 초점이 있는 창 알려 주기 (`KeyWhereAmI`)
-- **Ctrl+F10** — 지금 열려 있는 메뉴 읽기. 퀘스트 목록이 열려 있으면 퀘스트 읽기 (`KeyReadUI`)
-- **Ctrl+F11** — 말하기 즉시 멈춤 (`KeySilence`)
-- **Ctrl+Delete** — 내 HP와 MP (`KeyCombatStatus`)
-- **Ctrl+End** — 채집가의 GP (`KeySpStatus`)
-- **Ctrl+L** — 레벨과 남은 경험치 (`KeyLevelExp`)
-- **Shift+L** — 휴식 구역과 휴식 보너스 (`KeyRestedStatus`)
-- **Ctrl+F** — 어느 딥 던전의 몇 층인지 (`KeyDeepFloor`)
-- **Shift+F9** — 설정 메뉴 열기·닫기 (`KeyOptionsMenu`)
+- **Ctrl+F10** — 지금 열려 있는 메뉴 읽기. 퀘스트 목록이 열려 있으면 퀘스트를 읽습니다 (`KeyReadUI`)
+- **Ctrl+F11** — 말하기 즉시 멈추기 (`KeySilence`)
+- **Ctrl+Delete** — 내 HP와 MP 말해 주기 (`KeyCombatStatus`)
+- **Ctrl+End** — 채집가의 GP 말해 주기 (`KeySpStatus`)
+- **Ctrl+L** — 레벨과 남은 경험치 말해 주기 (`KeyLevelExp`)
+- **Shift+L** — 휴식 구역과 휴식 보너스 말해 주기 (`KeyRestedStatus`)
+- **Ctrl+F** — 어느 딥 던전의 몇 층인지 말해 주기 (`KeyDeepFloor`)
+- **Shift+F9** — 설정 메뉴 열고 닫기 (`KeyOptionsMenu`)
 - **Ctrl+F3** — 소지품과 중요 아이템 읽기 (`KeyReadInventory`)
-- **Shift+F3** — 소지금 (`KeyReadGil`)
+- **Shift+F3** — 소지금 말해 주기 (`KeyReadGil`)
 - **Ctrl+F4** — 토벌수첩 읽기 (`KeyBestiary`)
-- **Ctrl+F12** — 들어온 알림·초대 수락 (`KeyNotification`)
+- **Ctrl+F12** — 들어온 알림·초대 수락하기 (`KeyNotification`)
 
 ※ **`Ctrl+F`는 지금 동작하지 않습니다.** 자세한 것은 7장 1절에 있습니다.
 
 ### 6) 전투
 
-- **Ctrl+Shift+F3** — 범위 경고 켬·끔. **기본값은 꺼짐**입니다 (`KeyToggleAoeWarning`)
+- **Ctrl+Shift+F3** — 범위 경고 켜고 끄기. **기본값은 꺼짐**입니다 (`KeyToggleAoeWarning`)
 - **Shift+F7** — 열려 있는 전리품 입찰 읽기 (`KeyReadLootRolls`)
 - **Shift+F8** — 전리품 입찰 창으로 초점 옮기기. 그 창에서 숫자패드로 선입찰, 입찰, 포기를 고릅니다 (`KeyFocusLootRolls`)
 
@@ -460,34 +460,34 @@ FF14AccessibilityInstaller-KR.exe --check
 ### 7) 장비
 
 - **Ctrl+F6** — 착용 중인 장비 읽기 (`KeyReadEquipment`)
-- **Ctrl+F7** — 가장 좋은 장비를 한 번에 착용 (`KeyEquipBest`)
-- **Ctrl+F8** — 무작위 외모. 캐릭터 생성에서만 동작합니다 (`KeyRandomLook`)
+- **Ctrl+F7** — 가장 좋은 장비를 한 번에 착용하기 (`KeyEquipBest`)
+- **Ctrl+F8** — 무작위 외모 고르기. 캐릭터 생성에서만 동작합니다 (`KeyRandomLook`)
 
 ※ 게임 화면에서 이 기능의 이름은 `최강 장비`인데, 모드는 `추천 장비 착용됨.`이라고 말합니다. 같은 기능입니다.
 
 ### 8) 기술 메뉴
 
-- **Ctrl+F9** — 첫 단축바 읽기. 1번부터 0번 키에 무엇이 놓였는지 (`KeyReadHotbar`)
-- **Ctrl+숫자패드 0** — 기술 메뉴 열기·닫기 (`KeySkillMenu`)
+- **Ctrl+F9** — 첫 단축바 읽기. 1번부터 0번 키에 무엇이 놓였는지 말해 줍니다 (`KeyReadHotbar`)
+- **Ctrl+숫자패드 0** — 기술 메뉴 열고 닫기 (`KeySkillMenu`)
 
 기술 메뉴가 열려 있는 동안 숫자패드는 메뉴를 다루는 데만 쓰입니다. 아래 키들은 원래 게임에서 이동과 확인·취소에 쓰이는 것이라, 메뉴가 열려 있는 동안에는 게임에 전달되지 않습니다. 메뉴를 넘기다가 캐릭터가 움직이는 일을 막기 위해서입니다. 메뉴를 닫으면 원래대로 돌아갑니다.
 
 - **숫자패드 8, 숫자패드 2** — 목록 넘기기
 - **숫자패드 4, 숫자패드 6** — 기술과 아이템 사이 옮기기
 - **숫자패드 0** — 고르기. 기술을 고르면 놓을 수 있는 키 목록으로 넘어갑니다. 거기서 숫자패드 8과 2로 키를 고르고 숫자패드 0을 한 번 더 누르면 그 키에 놓입니다
-- **숫자패드 마침표** — 한 단계 뒤로, 또는 메뉴 닫기
+- **숫자패드 마침표** — 한 단계 뒤로 가기, 또는 메뉴 닫기
 
 ### 9) 로그 되읽기
 
-- **Alt+Page Up** — 이전 채널 (`KeyChatCatPrev`)
-- **Alt+Page Down** — 다음 채널 (`KeyChatCatNext`)
-- **Shift+Page Up** — 고른 채널에서 더 오래된 줄 (`KeyChatReadOlder`)
-- **Shift+Page Down** — 고른 채널에서 더 새로운 줄 (`KeyChatReadNewer`)
-- **Shift+Home** — 채널의 맨 처음으로 (`KeyChatReadOldest`)
-- **Shift+End** — 채널의 맨 끝으로 (`KeyChatReadNewest`)
-- **Alt+Home** — 이전 로그 탭으로 (`KeyChatTabPrev`)
-- **Alt+End** — 다음 로그 탭으로 (`KeyChatTabNext`)
-- **Enter** — 방금 읽은 줄에 같은 채널로 답장
+- **Alt+Page Up** — 이전 채널로 옮기기 (`KeyChatCatPrev`)
+- **Alt+Page Down** — 다음 채널로 옮기기 (`KeyChatCatNext`)
+- **Shift+Page Up** — 고른 채널에서 더 오래된 줄 읽기 (`KeyChatReadOlder`)
+- **Shift+Page Down** — 고른 채널에서 더 새로운 줄 읽기 (`KeyChatReadNewer`)
+- **Shift+Home** — 채널의 맨 처음으로 가기 (`KeyChatReadOldest`)
+- **Shift+End** — 채널의 맨 끝으로 가기 (`KeyChatReadNewest`)
+- **Alt+Home** — 이전 로그 탭으로 옮기기 (`KeyChatTabPrev`)
+- **Alt+End** — 다음 로그 탭으로 옮기기 (`KeyChatTabNext`)
+- **Enter** — 방금 읽은 줄에 같은 채널로 답장하기
 
 채널을 옮기면 채널 이름과 그 안에 쌓인 줄 수를 말해 줍니다. 채널은 대화, 말하기, 외치기, 파티, 연합 파티, 귓속말, 자유부대, 시스템, 전리품입니다.
 
@@ -497,9 +497,9 @@ FF14AccessibilityInstaller-KR.exe --check
 
 ### 10) 감정 표현
 
-- **Shift+F4** — 이전 감정 표현 (`KeyEmotePrev`)
-- **Shift+F5** — 다음 감정 표현 (`KeyEmoteNext`)
-- **Shift+F6** — 고른 감정 표현 실행 (`KeyEmoteDo`)
+- **Shift+F4** — 이전 감정 표현 알려 주기 (`KeyEmotePrev`)
+- **Shift+F5** — 다음 감정 표현 알려 주기 (`KeyEmoteNext`)
+- **Shift+F6** — 고른 감정 표현 실행하기 (`KeyEmoteDo`)
 
 ### 11) 카드 대결
 
@@ -508,15 +508,15 @@ FF14AccessibilityInstaller-KR.exe --check
 
 ### 12) 플러그인 목록
 
-- **Shift+F1** — 다음 플러그인 (`KeyPluginsNext`)
-- **Shift+F2** — 이전 플러그인 (`KeyPluginsPrev`)
+- **Shift+F1** — 다음 플러그인 알려 주기 (`KeyPluginsNext`)
+- **Shift+F2** — 이전 플러그인 알려 주기 (`KeyPluginsPrev`)
 - **Shift+F12** — 고른 플러그인의 설정 열기 (`KeyPluginsConfig`)
 
 ※ 플러그인 설정 창은 Dalamud가 그리는 것이라 스크린 리더가 읽지 못하는 경우가 많습니다.
 
 ### 13) 진단
 
-- **Ctrl+F5** — 지금 열려 있는 창의 내부 구조를 바탕 화면에 글 파일로 저장합니다. 어떤 창이 왜 안 읽히는지 알아보는 데 쓰는 파일이라, 문제를 알릴 때 함께 보내면 됩니다 (`KeyDumpUI`)
+- **Ctrl+F5** — 지금 열려 있는 창의 내부 구조를 바탕 화면에 글 파일로 저장하기. 어떤 창이 왜 안 읽히는지 알아보는 데 쓰는 파일이라, 문제를 알릴 때 함께 보내면 됩니다 (`KeyDumpUI`)
 
 ### 14) 게임 키와 겹치는 것
 
@@ -537,26 +537,26 @@ FF14AccessibilityInstaller-KR.exe --check
 키 대신 명령어로도 쓸 수 있는 기능이 있습니다. 대화 입력란에 그대로 치면 됩니다.
 
 - `/acc help` — 도움말 알려 주기
-- `/acc nav` — 대상까지의 방향과 거리
-- `/acc set` — 지금 지정한 대상을 계속 따라다니며 안내
+- `/acc nav` — 대상까지의 방향과 거리 말해 주기
+- `/acc set` — 지금 지정한 대상을 계속 따라다니며 안내하기
 - `/acc clear` — 추적 중인 대상 지우기
-- `/acc near` — 가까이 있는 대상 나열
-- `/acc status` — HP와 MP
+- `/acc near` — 가까이 있는 대상 나열하기
+- `/acc status` — HP와 MP 말해 주기
 - `/acc ui` — 지금 열려 있는 메뉴 읽기
 - `/acc win` — 지금 초점이 있는 창 알려 주기
-- `/acc keys` — 게임 단축키 설정을 바탕 화면에 저장
-- `/acc stop` — 말하기 멈춤
+- `/acc keys` — 게임 단축키 설정을 바탕 화면에 저장하기
+- `/acc stop` — 말하기 멈추기
 - `/acc fish` — 이 지역의 낚시터 알려 주기
-- `/acc fishhere` — 지금 서 있는 자리를 낚시터로 기억
+- `/acc fishhere` — 지금 서 있는 자리를 낚시터로 기억하기
 - `/acc fishobj` — 50미터 안의 사물을 가까운 순으로 훑어 Dalamud 로그 파일에 적기. 음성으로는 찾은 개수만 말합니다. 낚시터를 못 찾을 때 원인을 알아보는 진단용입니다
 - `/acc gather` — 이 지역의 채집 지점 알려 주기
-- `/acc gathergo` — 가장 가까운 채집 지점으로 이동
-- `/acc trails` — 이 지역에 기록해 둔 발자취 나열
-- `/acc cd` — 기술 준비됨 안내 켬·끔. `/acc cooldowns`도 같습니다
+- `/acc gathergo` — 가장 가까운 채집 지점으로 이동하기
+- `/acc trails` — 이 지역에 기록해 둔 발자취 나열하기
+- `/acc cd` — 기술 준비됨 안내 켜고 끄기. `/acc cooldowns`도 같습니다
 - `/acc soundtest` — 모드가 쓰는 소리를 차례로 들려주기
-- `/acc compat` — 한국 서버판에만 있습니다. 어떤 기능이 게임이 원래 주는 방식으로 동작하고, 어떤 기능이 한국 클라이언트용으로 따로 만든 방식으로 동작하는지 말해 줍니다. 무언가 이상할 때 어느 쪽인지 확인하는 데 씁니다
+- `/acc compat` — 어느 방식으로 동작하는지 말해 주기. 한국 서버판에만 있는 명령입니다. 어떤 기능이 게임이 원래 주는 방식으로 동작하고 어떤 기능이 한국 클라이언트용으로 따로 만든 방식으로 동작하는지 알려 주므로, 무언가 이상할 때 어느 쪽인지 확인하는 데 씁니다
 - `/acc lang ko` — 안내 언어 바꾸기. `ko`, `en`, `de`, `auto`를 쓸 수 있습니다
-- `/acc dump <창 이름>` — 그 창의 구조를 바탕 화면에 저장
+- `/acc dump <창 이름>` — 그 창의 구조를 바탕 화면에 저장하기
 
 ## 7. 문제 해결
 

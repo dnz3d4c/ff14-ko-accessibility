@@ -187,7 +187,7 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     (GUIDE_SKILL, "가이드 습니다체", r"`~습니다`가 ([\d,]+)회"),
     (GUIDE_SKILL, "가이드 한다체", r"`~된다`가 \*\*(\d+)\*\*회"),
     (GUIDE_SKILL, "가이드 가능형", r"`~할 수 있습니다` \((\d+)회\)"),
-    (GUIDE_SKILL, "가이드 모험가님", r"아예 없다\*\* \((\d+)회\)"),
+    (GUIDE_SKILL, "가이드 모험가님", r"`모험가님`을 쓰지만\((\d+)회\)"),
     (GUIDE_SKILL, "가이드 UI 경로", r"대괄호 쪽이 (\d+)회로"),
     (GUIDE_SKILL, "가이드 시각 의존", r"그런 자리가 (\d+)곳이다"),
     (GUIDE_SKILL, "가이드 시각 마우스", r"\| 마우스 조작 \| (\d+) \|"),

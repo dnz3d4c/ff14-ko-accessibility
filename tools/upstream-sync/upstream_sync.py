@@ -214,9 +214,20 @@ def commit_exists(sha: str, vendor: Path = VENDOR) -> bool:
     return _git("cat-file", "-e", f"{sha}^{{commit}}", cwd=vendor).returncode == 0
 
 
+def upstream_remote(vendor: Path = VENDOR) -> str:
+    """업스트림을 보는 원격. `upstream`이 있으면 그것, 없으면 origin.
+
+    갓 클론한 vendor는 origin이 미러다(서브모듈이 그 주소로 받는다).
+    tools/kr-setup/vendor_setup.py가 업스트림을 `upstream` 이름으로
+    등록한다 - origin이 업스트림인 옛 배선에서는 폴백이 받친다.
+    """
+    result = _git("remote", "get-url", "upstream", cwd=vendor)
+    return "upstream" if result.returncode == 0 else "origin"
+
+
 def fetch(vendor: Path = VENDOR) -> str | None:
     """업스트림에서 받아 온다. 실패하면 이유를 돌려준다(오프라인일 수 있다)."""
-    result = _git("fetch", "--tags", "origin", cwd=vendor)
+    result = _git("fetch", "--tags", upstream_remote(vendor), cwd=vendor)
     return None if result.returncode == 0 else result.stderr.strip()
 
 
@@ -379,7 +390,9 @@ def survey(offline: bool) -> dict:
     tags = all_tags()
     fresh = newer_tags(tags, pin["tag"])
     result["new_tags"] = fresh
-    result["untagged_commits"] = len(commits_between(pin["commit"], "origin/main"))
+    result["untagged_commits"] = len(
+        commits_between(pin["commit"], f"{upstream_remote()}/main")
+    )
 
     if fresh:
         newest = fresh[-1]

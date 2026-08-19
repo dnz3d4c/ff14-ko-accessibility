@@ -50,6 +50,9 @@ WORK_BRANCH = "kr-port"
 #: 방법에 따라 다르므로(전체 클론은 mirror, 서브모듈은 origin) 전부 받는다.
 _FETCH = "cd vendor/ff14-accessibility && git fetch --all --tags"
 
+#: 갓 클론한 vendor를 작업 가능하게 세우는 도구. 손으로 세우게 하지 않는다.
+_SETUP = "uv run --no-project python tools/kr-setup/vendor_setup.py"
+
 
 def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -127,9 +130,18 @@ def check_recorded(recorded: str | None, vendor: Path = VENDOR) -> list[str]:
         ]
     if not _exists(recorded, vendor):
         return [f"기록된 자리({recorded[:7]})가 vendor에 없다. 받아온다: {_FETCH}"]
-    tip = _git("rev-parse", WORK_BRANCH, cwd=vendor)
+    tip = _git("rev-parse", "--verify", "-q", f"refs/heads/{WORK_BRANCH}", cwd=vendor)
     if tip.returncode != 0:
-        return [f"vendor에 {WORK_BRANCH} 브랜치가 없다: {tip.stderr.strip()}"]
+        # 갓 클론: 서브모듈은 gitlink 커밋을 detached로 체크아웃하고 로컬
+        # 브랜치를 안 만든다. 받은 것이 기록과 같으면 그 자체는 정상이다 -
+        # 작업하려면 브랜치가 필요하다는 안내는 main()이 한다.
+        head = _git("rev-parse", "HEAD", cwd=vendor).stdout.strip()
+        if head == recorded:
+            return []
+        return [
+            f"vendor에 {WORK_BRANCH} 브랜치가 없고, 떠 있는 자리({head[:7]})가 "
+            f"기록({recorded[:7]})과 다르다. 세운다: {_SETUP}"
+        ]
     tip_sha = tip.stdout.strip()
     if recorded == tip_sha:
         return []
@@ -214,6 +226,17 @@ def main(argv: list[str]) -> int:
         for problem in problems:
             print(f"  - {problem}", file=sys.stderr)
         return 1
+
+    branchless = (
+        _git(
+            "rev-parse", "--verify", "-q", f"refs/heads/{WORK_BRANCH}", cwd=VENDOR
+        ).returncode
+        != 0
+    )
+    if branchless:
+        # 갓 클론 상태. 받은 것은 기록과 일치하니 실패가 아니다.
+        print("\nvendor가 브랜치 없이 기록된 자리에 떠 있다(갓 클론 상태).")
+        print(f"작업 전에 세운다: {_SETUP}")
 
     print("\n통과 - 기록이 kr-port 팁이고 핀이 그 이력의 조상이다")
     return 0

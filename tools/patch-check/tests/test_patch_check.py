@@ -236,6 +236,26 @@ def test_기록_자체가_없으면_잡는다(tmp_path: Path):
     assert "git add vendor/ff14-accessibility" in problems[0]
 
 
+def test_갓_클론처럼_브랜치_없이_기록에_떠_있으면_통과(tmp_path: Path):
+    # `git clone --recurse-submodules`는 gitlink 커밋을 detached로 체크아웃하고
+    # 로컬 kr-port를 안 만든다. 받은 것이 기록과 같으니 정상이다.
+    vendor, _, tip = _vendor(tmp_path)
+    _run("checkout", "--detach", cwd=vendor)
+    _run("branch", "-D", patch_check.WORK_BRANCH, cwd=vendor)
+    assert patch_check.check_recorded(tip, vendor) == []
+
+
+def test_브랜치_없이_다른_자리에_떠_있으면_잡는다(tmp_path: Path):
+    vendor, _, tip = _vendor(tmp_path)
+    _run("checkout", "--detach", f"{tip}~1", cwd=vendor)
+    _run("branch", "-D", patch_check.WORK_BRANCH, cwd=vendor)
+    problems = patch_check.check_recorded(tip, vendor)
+    assert len(problems) == 1
+    # git 원문 오류("fatal: ambiguous argument")가 새어 나가면 안 된다.
+    assert "fatal" not in problems[0]
+    assert "vendor_setup" in problems[0]
+
+
 # --- 핀 조상 검사 ----------------------------------------------------------
 
 

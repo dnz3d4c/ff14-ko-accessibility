@@ -370,6 +370,15 @@ def test_rebase가_실패하면_kr_port를_되돌린다(tmp_path: Path):
     assert _out("status", "--porcelain", cwd=vendor) == ""
 
 
+def test_upstream_원격이_있으면_그것으로_받는다(tmp_path: Path):
+    # 갓 클론한 vendor는 origin이 미러다(서브모듈이 그 주소로 받는다).
+    # vendor_setup이 업스트림을 upstream 이름으로 등록하면 그쪽을 본다.
+    vendor, _, _ = _drifted(tmp_path)
+    assert us.upstream_remote(vendor) == "origin"
+    _run("remote", "add", "upstream", str(tmp_path / "어딘가"), cwd=vendor)
+    assert us.upstream_remote(vendor) == "upstream"
+
+
 # --- 미러 push -------------------------------------------------------------
 #
 # gitlink이 가리킬 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다.

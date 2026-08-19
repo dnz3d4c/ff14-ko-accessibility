@@ -212,7 +212,7 @@ dist\FF14AccessibilityInstaller-KR.exe --check
 
 ### 4-5. 게임이 떠 있으면 배포가 실패라고 말한다 (W-17)
 
-`runuild.bat`이 `[실패] 압축을 못 풀었다`를 내는데 **실제로는 반영된다.**
+`run\build.bat`이 `[실패] 압축을 못 풀었다`를 내는데 **실제로는 반영된다.**
 
 게임이 `Tolk.dll`과 `nvdaControllerClient64.dll`을 잡고 있어서 그 둘만 못 덮는다. 둘은 거의 안 바뀌는 네이티브 파일이고, 정작 바뀐 `FF14Accessibility.dll`은 덮이고 Dalamud가 자동으로 다시 적재한다(2026-08-18 09:27 실측: 덮임 → `Unloading`/`Finished loading` 연속).
 
@@ -234,7 +234,7 @@ dist\FF14AccessibilityInstaller-KR.exe --check
 
 ### 4-3. vnavmesh 설정 파일 없음 — 고치지 않는다 (W-08, 버림)
 
-기동마다 `pluginConfigsnavmesh.json` FileNotFound로 `[ERR]`이 하나 뜨고 기본값으로 진행한다. 남의 플러그인이 자기 설정을 아직 저장하지 않았을 뿐이고, **업스트림도 이걸 손으로 만들어 주지 않는다.**
+기동마다 `pluginConfigs\vnavmesh.json` FileNotFound로 `[ERR]`이 하나 뜨고 기본값으로 진행한다. 남의 플러그인이 자기 설정을 아직 저장하지 않았을 뿐이고, **업스트림도 이걸 손으로 만들어 주지 않는다.**
 
 우리가 만들어 주면 vnavmesh 스키마에 우리가 묶인다. 그쪽이 필드를 바꾸면 우리가 깨진다. **남의 것은 남이 관리하게 둔다** — vnavmesh 전반의 방침과 같다(§3).
 

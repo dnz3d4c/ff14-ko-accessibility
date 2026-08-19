@@ -2,6 +2,7 @@
 
 파이널 판타지 14를 한국 서버에서 시각장애인이 스크린 리더로 플레이할 수 있게 합니다. [원본 접근성 모드](https://github.com/derbruedi/ff14-accessibility)에 한국 서버용 패치를 얹은 것입니다.
 
+- **받는 곳** — [최신 릴리스](https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest)
 - **설치하고 쓰는 법** — [사용 안내](overlay/ko/README.ko.md)
 - **남은 일과 알려진 결함** — [현황판](docs/status.md)
 - **문서가 어디 있나** — [문서 지도](docs/README.md)
@@ -103,7 +104,7 @@
 - **Alt+End** — 다음 로그 탭으로 옮기기 (`KeyChatTabNext`)
 - **Enter** — 방금 읽은 줄에 같은 채널로 답장하기
 
-**이 넷은 기본 설정에서 쓸 수 없습니다.** 두 번째 로그 시스템에만 있는 기능인데 기본값은 기존 시스템이라, 누르면 `이 키는 신규 로그 시스템 것임.`이 들립니다. 설정 메뉴에서 로그 시스템을 바꾸면 쓸 수 있고, 그중 `Shift+Home`과 `Alt+Home`은 `Ctrl+F`와 같은 이름 표 문제까지 겹쳐 있어 키도 함께 바꿔야 합니다.
+**`Shift+Home`·`Shift+End`·`Alt+Home`·`Alt+End` 넷은 기본 설정에서 쓸 수 없습니다.** 두 번째 로그 시스템에만 있는 기능인데 기본값은 기존 시스템이라, 누르면 `이 키는 신규 로그 시스템 전용이라 지금은 쓸 수 없음.`이 들립니다. 설정 메뉴에서 로그 시스템을 바꾸면 쓸 수 있고, 그중 `Shift+Home`과 `Alt+Home`은 `Ctrl+F`와 같은 이름 표 문제까지 겹쳐 있어 키도 함께 바꿔야 합니다.
 
 **답장이 되는 채널은 넷입니다.** 말하기, 파티, 자유부대, 귓속말입니다.
 
@@ -144,6 +145,7 @@
 - `/acc gather` — 이 지역의 채집 지점 알려 주기
 - `/acc gathergo` — 가장 가까운 채집 지점으로 이동하기
 - `/acc trails` — 이 지역에 기록해 둔 발자취 나열하기
+- `/acc trail del <번호>` — 기록해 둔 발자취 지우기. 번호는 `/acc trails`가 말해 주는 그 번호입니다
 - `/acc cd` — 기술 준비됨 안내 켜고 끄기. `/acc cooldowns`도 같습니다
 - `/acc soundtest` — 모드가 쓰는 소리를 차례로 들려주기
 - `/acc compat` — 한국 클라이언트에서 어느 기능이 어떤 방식으로 동작하는지 말해 주기. **한국 서버판에만 있습니다**
@@ -179,7 +181,7 @@
 
 원본 모드가 **GNU Affero General Public License 버전 3**을 따르고 Dalamud와 goatcorp 공식 플러그인 서식도 같은 라이선스입니다. 배포하는 플러그인은 그 파생물이므로 AGPL-3.0을 따릅니다. 쓰고, 고치고, 남에게 줄 수 있습니다. 다만 **고친 판을 배포하거나 네트워크로 제공하면 그 소스 코드도 함께 공개해야 합니다.**
 
-**이 저장소에는 아직 `LICENSE` 파일이 없습니다.** 소스를 담지 않고 원본 커밋을 가리키는 포인터와 우리 도구·문서만 담고 있어서 미뤄 둔 것인데, 공개 배포를 시작하면 필요합니다. [현황판](docs/status.md) §7에 판단 항목으로 올려 두었습니다.
+전문은 이 저장소의 [LICENSE](LICENSE)에 있고, 배포물에서는 `FF14Accessibility.zip` 안의 같은 파일에 있습니다.
 
 배포물에 함께 들어가는 다른 사람의 소프트웨어는 **Tolk**(LGPL-3.0), **NVDA Controller Client**(LGPL-2.1), **NAudio**(MIT)이고 `THIRD-PARTY-NOTICES.md`에 적혀 있습니다. **이 파일은 남에게 전할 때 함께 있어야 합니다.**
 
@@ -223,6 +225,12 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 
 `vendor/`는 비공개 미러라 접근 권한이 있어야 받아집니다. 못 받은 상태에서는 vendor가 필요한 검사를 건너뜁니다. 오류가 아닙니다. `kr-port` 브랜치를 세우는 일은 손으로 하지 않아도 됩니다. 처음 `run\build.bat`을 돌릴 때 자동으로 처리됩니다.
 
+빌드에는 셋이 더 필요합니다. `run\build.bat`이 없으면 그 자리에서 멈추고 무엇이 없는지 말합니다.
+
+- **scoop으로 설치한 .NET SDK 10** — `run\_env.cmd`가 `%SCOOP%\apps\dotnet-sdk\current\dotnet.exe`를 부릅니다. `SCOOP`이 정의되어 있지 않으면 `%USERPROFILE%\scoop`으로 봅니다. PATH의 `dotnet`은 런타임만 있어서 쓰지 않습니다
+- **7z** — `scoop install 7zip`
+- **KR Dalamud의 hook 폴더** — 업데이터에서 [Check Update]를 한 번 돌려야 생깁니다
+
 빌드 환경 구성은 [environment.md](docs/dev/environment.md)를 봅니다. .NET SDK 경로에서 자주 걸립니다.
 
 ### 매일 쓰는 것
@@ -249,7 +257,7 @@ uv run --no-project --with pytest pytest tools -q
 - [`ko-words`](tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다
 - [`ko-speech`](tools/ko-speech/README.md) — 번역 표를 안 거치고 소스에 맨몸으로 박힌 외국어 문장을 잡습니다. 그런 자리는 한국어가 없어도 조용히 지나가므로, 목록 자체를 고정해 늘어나면 실패시킵니다
 - [`pack-check`](tools/pack-check/README.md) — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치 프로그램을 임시 프로필에 실제로 돌려 봅니다
-- [`asmref-check`](tools/asmref-check/README.md) · `sig-probe` · `cs-api-diff` · [`asmstr`](tools/asmstr/README.md) — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
+- [`asmref-check`](tools/asmref-check/README.md) · `sig-probe` · [`asmstr`](tools/asmstr/README.md) — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
 
 ### 한국 서버와 무관한 것은 원본을 봅니다
 

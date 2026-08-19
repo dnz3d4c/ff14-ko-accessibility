@@ -1,4 +1,8 @@
 {
+  "aliases": [
+    "De",
+    "IsGerman"
+  ],
   "by_file": {
     "Compat/CompatReport.cs": [
       [

@@ -16,6 +16,14 @@
 `Loc.Pick(de, en, ko)`로 넘기는 줄이고, 인자가 문자열이 아니라 변수라서
 못 읽는다. 나머지 40개가 실제로 손으로 옮길 자리다(docs/korean/hand-cases.md).
 
+**갈림길의 이름도 같이 고정한다.** 이 도구는 `IsGerman`이라는 이름 하나를
+표식으로 삼는데, 소스가 `bool De => Loc.IsGerman;` 같은 별칭을 따로 두면
+그 뒤의 자리는 여기에도, 미해석 개수에도, 카탈로그에도 안 잡힌다. 쌍 수가
+안 움직이니 검사는 초록으로 통과하고, 한국어가 통째로 빠져도 아무 소리가
+안 난다. `ColorNamer.cs:32`의 `De`가 실제로 그랬다 - 캐릭터 생성 색 묘사가
+전부 영어로 나가는 것을 691쌍 스냅샷도 미해석 42건도 한 건도 못 봤다.
+그래서 별칭 **이름 집합**을 골든에 박아 둔다. 새 별칭이 생기면 빨개진다.
+
 사용법:
     uv run --no-project python tools/strings-golden/strings_golden.py          # 대조
     uv run --no-project python tools/strings-golden/strings_golden.py --write  # 갱신
@@ -24,6 +32,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -33,6 +42,16 @@ SOURCE_ROOT = REPO / "vendor" / "ff14-accessibility" / "FF14Accessibility"
 GOLDEN = Path(__file__).resolve().parent / "golden" / "de-en.json"
 
 MARKER = "IsGerman"
+
+#: 언어 갈림길에 붙은 다른 이름. `bool <이름> => Loc.IsGerman;` 꼴을 잡는다.
+#: 정의 자리라 모양이 고정이어서 오탐이 사실상 없다.
+#:
+#: **여기 잡힌 이름으로 `MARKER`를 넓히지 않는다.** 넓히면 `ColorNamer`의
+#: 갈림길이 그날로 스냅샷에 들어와 골든이 **104쌍 늘어난다**(2026-08-19 실측 -
+#: 691쌍에서 795쌍, 전부 `Services/ColorNamer.cs`, 미해석은 안 는다). 사람이
+#: 내용을 봐야 하는 크기라 판의 W-44로 따로 열려 있고, 이 검사는 별칭이
+#: 몇이나 있나까지만 본다.
+ALIAS = re.compile(r"\bbool\s+(\w+)\s*(?:=>|=)\s*Loc\.Is(?:German|Korean)\b")
 
 #: 번역하면서 삼항이 이 모양으로 바뀐다. 옮긴 줄도 같은 쌍을 내야 스냅샷이
 #: "문장이 사라졌다"고 하지 않는다. 앞 글자를 보고 PickItem 같은 이름은 거른다.
@@ -51,6 +70,16 @@ class Unparsed:
     file: str
     line: int
     snippet: str
+
+
+@dataclass(frozen=True)
+class Alias:
+    """언어 갈림길에 붙은 다른 이름. `uses`는 그 이름으로 갈라지는 자리 수다."""
+
+    name: str
+    file: str
+    line: int
+    uses: int
 
 
 NEWLINE = '\n'
@@ -242,6 +271,47 @@ def extract(text: str, name: str) -> tuple[list[Pair], list[Unparsed]]:
     return pairs, missed
 
 
+def find_aliases(text: str) -> list[str]:
+    """이 소스가 정의한 별칭 이름. 주석 속 예시는 안 읽는다."""
+    return [match.group(1) for match in ALIAS.finditer(strip_comments(text))]
+
+
+def _uses(text: str, name: str) -> int:
+    return len(re.findall(rf"(?<![.\w]){re.escape(name)}\b\s*\?", text))
+
+
+def count_uses(text: str, name: str) -> int:
+    """`<이름> ?` 꼴로 갈라지는 자리 수.
+
+    앞이 점이면 세지 않는다 - `Loc.IsGerman ? ...`은 별칭을 안 거치고, 그 모양은
+    이미 표식이 보고 있다. 정의 자리는 뒤에 `?`가 없으니 저절로 빠진다.
+    """
+    return _uses(strip_comments(text), name)
+
+
+def scan_aliases(root: Path = SOURCE_ROOT) -> list[Alias]:
+    """소스 전체의 별칭. 이름순으로 돌려준다.
+
+    쓰이는 자리는 트리 전체에서 센다. 지금 둘 다 `private`이라 정의한 파일
+    안에서만 쓰이지만, 공개 별칭이 생기면 다른 파일에서 갈라질 수 있다.
+    이름이 겹치면 수가 부풀 수 있는데, 이 수는 보고용 신호지 판정 근거가 아니다.
+    """
+    sources = {
+        path.relative_to(root).as_posix(): strip_comments(path.read_text(encoding="utf-8"))
+        for path in sorted(root.rglob("*.cs"))
+        if "obj" not in path.parts and "bin" not in path.parts
+    }
+
+    found: list[Alias] = []
+    for name, text in sources.items():
+        for match in ALIAS.finditer(text):
+            alias = match.group(1)
+            uses = sum(_uses(body, alias) for body in sources.values())
+            found.append(Alias(alias, name, _line_of(text, match.start()), uses))
+
+    return sorted(found, key=lambda item: item.name)
+
+
 def scan(root: Path = SOURCE_ROOT) -> tuple[dict[str, list[list[str]]], list[Unparsed]]:
     """소스 전체를 훑는다. 파일별로 정렬된 쌍 목록과 미해석 목록."""
     by_file: dict[str, list[list[str]]] = {}
@@ -266,41 +336,40 @@ def build(root: Path = SOURCE_ROOT) -> dict:
         "note": "한국어화 전 독일어/영어 스냅샷. 옮긴 뒤에도 이게 그대로여야 한다.",
         "pairs": sum(len(v) for v in by_file.values()),
         "unparsed": len(missed),
+        # 쓰이는 자리 수는 안 담는다. 업스트림이 색 묘사를 한 줄 고칠 때마다
+        # 골든이 흔들리면 정작 봐야 할 "이름이 늘었다"가 파묻힌다.
+        "aliases": [alias.name for alias in scan_aliases(root)],
         "by_file": by_file,
     }
 
 
-def main(argv: list[str]) -> int:
-    if not SOURCE_ROOT.is_dir():
-        print(f"vendor 클론이 없다 - 건너뛴다: {SOURCE_ROOT}")
-        return 0
+def report_aliases(was: list[str], now: list[Alias]) -> None:
+    """별칭이 늘거나 줄었을 때 무슨 일인지 적는다.
 
-    current = build()
-    _, missed = scan()
-
-    if "--write" in argv:
-        GOLDEN.parent.mkdir(parents=True, exist_ok=True)
-        GOLDEN.write_text(
-            json.dumps(current, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
+    새 별칭은 **그 뒤가 통째로 안 보인다**는 뜻이라, 쓰이는 자리 수까지 같이
+    낸다. 수가 크면 그만큼이 한 번에 계기판 밖으로 나간 것이다.
+    """
+    print("언어 갈림길의 별칭이 골든과 다르다:", file=sys.stderr)
+    names = {alias.name for alias in now}
+    for alias in now:
+        if alias.name in was:
+            continue
+        print(
+            f"  + {alias.name}  ({alias.file}:{alias.line}, 갈라지는 자리 {alias.uses}곳)",
+            file=sys.stderr,
         )
-        print(f"기록: {GOLDEN.relative_to(REPO).as_posix()}")
-        print(f"  쌍 {current['pairs']}개, 미해석 {current['unparsed']}개")
-        if missed:
-            print("\n미해석 - 손으로 옮길 자리다:")
-            for item in missed:
-                print(f"  {item.file}:{item.line}  {item.snippet}")
-        return 0
+        print(
+            f"    이 이름으로 갈라지는 자리는 표식(`{MARKER}`)에 안 잡힌다 - "
+            "쌍도 미해석도 안 움직이고, 한국어가 빠져도 소리가 안 난다.",
+            file=sys.stderr,
+        )
+    for name in was:
+        if name not in names:
+            print(f"  - {name}  (없어졌다 - 별칭을 걷어냈으면 갱신해라)", file=sys.stderr)
 
-    if not GOLDEN.is_file():
-        print(f"골든이 없다. 먼저 --write로 만든다: {GOLDEN}", file=sys.stderr)
-        return 2
 
-    golden = json.loads(GOLDEN.read_text(encoding="utf-8"))
-    if golden.get("by_file") == current["by_file"]:
-        print(f"통과 - 독일어/영어 {current['pairs']}개가 스냅샷 그대로다")
-        return 0
-
+def report_pairs(golden: dict, current: dict) -> None:
+    """문장이 스냅샷과 다를 때 어느 파일에서 무엇이 오갔는지 적는다."""
     print("독일어/영어 문장이 스냅샷과 다르다:", file=sys.stderr)
     gone: list[list[str]] = []
     fresh: list[list[str]] = []
@@ -337,6 +406,58 @@ def main(argv: list[str]) -> int:
             "떨어뜨린 것이다 - 갱신하기 전에 그 줄을 찾아라.",
             file=sys.stderr,
         )
+
+
+def main(argv: list[str]) -> int:
+    if not SOURCE_ROOT.is_dir():
+        print(f"vendor 클론이 없다 - 건너뛴다: {SOURCE_ROOT}")
+        return 0
+
+    current = build()
+    _, missed = scan()
+    aliases = scan_aliases()
+
+    if "--write" in argv:
+        GOLDEN.parent.mkdir(parents=True, exist_ok=True)
+        GOLDEN.write_text(
+            json.dumps(current, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        print(f"기록: {GOLDEN.relative_to(REPO).as_posix()}")
+        print(f"  쌍 {current['pairs']}개, 미해석 {current['unparsed']}개")
+        print("  갈림길 별칭:")
+        for alias in aliases:
+            print(f"    {alias.name}  {alias.file}:{alias.line}  갈라지는 자리 {alias.uses}곳")
+        if missed:
+            print("\n미해석 - 손으로 옮길 자리다:")
+            for item in missed:
+                print(f"  {item.file}:{item.line}  {item.snippet}")
+        return 0
+
+    if not GOLDEN.is_file():
+        print(f"골든이 없다. 먼저 --write로 만든다: {GOLDEN}", file=sys.stderr)
+        return 2
+
+    golden = json.loads(GOLDEN.read_text(encoding="utf-8"))
+    ok = True
+
+    # 별칭부터 본다. 별칭이 늘었으면 그 뒤의 문장은 아래 대조에 **안 나온다** -
+    # 문장 쪽이 초록이라는 사실 자체가 아무 뜻이 없다.
+    if golden.get("aliases", []) != current["aliases"]:
+        report_aliases(golden.get("aliases", []), aliases)
+        ok = False
+
+    if golden.get("by_file") != current["by_file"]:
+        report_pairs(golden, current)
+        ok = False
+
+    if ok:
+        print(
+            f"통과 - 독일어/영어 {current['pairs']}개가 스냅샷 그대로고, "
+            f"갈림길 별칭도 {len(current['aliases'])}개 그대로다"
+        )
+        return 0
+
     print("의도한 변경이면 --write로 갱신하고, 왜 바뀌는지 커밋에 적어라.", file=sys.stderr)
     return 1
 

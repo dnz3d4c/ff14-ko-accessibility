@@ -196,3 +196,80 @@ def test_미해석_42개_중_하나는_축약_정의다():
     forwarding = [u for u in now if u.snippet.startswith("Pick(de, en, ko)")]
     assert len(forwarding) == 1
     assert len(now) - len(forwarding) == 41
+
+
+# --- 언어 갈림길의 별칭 ----------------------------------------------------
+#
+# 이 검사가 있는 이유는 하나다 - **별칭이 소리 없이 생기면 그 뒤의 자리는
+# 어느 계기판에도 안 잡힌다.** 스냅샷은 `IsGerman`이라는 이름 하나를 보는데,
+# `ColorNamer.cs:32`가 `De`라는 별칭을 따로 두는 바람에 색 묘사 104곳이
+# 통째로 밖에 있었다. 쌍 수도 미해석 수도 안 움직였고, 그래서 아무도 몰랐다.
+# 이름 집합을 고정해 두면 다음 별칭은 생기는 날 빨개진다.
+
+
+def test_별칭_정의를_찾는다():
+    assert strings_golden.find_aliases("private static bool De => Loc.IsGerman;") == ["De"]
+
+
+def test_한국어_별칭도_찾는다():
+    # 갈림길은 독일어만이 아니다. 한국어 쪽으로 별칭을 파도 똑같이 밖에 선다.
+    assert strings_golden.find_aliases("static bool Ko => Loc.IsKorean;") == ["Ko"]
+
+
+def test_대입꼴_별칭도_찾는다():
+    assert strings_golden.find_aliases("bool de = Loc.IsGerman;") == ["de"]
+
+
+def test_Loc의_원본_정의는_별칭이_아니다():
+    # `Loc.cs`가 진짜로 판정하는 자리다. 이것까지 세면 골든이 원본을 별칭이라 한다.
+    src = "public static bool IsGerman => Current == LanguageMode.German;"
+    assert strings_golden.find_aliases(src) == []
+
+
+def test_주석_속_별칭_정의는_안_읽는다():
+    assert strings_golden.find_aliases("// bool De => Loc.IsGerman;\n") == []
+
+
+def test_별칭이_갈라지는_자리를_센다():
+    src = 'bool De => Loc.IsGerman;\nstring A => De ? "a" : "b";\nstring B => De ? "c" : "d";'
+    assert strings_golden.count_uses(src, "De") == 2
+
+
+def test_점_뒤의_같은_이름은_별칭_사용이_아니다():
+    # `Loc.IsGerman ? ...`은 별칭을 안 거친다 - 스냅샷이 이미 보는 모양이다.
+    assert strings_golden.count_uses('Loc.IsGerman ? "a" : "b";', "IsGerman") == 0
+
+
+def test_이름이_겹치는_긴_식별자는_안_센다():
+    assert strings_golden.count_uses('DeLuxe ? "a" : "b";', "De") == 0
+
+
+# --- 실제 저장소 ----------------------------------------------------------
+
+
+@needs_source
+def test_별칭_이름이_골든_그대로다():
+    # 새 별칭이 생기면 여기가 빨개진다. 그게 이 검사의 전부다.
+    golden = json.loads(strings_golden.GOLDEN.read_text(encoding="utf-8"))
+    assert golden["aliases"] == [a.name for a in strings_golden.scan_aliases()]
+
+
+@needs_source
+def test_지금_별칭은_둘이다():
+    # 수를 여기 박아 둔다 - 집합 대조만으로는 "골든과 소스가 함께 늘어난" 경우를
+    # 못 본다. `IsGerman`(AccessibilityStrings.cs:14), `De`(ColorNamer.cs:32).
+    found = strings_golden.scan_aliases()
+    assert [a.name for a in found] == ["De", "IsGerman"]
+
+
+@needs_source
+def test_색_묘사_별칭이_스냅샷_밖에_있다():
+    # 이 검사가 왜 생겼는지를 실물로 박아 둔다. `De`로 갈라지는 자리가 100곳이
+    # 넘는데 골든에는 `ColorNamer.cs` 항목이 아예 없다.
+    #
+    # W-44에서 `MARKER`를 이 집합으로 넓히면 여기가 빨개진다. 그때는 고칠 게
+    # 아니라 **지울 테스트다** - 구멍이 메워졌다는 뜻이기 때문이다.
+    golden = json.loads(strings_golden.GOLDEN.read_text(encoding="utf-8"))
+    color = next(a for a in strings_golden.scan_aliases() if a.name == "De")
+    assert color.uses > 100
+    assert "Services/ColorNamer.cs" not in golden["by_file"]

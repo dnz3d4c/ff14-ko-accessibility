@@ -67,12 +67,12 @@ def test_dll이_빠지면_잡는다():
 
 
 def test_개인_흔적을_utf16으로도_찾는다():
-    blob = b"\x00\x01" + "USER".encode("utf-16-le")
-    assert pack_check.personal_traces(blob, ["USER"]) == ["USER"]
+    blob = b"\x00\x01" + "tester".encode("utf-16-le")
+    assert pack_check.personal_traces(blob, ["tester"]) == ["tester"]
 
 
 def test_흔적이_없으면_조용하다():
-    assert pack_check.personal_traces(b"harmless bytes", ["USER"]) == []
+    assert pack_check.personal_traces(b"harmless bytes", ["tester"]) == []
 
 
 # ── 매니페스트 ─────────────────────────────────────────────────────────────

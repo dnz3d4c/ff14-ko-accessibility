@@ -5,7 +5,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 
 # 한국어화
 
-모드가 **자기 말**을 한국어로 하게 만드는 작업. 688문장이고, 결정은 이미 내려져 있다. 여기서 다시 정하지 않는다.
+모드가 **자기 말**을 한국어로 하게 만드는 작업. 691문장이고, 결정은 이미 내려져 있다. 여기서 다시 정하지 않는다.
 
 **사람이 읽는 문서는 이 스킬이 아니다.** 사용자 가이드·설치 안내·도움말은 공식 가이드를 따라 **습니다체**로 쓴다 — 여기의 §2(명사형·해라체, 존댓말 금지)를 거기 적용하면 안 된다. 그쪽은 [ko-user-guide 스킬](../ko-user-guide/SKILL.md)이 갖는다. 가르는 기준은 하나다: **TTS로 나가면 여기, 눈으로 읽으면 저기.**
 
@@ -23,7 +23,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 1. `overlay/ko/ko.json`에 `{"de": …, "en": …, "ko": …}` 한 줄을 더한다
 2. uv run --no-project python tools/ko-apply/ko_apply.py --write
 
-`de`와 `en`은 **소스에 있는 그대로** 적는다. 그 둘이 키라서, 한 글자만 달라도 못 찾는다. 지금 뭐가 있는지는 `tools/strings-golden/golden/de-en.json`에 688쌍이 다 있다.
+`de`와 `en`은 **소스에 있는 그대로** 적는다. 그 둘이 키라서, 한 글자만 달라도 못 찾는다. 지금 뭐가 있는지는 `tools/strings-golden/golden/de-en.json`에 691쌍이 다 있다.
 
 왜 이렇게 하는가는 [overlay/patches/README.md](../../../overlay/patches/README.md)의 "한국어 커밋은 생성물이다"가 갖는다. 요지만: 그 C# 파일을 업스트림이 8일에 7번 고쳐서, 손으로 쓴 700줄 diff는 유지가 안 된다.
 
@@ -170,7 +170,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 
 | 검사 | 무엇을 막나 | 언제 |
 |------|-------------|------|
-| `tools/strings-golden` | 독일어·영어 문장이 바뀌는 것. 688쌍을 한 자 단위로 대조한다 | `check.bat`, pytest |
+| `tools/strings-golden` | 독일어·영어 문장이 바뀌는 것. 691쌍을 한 자 단위로 대조한다 | `check.bat`, pytest |
 | `tools/ko-apply` | 카탈로그를 안 거치고 소스에 한국어를 넣는 것, 생성 커밋을 손으로 고치는 것, 업스트림이 고친 문장을 못 보고 지나가는 것 | `check.bat`, pytest |
 | `tools/ko-words` | **게임에 없는 낱말을 그럴듯해서 쓰는 것.** 번역이 실제로 쓴 한국어 낱말을 전부 모아 KR Addon 덤프와 대조하고, 없는 것들의 목록을 골든으로 고정한다 | `check.bat`, pytest |
 | `tools/patch-check` | vendor의 `kr-port`에 커밋해 놓고 기록(gitlink)을 안 옮기는 것 | 커밋 훅, `check.bat` |

@@ -171,7 +171,7 @@ git submodule update --init
 
 **`0008`만 다르다.** 나머지는 손으로 쓴 변경이고, 이건 `overlay/ko/ko.json`에서 기계가 만든다. 커밋 제목이 고정형(`Korean: the mod's own strings, generated from the catalogue`)인 것도 그래서다 — `tools/ko-apply`가 제목으로 이 커밋을 찾는다.
 
-한국어는 결국 `AccessibilityStrings.cs`의 688쌍에 붙는데, **그 파일을 업스트림이 거의 매 릴리스마다 고친다** — 8일에 릴리스 7개다. 손으로 쓴 700줄짜리 diff를 그 속도로 계속 다시 병합하는 것은 성립하지 않는다. 근거와 실측은 [docs/status.md](../../docs/status.md) §5-4.
+한국어는 결국 `AccessibilityStrings.cs`의 691쌍에 붙는데, **그 파일을 업스트림이 거의 매 릴리스마다 고친다** — 8일에 릴리스 7개다. 손으로 쓴 700줄짜리 diff를 그 속도로 계속 다시 병합하는 것은 성립하지 않는다. 근거와 실측은 [docs/status.md](../../docs/status.md) §5-4.
 
 그래서 **저장하는 것은 diff가 아니라 표**다.
 

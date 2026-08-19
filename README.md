@@ -201,7 +201,8 @@
 - `overlay/patches/` — 한국 전용 변경의 명세
 - `patches/` — **업스트림에 보낼 것**의 기준과 기록. 기각된 후보는 `rejected.md`에 남고 다시 만들지 않습니다
 - `upstream.json` — 우리 커밋이 원본의 어느 버전 위에 얹혀 있는지
-- `tools/` · `run/` · `docs/` — 검사기와 한국어화 도구, 실행 배치, 개발 문서
+- `tools/ko-apply` · [`ko-terms`](tools/ko-terms/README.md) · [`ko-words`](tools/ko-words/README.md) · `strings-golden` — 한국어화 도구. 카탈로그를 소스에 써 넣고, 게임을 켜지 않고 낱말을 뽑고, 옮기기 전 원본을 지킵니다
+- `run/` · `docs/` — 실행 배치와 개발 문서
 
 ### 한국 서버라서 다른 것
 
@@ -241,9 +242,9 @@ uv run --no-project --with pytest pytest tools -q
 - `commit-lint` — 커밋 메시지 규칙 C1~C11
 - `patch-check` — 저장소가 기록한 vendor 포인터가 `kr-port` 팁이고 핀이 그 조상인지
 - `docs-check` — **문서가 인용한 숫자를 산출물에서 다시 계산해 대조합니다.** 손으로 옮겨 적은 값이 낡으면 검사가 실패합니다. 단축키 목록이 두 문서와 소스에서 갈라지는 것도 여기서 잡습니다
-- `ko-words` — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다
-- `pack-check` — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치기를 임시 프로필에 실제로 돌려 봅니다
-- `asmref-check` · `sig-probe` · `cs-api-diff` · `asmstr` — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
+- [`ko-words`](tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다
+- [`pack-check`](tools/pack-check/README.md) — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치기를 임시 프로필에 실제로 돌려 봅니다
+- [`asmref-check`](tools/asmref-check/README.md) · `sig-probe` · `cs-api-diff` · [`asmstr`](tools/asmstr/README.md) — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
 
 ### 한국 서버와 무관한 것은 원본을 봅니다
 

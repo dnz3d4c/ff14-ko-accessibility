@@ -41,11 +41,13 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 
 `terms.bat`은 게임을 안 켜고 `game\sqpack`을 직접 읽는다. 그래서 한국어화 중에 "게임이 이걸 뭐라고 부르지"가 막힐 때 사용자를 기다릴 필요가 없다. 자세한 것은 [tools/ko-terms/README.md](../tools/ko-terms/README.md).
 
-    run\terms.bat dump tools\ko-terms\out
+run\terms.bat dump tools\ko-terms\out
 
 `guide.bat`은 받아 둔 공식 가이드 코퍼스에서 낱말과 형식을 찾는다 (`find <낱말>`·`scan`·`fetch`·`md`). 사용자 문서를 쓸 때 이름을 지어내지 않기 위한 것이고, 자세한 것은 [docs/korean/guide-corpus.md](../docs/korean/guide-corpus.md).
 
 `check.bat`은 커밋 전 일과 검사다 — pytest 전체, vendor 기록(gitlink·핀), KR·글로벌 양쪽 빌드. 손대기 전에 한 번 돌려 **시작 상태가 초록인지**부터 본다.
+
+**글로벌 빌드는 없으면 건너뛴다.** `%LOCALAPPDATA%\Temp\dalamud-official-15.0.3.2\Dalamud.dll`이 있어야 돌고, 없으면 `[건너뜀]`을 찍은 뒤 **KR만 빌드하고 초록으로 끝난다.** 그 머신에 글로벌 배포판이 없는 것은 정상이지만(`docs/dev/environment.md` §4), 그때의 초록은 **글로벌 회귀를 안 봤다는 뜻**이다. 글로벌까지 확인해야 하는 변경이면 출력에서 `[건너뜀]`이 없는지부터 본다.
 
 ## 경로를 박아 넣지 않는다
 

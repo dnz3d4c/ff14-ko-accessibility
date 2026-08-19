@@ -19,10 +19,19 @@
 
 ## 무엇을 하나
 
-`overlay/ko/ko.json`의 한국어와 손 케이스 패치(`overlay/patches/0009`)의 더해진 줄에서 한국어 낱말을 전부 뽑고, KR Addon 덤프에도 대장에도 없는 것만 남겨 골든으로 고정한다.
+`overlay/ko/ko.json`의 한국어와 **손 케이스 커밋**의 더해진 줄에서 한국어 낱말을 전부 뽑고, KR Addon 덤프에도 대장에도 없는 것만 남겨 골든으로 고정한다. 손 케이스는 파일이 아니라 vendor `kr-port` 브랜치에서 제목에 `lines the generator cannot reach`가 든 커밋을 찾아 `git show`의 더해진 줄을 읽는 방식이다(`ko_words.py`의 `hand_commit`).
 
-    uv run --no-project python tools/ko-words/ko_words.py           # 대조
-    uv run --no-project python tools/ko-words/ko_words.py --write   # 골든 갱신
+대조는 이렇게 돌린다.
+
+uv run --no-project python tools/ko-words/ko_words.py
+
+골든을 갱신할 때는 `--write`를 붙인다.
+
+uv run --no-project python tools/ko-words/ko_words.py --write
+
+**덤프가 없으면 낱말 검사가 통째로 빠진다.** `tools/ko-terms/out/addon-Korean.tsv`가 없으면 `건너뛴다`를 찍고 **영어 잔여 검사 결과만** 돌려준다 — 그쪽은 카탈로그만 보면 되므로 덤프 없이도 돈다. 즉 **초록이 두 가지 뜻을 갖는다.** 낱말까지 봤는지 확인하려면 먼저 덤프를 뽑는다.
+
+run\terms.bat dump tools\ko-terms\out
 
 조사는 **떼어 낸 나머지가 게임에 있을 때만** 뗀다. `소지품에`는 `소지품`으로 잡히고, `장판`은 뗄 것이 없어 그대로 남는다.
 

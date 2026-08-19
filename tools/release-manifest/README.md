@@ -48,7 +48,7 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 
 ## 무엇을 만드나
 
-### `dist\repo.json` — Dalamud 커스텀 저장소 매니페스트
+### `dist\release\repo.json` — Dalamud 커스텀 저장소 매니페스트
 
 사용자가 Dalamud에 이 저장소 주소를 등록해 두면, Dalamud가 이 파일을 보고 새 판을 알아서 받는다. 형식은 업스트림 `repo.json`을 그대로 본떴고 **필드 순서까지 맞춘다.**
 
@@ -60,7 +60,7 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 
 **독일어 문구는 표를 거쳐서 나간다**(`GERMAN_TO_KOREAN`). 한국어가 아닌 문장이 표에 없으면 **만들지 않고 멈춘다.** "한국어가 아니면 원문을 그대로 쓴다"로 두면 업스트림이 문구를 고치는 날 독일어가 조용히 배포된다. 한국어 문구의 근거는 `overlay/ko/README.ko.md` 첫머리가 모드를 소개하는 문장이다.
 
-### `dist\installer.json` — 설치 프로그램 자기 갱신용
+### `dist\release\installer.json` — 설치 프로그램 자기 갱신용
 
 읽는 쪽은 `Installer/InstallerService.cs`의 `TrySelfUpdateAsync`이고, 거기서 쓰는 필드는 셋뿐이다.
 

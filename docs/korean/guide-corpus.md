@@ -42,10 +42,21 @@
 
 ## 3. 어떻게 쓰나
 
-    run\guide.bat fetch        인덱스와 문서 전량 (1초 간격, 캐시 있으면 건너뜀)
-    run\guide.bat md           캐시를 마크다운으로 다시 옮긴다 (네트워크 없음)
-    run\guide.bat scan         시각 의존 표현이 어디에 몇 건인가
-    run\guide.bat find 소지품  코퍼스에서 낱말 찾기
+인덱스와 문서를 전량 받는다 (1초 간격, 캐시가 있으면 건너뛴다).
+
+run\guide.bat fetch
+
+캐시를 마크다운으로 다시 옮긴다 (네트워크를 안 쓴다).
+
+run\guide.bat md
+
+시각에 기대는 표현이 어디에 몇 건인지 센다.
+
+run\guide.bat scan
+
+코퍼스에서 낱말을 찾는다.
+
+run\guide.bat find 소지품
 
 받은 것은 `tools/ko-guide/out/`에 있다. `html/`이 원문이고 `md/`가 정규화한 것이다.
 

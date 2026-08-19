@@ -6,10 +6,21 @@
 
 ## 쓰는 법
 
-    run\terms.bat langs                          어떤 언어가 들어 있나
-    run\terms.bat dump tools\ko-terms\out        전 행을 TSV로
-    run\terms.bat row 1216                       행 번호로 바로
-    run\terms.bat find Target                    아는 언어로 찾기 (아래 제약)
+어떤 언어가 들어 있는지 본다.
+
+run\terms.bat langs
+
+전 행을 TSV로 뽑는다.
+
+run\terms.bat dump tools\ko-terms\out
+
+행 번호를 알면 바로 꺼낸다.
+
+run\terms.bat row 1216
+
+아는 언어로 찾는다 (제약은 아래).
+
+run\terms.bat find Target
 
 뽑은 낱말은 `overlay/ko/terms.json`에 **행 번호와 원문을 붙여** 남긴다. 번호 없는 줄은 "어디서 봤는지 모르는 용어"고, 그건 지어낸 것과 구분이 안 된다.
 

@@ -362,9 +362,17 @@ description: 이 모드의 사용자 문서를 한국어로 쓸 때 적용. 사�
 
 ## 7. 원문을 받는 법 · 무엇이 검사되나
 
-    run\guide.bat fetch        인덱스와 문서 전량 (1초 간격, 캐시 있으면 건너뜀)
-    run\guide.bat scan         시각 의존 표현이 어디에 몇 건인가
-    run\guide.bat find 소지품  코퍼스에서 낱말 찾기
+인덱스와 문서를 전량 받는다 (1초 간격, 캐시가 있으면 건너뛴다).
+
+run\guide.bat fetch
+
+시각에 기대는 표현이 어디에 몇 건인지 센다.
+
+run\guide.bat scan
+
+코퍼스에서 낱말을 찾는다.
+
+run\guide.bat find 소지품
 
 **원문은 저장소에 안 들어간다.** `tools/ko-guide/out/`은 `.gitignore`에 있다 — 남의 문서를 통째로 재배포하지 않는다. ko-terms의 게임 덤프와 같은 규약이다.
 

@@ -25,7 +25,7 @@ argument-hint: check | up <태그> | notes | patches
 
 ## check (기본)
 
-    cmd //c "set FF14_NOPAUSE=1 && run\sync.bat"
+cmd //c "set FF14_NOPAUSE=1 && run\sync.bat"
 
 아무것도 안 옮긴다. 읽을 것 넷: 새 태그, 겹치는 파일, **`kr-port`가 새 태그에 아직 얹히는가**, 이력에 빠진 판.
 

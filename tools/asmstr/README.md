@@ -22,6 +22,8 @@ uv run --no-project python tools/asmstr/classify.py "<게임.exe>" "<플러그�
 | NOT FOUND | 0건. `ScanText`가 예외를 던지고 그 훅은 죽는다 |
 | AMBIGUOUS | 2건 이상. `ScanText`는 첫 번째를 쓰는데, 그게 맞는 함수라는 보장이 없다 |
 
+**이 판정은 관문이 아니다.** `classify.py`는 `NOT FOUND`가 나오든 `AMBIGUOUS`가 나오든 항상 0으로 끝나고(`main`의 `return 0`), `run\check.bat`은 이 도구를 부르지 않는다 — 거기서 도는 것은 `tools` 아래 pytest뿐이라 **판정기가 고장 나지 않았는지**만 지킨다. 빨간불을 기다리지 말고 **출력을 사람이 읽어야 한다.** 사람이 고쳐야 하는 신호는 `UNIQUE`가 아닌 줄 전부다.
+
 스캔 자체는 `tools/sig-probe/sig_probe.py`가 한다(이미 검증된 물건이다). exe는 **한 번만 읽어** 메모리에 올리고 모든 시그니처를 그 위에서 대조한다.
 
 ## `#US`와 `#Blob`을 둘 다 읽어야 하는 이유

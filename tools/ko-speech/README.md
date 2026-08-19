@@ -17,10 +17,17 @@
 | `umlaut` | `[äöüßÄÖÜ]`를 가진 리터럴이 `Pick`/삼항 밖에 있다 | 이 문자는 한국어에도 명령어에도 안 나와서 문자셋만으로 갈린다 |
 | `sibling` | `switch` 가지나 배열 초기화에서 형제가 `Pick`인데 자기만 맨 리터럴이다 | `Aethernet`·`Ort`·`FATEs`는 움라우트가 없어 이 규칙으로만 잡힌다 |
 
-    uv run --no-project python tools/ko-speech/ko_speech.py           # 대조
-    uv run --no-project python tools/ko-speech/ko_speech.py --write   # 골든 갱신
+대조는 이렇게 돌린다.
+
+uv run --no-project python tools/ko-speech/ko_speech.py
+
+골든을 갱신할 때는 `--write`를 붙인다.
+
+uv run --no-project python tools/ko-speech/ko_speech.py --write
 
 `run\check.bat` 1단계 pytest가 같이 돌린다.
+
+**vendor가 없으면 아무것도 안 보고 초록으로 끝난다.** `vendor/ff14-accessibility/FF14Accessibility`가 없을 때 `건너뛴다`를 찍고 0을 돌려준다(`ko_speech.py`의 `main`). 소스를 읽어야 하는 검사라 그 자리에서는 잴 것이 없기 때문인데, **초록을 통과로 읽으면 안 된다.** 이 검사의 결과를 믿으려면 vendor가 받아져 있어야 한다.
 
 ## 오탐 넷 — 앞 셋은 계산으로 갈리고 넷째는 오탐이 아니다
 

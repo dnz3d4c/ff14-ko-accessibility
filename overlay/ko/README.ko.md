@@ -59,7 +59,7 @@ https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest
 
 #### ② 설치 프로그램 실행
 
-`FF14AccessibilityInstaller-KR.exe`를 실행합니다.
+압축을 푼 `FF14Accessibility-KR` 폴더를 열고, 그 안의 `FF14AccessibilityInstaller-KR.exe`에서 Enter를 누릅니다.
 
 ※ 서명이 없는 프로그램이라 Windows SmartScreen 경고가 뜰 수 있습니다. [추가 정보] 링크를 클릭하면 [실행] 버튼이 나타납니다.
 
@@ -150,7 +150,7 @@ https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest
 `설치 프로그램을 ...으로 업데이트하고 다시 실행했습니다.`
 `확인을 누르면 설치가 자동으로 이어집니다 - 더 하실 일은 없습니다.`
 
-[확인]을 누르면 설치가 알아서 끝까지 갑니다. [설치 / 업데이트] 버튼을 다시 누르지 않아도 됩니다.
+[확인]을 누르면 설치가 이어서 끝까지 진행됩니다. [설치 / 업데이트] 버튼을 다시 누르지 않아도 됩니다.
 
 #### ③ [아니오]를 고른 경우
 

@@ -41,7 +41,12 @@ GitHub가 `releases/latest`에 404를 주고, 설치 프로그램이 이렇게 �
 
 1. 저장소를 **공개로 전환**한다
 2. `run\release.bat`으로 **첫 릴리스를 올린다**
-3. 그 다음에 EXE를 배포한다
+3. **올라간 것을 릴리스에서 도로 받아 잰다** (아래)
+4. 그 다음에 EXE를 배포한다
+
+**3번을 건너뛰지 않는다.** `run\release.bat`은 올리고 끝나지 자산이 제대로 올라갔는지 다시 보지 않는다. `dist`가 완벽해도 업로드에서 하나가 빠지면 그대로 나가고, 받는 쪽에는 오류가 아니라 "새 판이 없다"로 보인다. 그래서 `dist`를 안 보고 릴리스 쪽을 받아 재는 갈래가 따로 있다.
+
+uv run --no-project python tools/release-manifest/release_manifest.py --release <태그>
 
 ## 3. 릴리스 자산 여섯 — 사람이 받는 것은 하나다
 

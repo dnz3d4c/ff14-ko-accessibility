@@ -147,7 +147,7 @@ vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud
 
 **배치가 이 순서를 갖고 있다.** 아래 하나만 실행하면 1~3이 순서대로 나온다.
 
-C:\project\games\ff14-ko-accessibility\run\play.bat
+저장소 루트에서 `run\play.bat`을 실행한다. 탐색기에서 더블클릭해도 되고, 클론 위치가 어디든 상관없다 — 배치가 경로를 자기 위치에서 끌어낸다(`run\_env.cmd`).
 
 배치가 하는 일은 이렇다.
 

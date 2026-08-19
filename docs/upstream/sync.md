@@ -55,7 +55,13 @@
 
 git add vendor/ff14-accessibility
 
-그 커밋은 **미러에도 있어야 한다** — gitlink이 가리키는 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다. 동기화 때는 도구가 밀어 주고(§5.2), 손 커밋은 직접 민다. 미러 원격 이름은 클론 방법에 따라 다르다 — 이 머신처럼 통째로 클론했으면 `mirror`, 서브모듈로 받았으면 `origin`이다.
+그 커밋은 **미러에도 있어야 한다** — gitlink이 가리키는 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다. 동기화 때는 도구가 밀어 주고(§5.2), 손 커밋은 직접 민다.
+
+**원격 이름을 먼저 확인한다.** 클론 방법에 따라 다르다 — 이 머신처럼 통째로 클론했으면 `mirror`, 서브모듈로 받았으면 `origin`이다. 서브모듈에 `mirror`를 붙이는 것은 `tools/kr-setup/vendor_setup.py`이고, 그 전에는 그 이름이 없다.
+
+cd vendor/ff14-accessibility && git remote
+
+나온 이름을 그대로 넣는다. 통째로 클론한 머신이면 이것이다.
 
 cd vendor/ff14-accessibility && git push mirror kr-port
 
@@ -77,7 +83,7 @@ git submodule update --init
 
 ### 5.1 점검 — 아무것도 안 옮긴다
 
-    run\sync.bat
+run\sync.bat
 
 받아오고 재기만 한다. 나오는 것: 새 태그, 새 커밋 수, 바뀐 파일 중 **우리 변경과 겹치는 것**, 그리고 **`kr-port`가 새 태그에 아직 얹히는가** — 임시 워크트리에서 `git rebase --onto`로 얹어 본다. `kr-port` 자체는 안 건드린다.
 
@@ -85,7 +91,7 @@ git submodule update --init
 
 ### 5.2 깨끗할 때 — 도구가 한다
 
-    run\sync.bat v5.87
+run\sync.bat v5.87
 
 이 경우가 대부분이다. 도구가 하는 일:
 
@@ -107,8 +113,7 @@ git submodule update --init
 
 도구가 멈추고 **멈춘 커밋**을 알려 준다. 그때부터는 손이다.
 
-    cd vendor/ff14-accessibility
-    git rebase --onto <새태그> <핀커밋> kr-port
+cd vendor/ff14-accessibility && git rebase --onto <새태그> <핀커밋> kr-port
 
 충돌한 자리에서 판단할 것은 하나다 — **업스트림이 우리 커밋이 하려던 일을 이미 했는가.**
 
@@ -116,7 +121,9 @@ git submodule update --init
 - 아니면 새 코드에 맞춰 고치고 `git rebase --continue`
 - **생성 커밋에서 멈췄으면 §5.4다.** 충돌을 풀지 않는다
 - 끝나면 `main`도 새 태그로 옮겨 둔다(`git branch -f main <새태그>`) — 도구가 만드는 것과 같은 배치다
-- 미러로 밀고(§5.2의 5와 같은 push), 핀을 옮긴 뒤 `git add vendor/ff14-accessibility`로 기록한다. 핀은 손으로 고치지 않는다 — `tools/upstream-sync`의 `write_pin`을 쓴다
+- 미러로 밀고(§5.2의 5와 같은 push), 핀을 옮긴 뒤 `git add vendor/ff14-accessibility`로 기록한다
+
+**핀을 옮길 진입점이 이 갈래에는 없다.** 핀을 쓰는 것은 `upstream_sync.py`의 `write_pin` 하나인데, 그 함수를 부르는 곳은 `cmd_to`뿐이고 `--to`는 얹기가 실패하면 핀에 손대기 전에 끝난다. 그래서 **손으로 푼 뒤에 쓸 명령이 없다.** 손으로 rebase를 끝냈으면 `run\sync.bat <태그>`를 다시 돌려 본다 — 이미 얹혀 있으면 통과해서 핀까지 옮긴다. 그것도 안 되면 판의 W-59다. `upstream.json`을 편집기로 고치지 않는다(§2의 핀 조상 검사가 막는다).
 
 rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 **옆에** 문장을 끼워 넣어 문맥이 밀린 것은 합쳐지고, 같은 줄을 양쪽이 다르게 고친 **진짜 충돌만 그대로 실패한다** — 통과 범위가 넓어지는 게 아니다.
 

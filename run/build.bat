@@ -42,11 +42,12 @@ if errorlevel 1 (
   goto :fail
 )
 
-rem 패치가 안 붙은 main을 조용히 빌드하면 KR에서 안 뜨는 물건이 나온다.
-for /f "delims=" %%B in ('git -C "%REPO%\vendor\ff14-accessibility" rev-parse --abbrev-ref HEAD 2^>nul') do set "BRANCH=%%B"
-if /i not "%BRANCH%"=="kr-port" (
-  echo [실패] vendor 클론이 kr-port 브랜치가 아니다. 현재: %BRANCH%
-  echo   KR 패치 없이 빌드하면 게임 안에서 안 뜬다. overlay/patches/README.md 참조.
+rem kr-port 아닌 소스를 조용히 빌드하면 KR에서 안 뜨는 물건이 나온다.
+rem 갓 클론은 vendor가 브랜치 없이 떠 있다 - 세우기까지 도구가 한다.
+rem kr-port 밖의 다른 브랜치면 여기서 거부된다.
+uv run --no-project python "%REPO%\tools\kr-setup\vendor_setup.py"
+if errorlevel 1 (
+  echo [실패] vendor가 빌드할 상태가 아니다. 위 안내대로 정리하고 다시.
   goto :fail
 )
 

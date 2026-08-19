@@ -47,7 +47,7 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 
 KR Dalamud 업데이터 (Win+R, 게임이 떠 있는 상태에서):
 
-C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
+%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 새로 확정한 실행 대상은 여기에 즉시 추가한다.
 

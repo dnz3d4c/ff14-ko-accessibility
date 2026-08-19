@@ -12,15 +12,15 @@
 
 ## 용법
 
-**저장소 루트에서** 실행한다. 별도 빌드가 필요 없다 (`dotnet run`이 빌드까지 한다). `dotnet`은 절대 경로로 부른다 — 이유는 `docs/dev/environment.md` §2.
+**저장소 루트에서** 실행한다. 별도 빌드가 필요 없다 (`dotnet run`이 빌드까지 한다). `dotnet`은 절대 경로로 부른다 — 이유는 `docs/dev/environment.md` §2. 아래 복사용 명령은 **Git Bash 기준**이라 경로를 `$USERPROFILE`·`$APPDATA`로 적었고, 그 값은 백슬래시 경로로 그대로 확장된다.
 
-C:/Users/USER/scoop/apps/dotnet-sdk/current/dotnet.exe run -c Release --project tools/asmref-check -- <플러그인DLL> <참조어셈블리디렉토리>
+$USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe run -c Release --project tools/asmref-check -- <플러그인DLL> <참조어셈블리디렉토리>
 
 특정 어셈블리만 보려면 뒤에 `--only FFXIVClientStructs` 또는 쉼표로 여러 개를 붙인다. 어셈블리별 검사 건수를 따로 뽑을 때 쓴다.
 
 참조 어셈블리 디렉토리는 KR Dalamud의 Hooks 디렉토리다.
 
-C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2
+%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2
 
 ## 검사 대상 선정
 
@@ -55,11 +55,11 @@ C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2
 
 이 도구는 **오탐이 없다는 게 증명되지 않으면 쓸모가 없다.** 전부 통과로 나올 때 그게 진짜 안전인지 도구가 조용한 건지 구분이 안 되기 때문이다. 그래서 성질을 아는 대조군 2건을 먼저 돌린다. 도구를 고친 뒤에는 반드시 둘 다 다시 돌린다. 저장소 루트에서 한 줄로 둘 다 돌아간다.
 
-DN="C:/Users/USER/scoop/apps/dotnet-sdk/current/dotnet.exe"; R="C:/Users/USER/AppData/Roaming/XIVLauncherKR/addon/Hooks/15.0.3.2"; "$DN" run -c Release --project tools/asmref-check -- "C:/Users/USER/AppData/Roaming/XIVLauncherKR/devPlugins/FF14Accessibility/FF14Accessibility.dll" "$R" && "$DN" run -c Release --project tools/asmref-check -- "$R/Dalamud.dll" "$R"
+DN="$USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe"; R="$APPDATA\XIVLauncherKR\addon\Hooks\15.0.3.2"; "$DN" run -c Release --project tools/asmref-check -- "$APPDATA\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Accessibility.dll" "$R" && "$DN" run -c Release --project tools/asmref-check -- "$R\Dalamud.dll" "$R"
 
 **(a) FF14Accessibility.dll** — 참조 디렉토리는 KR Hooks.
 
-C:\Users\USER\AppData\Roaming\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Accessibility.dll
+%APPDATA%\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Accessibility.dll
 
 이 DLL은 **한국 클라이언트 실기에서 적재·동작이 이미 증명됐다.** 따라서 여기서 MISSING이나 ARITY가 나오면 그건 진짜 결함이 아니라 도구의 오탐이다. 기대값은 906 checked, 전 항목 0.
 
@@ -82,7 +82,7 @@ C:\Users\USER\AppData\Roaming\XIVLauncherKR\devPlugins\FF14Accessibility\FF14Acc
 
 저장소 루트에서 한 줄로 돌린다.
 
-DN="C:/Users/USER/scoop/apps/dotnet-sdk/current/dotnet.exe"; T=tools/asmref-check/tests; "$DN" build -c Release -v q --nologo $T/v1 && "$DN" build -c Release -v q --nologo $T/client && "$DN" build -c Release -v q --nologo $T/v2 && "$DN" run -c Release --project tools/asmref-check -- $T/client/bin/Release/net10.0/Client.dll $T/v2/bin/Release/net10.0 --only StubLib
+DN="$USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe"; T=tools/asmref-check/tests; "$DN" build -c Release -v q --nologo $T/v1 && "$DN" build -c Release -v q --nologo $T/client && "$DN" build -c Release -v q --nologo $T/v2 && "$DN" run -c Release --project tools/asmref-check -- $T/client/bin/Release/net10.0/Client.dll $T/v2/bin/Release/net10.0 --only StubLib
 
 2026-08-18 실측 출력이다. 도구를 고친 뒤에는 교정 2건과 함께 이걸 다시 돌려 아래와 같은지 본다.
 

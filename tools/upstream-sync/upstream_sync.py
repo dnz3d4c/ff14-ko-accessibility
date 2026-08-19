@@ -225,6 +225,22 @@ def upstream_remote(vendor: Path = VENDOR) -> str:
     return "upstream" if result.returncode == 0 else "origin"
 
 
+def upstream_main(vendor: Path = VENDOR) -> str | None:
+    """업스트림 main을 가리키는, **실제로 있는** 로컬 ref. 없으면 None.
+
+    upstream 원격을 등록만 하고 아직 못 받았으면(예: `--offline`)
+    `upstream/main` ref가 없다. 없는 ref를 기준으로 세면 조용히 0건이
+    나오므로, 있는 쪽으로 물러선다.
+    """
+    for remote in (upstream_remote(vendor), "origin"):
+        probe = _git(
+            "rev-parse", "--verify", "-q", f"refs/remotes/{remote}/main", cwd=vendor
+        )
+        if probe.returncode == 0:
+            return f"{remote}/main"
+    return None
+
+
 def fetch(vendor: Path = VENDOR) -> str | None:
     """업스트림에서 받아 온다. 실패하면 이유를 돌려준다(오프라인일 수 있다)."""
     result = _git("fetch", "--tags", upstream_remote(vendor), cwd=vendor)
@@ -390,8 +406,9 @@ def survey(offline: bool) -> dict:
     tags = all_tags()
     fresh = newer_tags(tags, pin["tag"])
     result["new_tags"] = fresh
-    result["untagged_commits"] = len(
-        commits_between(pin["commit"], f"{upstream_remote()}/main")
+    main_ref = upstream_main()
+    result["untagged_commits"] = (
+        len(commits_between(pin["commit"], main_ref)) if main_ref else 0
     )
 
     if fresh:

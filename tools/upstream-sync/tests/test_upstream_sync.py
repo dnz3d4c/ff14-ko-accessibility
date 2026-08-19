@@ -379,6 +379,19 @@ def test_upstream_원격이_있으면_그것으로_받는다(tmp_path: Path):
     assert us.upstream_remote(vendor) == "upstream"
 
 
+def test_upstream을_아직_못_받았으면_있는_ref로_잰다(tmp_path: Path):
+    # upstream을 등록만 하고 fetch 전이면(예: --offline) upstream/main이
+    # 없다. 없는 ref를 기준으로 세면 태그 없는 커밋이 조용히 0이 된다.
+    vendor, _, _ = _drifted(tmp_path)
+    clone = tmp_path / "clone"
+    _run("clone", str(vendor), str(clone), cwd=tmp_path)
+    assert us.upstream_main(clone) == "origin/main"
+    _run("remote", "add", "upstream", str(vendor), cwd=clone)
+    assert us.upstream_main(clone) == "origin/main"
+    _run("fetch", "upstream", cwd=clone)
+    assert us.upstream_main(clone) == "upstream/main"
+
+
 # --- 미러 push -------------------------------------------------------------
 #
 # gitlink이 가리킬 커밋이 원격에 없으면 다음에 클론하는 사람이 못 받는다.

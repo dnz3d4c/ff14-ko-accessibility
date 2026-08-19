@@ -39,6 +39,10 @@ import patch_check  # noqa: E402
 WORK_BRANCH = patch_check.WORK_BRANCH
 GITLINK = patch_check.GITLINK
 
+#: 업스트림을 가리키는 원격의 push 주소에 넣는 값. git이 이 주소로 밀려다
+#: 실패하므로 실수로 남의 저장소에 브랜치를 만드는 일이 막힌다.
+NO_PUSH = "no_push"
+
 
 def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -129,6 +133,38 @@ def _ensure_remote(vendor: Path, name: str, url: str | None) -> str | None:
     return None
 
 
+def _seal_upstream_push(vendor: Path) -> list[str]:
+    """업스트림을 가리키는 원격의 push 주소를 막는다.
+
+    **우리가 밀 곳은 `mirror` 하나뿐인데 이름만으로는 그게 안 드러난다.**
+    `origin`은 클론이 만든 것이고 `upstream`은 우리가 붙인 것이라 둘 다 남의
+    공개 저장소를 가리킨다. `git push origin kr-port`를 한 번 잘못 치면 우리
+    브랜치가 거기 생기고, 그건 지우기 전까지 남이 본다.
+
+    받기는 그대로 둔다 - 업스트림 따라잡기가 fetch만 쓰고, PR은 fork로 낸다.
+    원격 설정은 저장소가 아니라 로컬 `.git/config`에 있어서 클론마다 다시
+    해야 하고, 그래서 여기가 그 자리다.
+    """
+    sealed = []
+    mirror = _mirror_url(vendor.parent.parent)
+
+    for name in ("origin", "upstream"):
+        url = _git("remote", "get-url", name, cwd=vendor)
+        if url.returncode != 0:
+            continue  # 그 원격이 없으면 막을 것도 없다.
+        if mirror is not None and url.stdout.strip() == mirror:
+            continue  # 미러를 가리키는 이름이면 막으면 안 된다.
+
+        pushed = _git("remote", "get-url", "--push", name, cwd=vendor)
+        if pushed.stdout.strip() == NO_PUSH:
+            continue
+
+        closed = _git("remote", "set-url", "--push", name, NO_PUSH, cwd=vendor)
+        if closed.returncode == 0:
+            sealed.append(name)
+    return sealed
+
+
 def setup(repo: Path = REPO) -> int:
     """vendor를 세운다. 0이면 작업 가능한 상태다."""
     vendor = repo / "vendor" / "ff14-accessibility"
@@ -163,6 +199,10 @@ def setup(repo: Path = REPO) -> int:
             # 빌드에는 지장이 없어서 막지 않는다. 동기화는 원격이 없으면
             # 자기 단계에서 명확하게 실패한다.
             print(f"주의: {warning}", file=sys.stderr)
+
+    sealed = _seal_upstream_push(vendor)
+    if sealed:
+        print(f"업스트림으로는 못 밀게 닫았다: {', '.join(sealed)}")
 
     tip = _git("rev-parse", "HEAD", cwd=vendor).stdout.strip()
     print(f"vendor 준비 완료 - {WORK_BRANCH}({tip[:7]})")

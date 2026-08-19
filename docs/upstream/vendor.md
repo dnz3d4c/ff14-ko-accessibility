@@ -72,6 +72,19 @@ gitlink은 **원격에서 받아올 수 있는 커밋**을 가리켜야 한다. 
 
 **밑동도 같이 구했다.** 태그를 함께 밀어서 핀 커밋이 미러에 들어갔다. 전에는 그 커밋이 업스트림 GitHub와 이 디스크에만 있었으므로, 업스트림이 사라지면 패치 16건은 **붙을 자리가 없는 종잇장**이 되는 상태였다.
 
+### 5-1. 업스트림으로는 못 밀게 닫아 뒀다
+
+vendor의 원격은 셋인데 **그중 둘(`origin`·`upstream`)이 같은 업스트림 주소**다. `git push origin kr-port`를 한 번 잘못 치면 **남의 공개 저장소에 우리 브랜치가 생긴다.** 우리가 밀 곳은 `mirror` 하나뿐인데 이름만으로는 그게 안 드러난다.
+
+그래서 둘의 push 주소를 막았다 (2026-08-19).
+
+    git remote set-url --push origin no_push
+    git remote set-url --push upstream no_push
+
+**받기는 그대로다.** 업스트림 따라잡기(`run\sync.bat`)는 fetch만 쓰므로 영향이 없다. PR은 fork로 내는 것이라 이것도 막히지 않는다.
+
+**새로 클론하면 이 설정이 안 따라온다** — 원격 설정은 저장소가 아니라 로컬 `.git/config`에 있다. `tools/kr-setup/vendor_setup.py`가 vendor를 세우므로 거기서 같이 닫는 것이 맞고, 아직 안 했다.
+
 ## 6. 남는 위험
 
 **`kr-port`는 태그마다 다시 쌓인다**(`tools/upstream-sync/upstream_sync.py`의 `cmd_to`). 옛 팁을 가리키던 gitlink은 그때 갈 곳을 잃는다. 그래서 우리 저장소가 기록한 gitlink은 **전부 이름 있는 참조로 미러에 남겨야 한다** — 도달성 추론에 기대지 않는다.

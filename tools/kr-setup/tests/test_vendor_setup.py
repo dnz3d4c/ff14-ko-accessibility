@@ -159,6 +159,35 @@ def test_갓_클론을_세운다(tmp_path: Path):
     assert _out("remote", "get-url", "upstream", cwd=vendor) == str(src)
 
 
+def test_업스트림으로는_못_밀게_닫는다(tmp_path: Path):
+    # 원격 이름만으로는 어디가 남의 것인지 안 드러난다. `git push origin
+    # kr-port` 한 번이면 우리 브랜치가 남의 공개 저장소에 생기고, 그건
+    # 지우기 전까지 남이 본다.
+    super_, src, mirror = _world(tmp_path)
+    fresh = _fresh(tmp_path, super_)
+    vendor = _vendor(fresh)
+
+    assert vendor_setup.setup(fresh) == 0
+
+    # 미는 쪽만 막힌다.
+    assert _out("remote", "get-url", "--push", "upstream", cwd=vendor) == "no_push"
+    assert _out("remote", "get-url", "upstream", cwd=vendor) == str(src)
+    # 미러는 우리가 미는 곳이라 그대로 열려 있어야 한다.
+    assert _out("remote", "get-url", "--push", "mirror", cwd=vendor) == str(mirror)
+
+
+def test_열린_업스트림_푸시를_다시_닫는다(tmp_path: Path):
+    # 사람이 되살리거나 git이 새로 붙일 수 있다. 매번 다시 닫는다.
+    super_, src, _ = _world(tmp_path)
+    fresh = _fresh(tmp_path, super_)
+    vendor = _vendor(fresh)
+    assert vendor_setup.setup(fresh) == 0
+
+    _run("remote", "set-url", "--push", "upstream", str(src), cwd=vendor)
+    assert vendor_setup.setup(fresh) == 0
+    assert _out("remote", "get-url", "--push", "upstream", cwd=vendor) == "no_push"
+
+
 def test_두_번_돌려도_같다(tmp_path: Path):
     # 멱등이어야 build.bat이 매번 불러도 된다.
     super_, _, _ = _world(tmp_path)

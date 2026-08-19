@@ -147,7 +147,9 @@ def setup(repo: Path = REPO) -> int:
 
     recorded = patch_check.gitlink_commit(repo)
     if recorded is None:
-        print("저장소에 vendor 기록(gitlink)이 없다 - 세울 기준이 없다.", file=sys.stderr)
+        print(
+            "저장소에 vendor 기록(gitlink)이 없다 - 세울 기준이 없다.", file=sys.stderr
+        )
         return 1
 
     problem = _ensure_branch(vendor, recorded)

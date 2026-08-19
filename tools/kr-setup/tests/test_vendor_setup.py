@@ -80,14 +80,19 @@ def _world(tmp_path: Path) -> tuple[Path, Path, Path]:
     _run("config", "user.email", "t@example.invalid", cwd=super_)
     _run("config", "user.name", "t", cwd=super_)
     (super_ / "upstream.json").write_text(
-        json.dumps({"commit": base, "repo": str(src), "synced": "2026-08-19",
-                    "tag": "v0.1"}),
+        json.dumps(
+            {"commit": base, "repo": str(src), "synced": "2026-08-19", "tag": "v0.1"}
+        ),
         encoding="utf-8",
     )
     _run("add", "upstream.json", cwd=super_)
     _run(
-        "-c", "protocol.file.allow=always",
-        "submodule", "add", str(mirror), "vendor/ff14-accessibility",
+        "-c",
+        "protocol.file.allow=always",
+        "submodule",
+        "add",
+        str(mirror),
+        "vendor/ff14-accessibility",
         cwd=super_,
     )
     _run("commit", "-m", "gitlink", cwd=super_)
@@ -105,7 +110,11 @@ def _fresh(tmp_path: Path, super_: Path, recurse: bool = True) -> Path:
     fresh = tmp_path / ("fresh-r" if recurse else "fresh")
     args = ["clone", "--recurse-submodules"] if recurse else ["clone"]
     _run(
-        "-c", "protocol.file.allow=always", *args, str(super_), str(fresh),
+        "-c",
+        "protocol.file.allow=always",
+        *args,
+        str(super_),
+        str(fresh),
         cwd=tmp_path,
     )
     return fresh

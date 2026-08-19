@@ -9,7 +9,6 @@
 """
 
 import json
-from pathlib import Path
 
 import pytest
 import terms
@@ -63,7 +62,7 @@ def test_게임_판번호를_적어_뒀다(catalog):
 
 needs_dump = pytest.mark.skipif(
     not DUMP.is_file(),
-    reason=f"게임 데이터 덤프가 없다 - run\\terms.bat dump tools\\ko-terms\\out",
+    reason="게임 데이터 덤프가 없다 - run\\terms.bat dump tools\\ko-terms\\out",
 )
 
 

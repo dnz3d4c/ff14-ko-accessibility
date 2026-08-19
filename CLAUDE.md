@@ -56,17 +56,18 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 사용자가 읽는 문서(가이드·설치 안내·사용법·도움말)는 **파판14 공식 가이드의 형식과 문체**를 따른다. 규칙 전체는 [ko-user-guide 스킬](.claude/skills/ko-user-guide/SKILL.md)이 갖고, 여기 셋만 남긴다.
 
 - **말투를 헷갈리지 마라.** TTS로 나가는 모드 문장은 명사형·해라체([ko-localization](.claude/skills/ko-localization/SKILL.md)), 사람이 읽는 문서는 습니다체다. 같은 저장소 안에서 반대다.
-- **이름은 지어내지 않는다.** 화면에 뜨는 낱말은 `overlay/ko/terms.json`이 먼저고, 메뉴 경로·기능 이름은 `run\guide.bat find <낱말>`로 공식 가이드에서 찾는다. 둘 다 없으면 **못 찾았다고 적고 묻는다.**
+- **이름은 지어내지 않는다.** 순서가 있다 — 모드가 말하는 것은 `overlay/ko/ko.json`, 게임 화면에 뜨는 낱말은 `overlay/ko/terms.json`, 메뉴 경로와 기능 이름은 `run\guide.bat find <낱말>`. 어디에도 없으면 **못 찾았다고 적고 묻는다.** 순서 전체는 [ko-user-guide 스킬](.claude/skills/ko-user-guide/SKILL.md) §6이 갖는다.
 - **공식 가이드가 눈에 기대는 자리는 안 베낀다.** 위치(`우측의`)·색(`파란색일 경우`)·마우스 전용 조작·그림 참조는 그대로 옮기면 안 된다. 이름과 경로, 상태 이름, 키보드·명령어 경로로 바꾼다. 어디가 그런 자리인지는 `run\guide.bat scan`이 센다.
 
 ## vendor 취급 [필수]
 
-`vendor/ff14-accessibility/`는 업스트림 클론이고 **우리 저장소의 버전 관리 밖**이다.
+`vendor/ff14-accessibility/`는 업스트림 클론이고, **우리 작업의 원본은 거기 `kr-port` 브랜치다.** 저장소가 담는 것은 그 팁을 가리키는 포인터 하나뿐이고 파일은 안 담는다. 왜 그렇게 하는지는 [docs/vendor-submodule.md](docs/vendor-submodule.md).
 
-- 거기서 직접 작업하지 않는다. `kr-port` 브랜치에 커밋하고 `git format-patch`로 떼어낸다.
-- 우리만 쓰는 패치는 `overlay/patches/`, 업스트림에 **보낼** 변경만 `patches/`. 섞는 커밋은 훅이 거부한다.
-- **`patches/`에 새로 넣기 전에 [patches/rejected.md](patches/rejected.md)를 먼저 본다.** 기각된 부류를 다시 만들지 않기 위한 목록이다. 기준 다섯을 다 넘겨야 하고([patches/README.md](patches/README.md)), 그중 둘이 특히 자주 걸린다 — **글섭 클라 없이 소스만으로 판정될 것**(우리한테 KR 클라뿐이다)과 **명백한 기존 로직의 오류일 것**(리팩터·구조 개선·"언젠가 편해지는 것"은 만들지 않는다). 못 넘기면 `overlay/`로 간다.
-- **한국어 문장은 패치가 아니라 `overlay/ko/ko.json`에서 고친다.** 마지막 패치(`0008`)는 `tools/ko-apply`가 만드는 생성물이라 손대지 않는다 — 충돌하면 푸는 게 아니라 다시 만든다. 왜인지는 [overlay/patches/README.md](overlay/patches/README.md).
+- **작업은 `kr-port`에 커밋한다.** 커밋했으면 미러에 밀고 포인터를 갱신한다(`git add vendor/ff14-accessibility`). 밀기 전에 포인터를 커밋하면 받는 사람의 클론이 깨진다.
+- 포인터를 옮기는 커밋은 `[벤더]`·`[업스트림]`·`[한국전용]`만 낼 수 있다. 다른 갈래에 섞이면 훅 C11이 거부한다.
+- **업스트림에 보낼 것과 우리 것을 섞지 않는다.** 보낼 것은 PR을 낼 때 `kr-port`에서 뽑아 조립한다. 판단의 기록은 [patches/](patches/README.md)에 남는다.
+- **`patches/`에 새 후보를 올리기 전에 [patches/rejected.md](patches/rejected.md)를 먼저 본다.** 기각된 부류를 다시 만들지 않기 위한 목록이다. 기준 다섯을 다 넘겨야 하고([patches/README.md](patches/README.md)), 그중 둘이 특히 자주 걸린다 — **글섭 클라 없이 소스만으로 판정될 것**(우리한테 KR 클라뿐이다)과 **명백한 기존 로직의 오류일 것**(리팩터·구조 개선·"언젠가 편해지는 것"은 만들지 않는다).
+- **한국어 문장은 소스가 아니라 `overlay/ko/ko.json`에서 고친다.** 소스의 그 자리는 `tools/ko-apply`가 만드는 생성물이라 손대지 않는다 — 충돌하면 푸는 게 아니라 다시 만든다. 왜인지는 [overlay/patches/README.md](overlay/patches/README.md).
 - **붙는 자리는 `upstream.json`의 핀이지 `main`이 아니다.** 핀을 손으로 고치지 않는다 — `run\sync.bat`이 옮긴다.
 - **업스트림은 독일어로 개발된다.** 핀을 옮겼으면 [docs/upstream-changes.md](docs/upstream-changes.md)에 한국어로 남긴다. 안 남기면 훅 C10과 테스트가 막는다. 절차는 [docs/upstream-sync.md](docs/upstream-sync.md).
 

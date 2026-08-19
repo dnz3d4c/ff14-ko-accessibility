@@ -57,6 +57,11 @@ if errorlevel 1 goto :fail
 copy /y "%PLUGINZIP%" "%OUT%\FF14Accessibility.zip" >nul
 if errorlevel 1 goto :fail
 
+rem 안내 문서도 같이 나간다. 설치의 첫 단계가 이걸 읽는 것인데, 저장소에만
+rem 두면 받는 사람은 무엇부터 눌러야 하는지 알 길이 없다.
+copy /y "%REPO%\overlay\ko\README.ko.md" "%OUT%\사용 안내.md" >nul
+if errorlevel 1 goto :fail
+
 echo.
 echo 4/4  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
 uv run --no-project python "%REPO%\tools\pack-check\pack_check.py" --e2e --kr-dalamud "%DALAMUD_HOME%" --dotnet "%DOTNET%"

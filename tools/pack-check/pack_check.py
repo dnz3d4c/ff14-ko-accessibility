@@ -38,6 +38,9 @@ from pathlib import Path
 #: 플러그인 내부 이름. Dalamud는 폴더 이름·DLL 이름·매니페스트가 다 이것이길 요구한다.
 INTERNAL_NAME = "FF14Accessibility"
 
+#: 받는 폴더에 함께 나가는 안내 문서. 원본은 `overlay/ko/README.ko.md`다.
+GUIDE_NAME = "사용 안내.md"
+
 #: Dalamud가 "공식 저장소에서 왔다"에 쓰는 값(`SpecialPluginSource.MainRepo`).
 #: 이 값이라야 `LocalPlugin.IsOrphaned`가 거짓이 되고, 참이면 **적재를 건너뛴다.**
 OFFICIAL_SOURCE = "OFFICIAL"
@@ -226,20 +229,34 @@ def csproj_assembly_version(repo: Path) -> str | None:
     return match.group(1) if match else None
 
 
-def check_artifacts(dist: Path, repo: Path, needles: list[str]) -> list[str]:
+def dist_layout_problems(dist: Path) -> list[str]:
+    """받는 폴더에 있어야 할 것이 다 있고, 없어야 할 것이 없나.
+
+    안내 문서가 여기 끼는 이유는 편의가 아니다. 설치의 첫 단계가 "문서를
+    읽는 것"인데 그 문서가 저장소에만 있으면, 받는 사람은 무엇부터 눌러야
+    하는지 알 방법이 없다.
+    """
     problems = []
+    expected = {f"{INTERNAL_NAME}.zip", "FF14AccessibilityInstaller-KR.exe", GUIDE_NAME}
+
+    for name in sorted(expected):
+        if not (dist / name).is_file():
+            problems.append(f"산출물이 없다: {dist / name}")
+
+    extra = sorted(p.name for p in dist.iterdir() if p.name not in expected)
+    if extra:
+        problems.append(f"dist에 배포물이 아닌 것이 있다: {', '.join(extra)}")
+
+    return problems
+
+
+def check_artifacts(dist: Path, repo: Path, needles: list[str]) -> list[str]:
     zip_path = dist / f"{INTERNAL_NAME}.zip"
     exe_path = dist / "FF14AccessibilityInstaller-KR.exe"
 
-    for path in (zip_path, exe_path):
-        if not path.is_file():
-            problems.append(f"산출물이 없다: {path}")
-    if problems:
+    problems = dist_layout_problems(dist)
+    if any(p.startswith("산출물이 없다") for p in problems):
         return problems
-
-    extra = sorted(p.name for p in dist.iterdir() if p.name not in {zip_path.name, exe_path.name})
-    if extra:
-        problems.append(f"dist에 배포물이 아닌 것이 있다: {', '.join(extra)}")
 
     with zipfile.ZipFile(zip_path) as archive:
         names = archive.namelist()

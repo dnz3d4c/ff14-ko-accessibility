@@ -222,3 +222,35 @@ def test_dev_설정_항목이_남으면_잡는다():
 def test_항목이_둘이면_잡는다():
     cfg = config([enabled_entry(), enabled_entry()])
     assert any("하나여야" in p for p in pack_check.config_problems(cfg, ID, DEV_DLL))
+
+
+# ── 받는 폴더에 무엇이 있나 ────────────────────────────────────────────────
+#
+# 설치를 시작하려면 읽어야 하는 문서를 정작 받는 사람이 못 갖고 있었다
+# (2026-08-19). exe와 zip만 나가고 안내는 저장소에만 있었다.
+
+
+def make_dist(tmp_path, *, doc=True):
+    (tmp_path / "FF14Accessibility.zip").write_bytes(b"")
+    (tmp_path / "FF14AccessibilityInstaller-KR.exe").write_bytes(b"")
+    if doc:
+        (tmp_path / pack_check.GUIDE_NAME).write_text("안내", encoding="utf-8")
+    return tmp_path
+
+
+def test_안내_문서가_배포물로_센다(tmp_path):
+    """있다고 "배포물이 아닌 것"으로 잡히면 안 된다."""
+    problems = pack_check.dist_layout_problems(make_dist(tmp_path))
+    assert problems == []
+
+
+def test_안내_문서가_빠지면_잡는다(tmp_path):
+    problems = pack_check.dist_layout_problems(make_dist(tmp_path, doc=False))
+    assert any(pack_check.GUIDE_NAME in p for p in problems)
+
+
+def test_모르는_파일은_여전히_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    (dist / "내_설정.json").write_text("{}", encoding="utf-8")
+    problems = pack_check.dist_layout_problems(dist)
+    assert any("내_설정.json" in p for p in problems)

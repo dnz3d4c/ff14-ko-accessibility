@@ -70,6 +70,19 @@ PROFILE_ROOT_KEY = "ProfileRoot"
 #: 업데이터의 기본값과 같은 폴더 이름. 우리가 지은 이름이 아니다.
 DEFAULT_FOLDER = "XIVLauncherKR"
 
+#: 업데이터를 받아 오는 곳. 태그를 박지 않는다 - 최신 릴리스를 묻는다.
+UPDATER_RELEASE_API = "https://api.github.com/repos/MiqoKR/kr-dalamud-updater/releases/latest"
+
+#: 자산 둘 중 어느 쪽인가. `Payload`는 업데이터가 자기 갱신에 쓰는 것이라
+#: 실행 파일이 없다. 이름으로 가르는 표지는 이 낱말 하나다.
+UPDATER_ASSET_MARKER = "Portable"
+
+#: 어디에 푸나. `%LOCALAPPDATA%` 밑이라 관리자 권한이 필요 없고, 업데이터
+#: 자신의 `README-KR.txt`가 요구하는 "쓰기 가능한 일반 폴더"를 만족한다.
+UPDATER_INSTALL_FOLDER = "KR-Dalamud-Updater"
+UPDATER_APP_FOLDER = "app"
+UPDATER_EXE_NAME = "Dalamud.Updater.exe"
+
 
 def _appdata() -> str:
     return os.environ.get("APPDATA", "")
@@ -137,6 +150,50 @@ def source() -> str:
     if from_settings():
         return f"업데이터 설정 {settings_path()}"
     return "기본값 (업데이터 설정 없음/못 씀)"
+
+
+def updater_install_root() -> str:
+    """업데이터를 두는 폴더."""
+    return str(Path(os.environ.get("LOCALAPPDATA", "")) / UPDATER_INSTALL_FOLDER)
+
+
+def updater_extract_dir() -> str:
+    """배포 zip을 푸는 폴더.
+
+    zip이 평평해서(루트에 `Dalamud.Updater.exe`·`README-KR.txt`·
+    `UpdaterReleaseConfig.json`) 여기에 통째로 푼다. `UpdaterReleaseConfig.json`은
+    exe 옆에 있어야 자기 갱신이 도므로 셋을 갈라 놓으면 안 된다.
+    """
+    return str(Path(updater_install_root()) / UPDATER_APP_FOLDER)
+
+
+def updater_path() -> str:
+    """업데이터 실행 파일. 설치기가 "있나 없나"를 이 경로로 묻는다."""
+    return str(Path(updater_extract_dir()) / UPDATER_EXE_NAME)
+
+
+def pick_updater_asset(assets) -> str | None:
+    """릴리스 자산 목록에서 받을 zip의 URL. 못 고르면 None.
+
+    이름에 `Portable`이 들어간 zip만 받는다. 같은 릴리스에 올라오는
+    `Payload` zip은 업데이터가 자기를 갱신할 때 쓰는 것이라 실행 파일이
+    없고, 그걸 받으면 **압축은 멀쩡히 풀리고 exe만 없다.**
+    """
+    if not isinstance(assets, list):
+        return None
+
+    marker = UPDATER_ASSET_MARKER.lower()
+    for entry in assets:
+        if not isinstance(entry, dict):
+            continue
+        name = entry.get("name")
+        url = entry.get("browser_download_url")
+        if not isinstance(name, str) or not isinstance(url, str):
+            continue
+        lowered = name.lower()
+        if marker in lowered and lowered.endswith(".zip"):
+            return url
+    return None
 
 
 def main(argv: list[str]) -> int:

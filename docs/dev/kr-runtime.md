@@ -72,9 +72,9 @@ hook 폴더 이름이 버전이라 **업데이트마다 바뀐다.** 빌드용 `
 
 저장소 루트에서 vendor 클론에 KR 패치를 적용한 뒤 빌드한다(`overlay/patches/README.md` 참조).
 
-빌드 (한 줄):
+빌드 (한 줄, Git Bash 기준):
 
-DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
+DALAMUD_HOME="$APPDATA\XIVLauncherKR\addon\Hooks\15.0.3.2" $USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
 
 산출물은 `bin/Release/net10.0-windows/FF14Accessibility/latest.zip`이다. 어디에 푸는지는 다음 절이 가른다.
 

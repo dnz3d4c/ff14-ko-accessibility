@@ -1,8 +1,9 @@
 # 개발 환경 실측과 설치 결과
 
 - 작성: 2026-08-17
-- 대상 머신: 윈도 11 (Dewey 개인 PC)
+- 대상 머신: 윈도 11
 - 이 문서는 **직접 확인한 값만** 적는다. 추정은 그렇게 표기한다.
+- **경로는 환경변수로 적는다.** 본문 서술은 `%APPDATA%` 꼴이고, 복사용 명령은 **Git Bash 기준**이라 `$APPDATA` 꼴이다. 둘 다 같은 자리를 가리키며, Git Bash에서도 백슬래시 경로로 그대로 확장된다(실측 2026-08-19). cmd나 Win+R에 붙여넣을 것만 `%...%` 꼴로 적고 그렇다고 밝힌다.
 
 ## 1. 한국 클라이언트
 
@@ -27,13 +28,13 @@
 
 조사 보고서 §14-4는 "이 머신에 SDK가 없다"고 적었다. **틀렸다.** 실측:
 
-- scoop에 **.NET SDK 10.0.302**가 있다 — `C:\Users\USER\scoop\apps\dotnet-sdk\current`
+- scoop에 **.NET SDK 10.0.302**가 있다 — `%USERPROFILE%\scoop\apps\dotnet-sdk\current`
 - 그런데 PATH의 `dotnet`은 `C:\Program Files\dotnet\dotnet.exe`로 해석되고, 그쪽은 **런타임만 있고 SDK가 없다**. 시스템 PATH가 사용자 PATH보다 앞서기 때문이다.
 - `DOTNET_ROOT`는 scoop을 가리키지만 `C:\Program Files\dotnet`의 호스트는 자기 루트에서만 SDK를 찾는다. 그래서 `dotnet --list-sdks`가 비어 있다.
 
 **빌드할 때는 절대 경로로 부른다.** PATH 조회를 아예 안 하므로 이 함정을 반복하지 않는다.
 
-C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
+$USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 
 설치된 런타임: `Microsoft.NETCore.App 10.0.11`, `Microsoft.WindowsDesktop.App 10.0.11` (시스템). 플러그인의 `net10.0-windows`와 KR Dalamud Updater의 .NET 10 Desktop Runtime 요구를 둘 다 만족한다.
 
@@ -113,7 +114,7 @@ Check Update 이전에 공식 stable을 손으로 받아 `Hooks\dev`에 넣고 `
 
 사용자 환경변수로 걸어 뒀다. Check Update로 hook 경로가 `dev`에서 버전 폴더로 바뀌었으므로 그에 맞춰 갱신했다.
 
-DALAMUD_HOME=C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2
+DALAMUD_HOME=%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2
 
 글로벌 클라이언트용으로 빌드하려면 그 쉘에서만 덮어쓴다. 사용자 환경변수는 KR로 둔다.
 
@@ -129,9 +130,9 @@ Dalamud를 게임에 붙이는 마지막 단계는 GUI 조작이라 남아 있�
 2. 게임 실행
 3. "달라무드 적용" 누름
 
-실행 명령(복사용):
+실행 명령(복사용, Win+R):
 
-C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
+%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 관리자 권한으로 재실행하려 들면 `--no-elevate`를 붙여 막을 수 있다.
 
@@ -174,13 +175,13 @@ Check Update로 정식 설치된 hook(`Hooks\15.0.3.2`)에서도 **같은 오류
 
 재현 명령(복사용, 저장소 루트에서):
 
-DALAMUD_HOME="C:\Users\USER\AppData\Roaming\XIVLauncherKR\addon\Hooks\15.0.3.2" C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
+DALAMUD_HOME="$APPDATA\XIVLauncherKR\addon\Hooks\15.0.3.2" $USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release vendor/ff14-accessibility/FF14Accessibility/FF14Accessibility.csproj
 
 ### 글로벌(7.55) 참조를 다시 구하는 법 — 2026-08-17 23:47 확인
 
 업데이터의 Check Update가 공식 어셈블리를 KR 호환본으로 덮어쓰기 때문에 이 머신에는 7.55가 남지 않는다. 다시 받는다(복사용 한 줄):
 
-curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goatcorp.github.io/dalamud-distrib/latest.zip && 7z x -y -o"C:\Users\USER\AppData\Local\Temp\dalamud-official-15.0.3.2" "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip"
+curl -sS -o "$LOCALAPPDATA\Temp\dalamud-official.zip" https://goatcorp.github.io/dalamud-distrib/latest.zip && 7z x -y -o"$LOCALAPPDATA\Temp\dalamud-official-15.0.3.2" "$LOCALAPPDATA\Temp\dalamud-official.zip"
 
 **받은 게 맞는 물건인지 해시로 확인한다.** `Dalamud.KR.Compatibility.Patch.json`의 `OfficialClientStructsSha256`과 같아야 한다 — 2026-08-17 실측에서 `913FA3ED…8A8A43`으로 일치했다. `dalamud-distrib/version`도 `15.0.3.2`를 돌려주므로 KR 업데이터가 깐 것과 같은 판이다.
 

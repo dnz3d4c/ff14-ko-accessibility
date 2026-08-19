@@ -152,6 +152,58 @@ https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest
 
 `설치 프로그램 업데이트를 건너뛰었다. 지금 버전 그대로 이어서 한다.`가 남고 설치가 그대로 이어집니다. 모드 본체는 이 선택과 관계없이 최신 판으로 설치됩니다.
 
+### 4) 게임이 업데이트된 뒤
+
+게임이 업데이트되어 버전이 올라가면 **KR Dalamud가 새 버전을 지원할 때까지 모드가 실행되지 않습니다.** KR Dalamud는 지원하는 게임 버전을 하나로 고정하고 있어서, 게임 버전이 올라가면 그 값과 어긋납니다.
+
+접속해도 `FF14 Accessibility 버전 ... 준비됨.`이 들리지 않는 상태가 됩니다. 설치가 망가진 것이 아니므로 모드를 다시 설치하지 않아도 됩니다.
+
+#### ① 새 판이 나왔는지 확인하기
+
+**게임이 꺼져 있는 상태에서** KR Dalamud 업데이터를 실행합니다. Win+R을 누르고 아래를 붙여넣으면 됩니다.
+
+%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe
+
+업데이터 창에서 [Check Update] 버튼을 누릅니다. 새 판이 나와 있으면 내려받아 적용되고, 그 뒤로는 3장의 실행 순서를 그대로 따르면 모드가 다시 실행됩니다.
+
+#### ② 아직 안 나왔을 때
+
+[Check Update]를 눌러도 새 판이 오지 않으면 아직 나오지 않은 것입니다. 나온 뒤에 [Check Update]를 다시 누르면 됩니다.
+
+### 5) 제거
+
+모드만 지우는 것과 Dalamud까지 걷어내는 것이 다릅니다.
+
+#### ① 모드만 지우기
+
+Win+R을 누르고 아래를 붙여넣으면 설치된 플러그인 폴더가 열립니다.
+
+%APPDATA%\XIVLauncherKR\installedPlugins
+
+열린 곳에서 `FF14Accessibility` 폴더를 지웁니다. 다음에 게임을 켜면 모드가 실행되지 않습니다.
+
+vnavmesh도 설치했다면 아래를 붙여넣어 열리는 폴더에서 `vnavmesh` 폴더를 같이 지울 수 있습니다.
+
+%APPDATA%\XIVLauncherKR\devPlugins
+
+※ KR Dalamud 업데이터의 설정에서 프로필 위치를 변경한 적이 있으면 위 두 경로가 다릅니다. 그때는 변경한 위치 아래의 `installedPlugins`와 `devPlugins`를 찾습니다.
+
+#### ② Dalamud까지 걷어내기
+
+**다른 Dalamud 플러그인을 사용하고 있으면 이 단계는 하지 않습니다.** Dalamud를 지우면 그 플러그인들도 함께 동작하지 않습니다.
+
+이 모드만 사용하던 경우에는 아래 폴더를 통째로 지웁니다. Dalamud 본체와 설정이 모두 이 안에 있습니다.
+
+%APPDATA%\XIVLauncherKR
+
+KR Dalamud 업데이터까지 지우려면 아래 폴더도 지웁니다.
+
+%LOCALAPPDATA%\KR-Dalamud-Updater
+
+#### ③ 남는 것
+
+설치할 때 만들어진 `DALAMUD_RUNTIME` 사용자 환경 변수는 위 폴더들을 지워도 남습니다. .NET이 설치된 자리인 `C:\Program Files\dotnet`을 가리키는 값이라 그대로 두어도 다른 프로그램에 영향이 없습니다. 지우려면 윈도의 환경 변수 설정에서 사용자 변수 `DALAMUD_RUNTIME`을 삭제합니다.
+
 ## 3. 게임 실행
 
 ### 1) 실행 순서

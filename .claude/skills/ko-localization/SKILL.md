@@ -204,7 +204,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 두 파일의 성격이 다르다.
 
 - `CharaMakeIconText.cs` — 손으로 쓴 것. 그대로 고쳐야 한다
-- `CharaMakeShapeText.cs` — **자동 생성물**이다(`tools/charamake-dump/shapewords.py`가 `tools/icons/shapes.tsv`에서 만든다). 파일을 직접 고치면 안 되고 TSV에 한국어 열을 붙여 다시 만든다
+- `CharaMakeShapeText.cs` — **자동 생성물**이다(`vendor/ff14-accessibility/tools/charamake-dump/shapewords.py`가 `vendor/ff14-accessibility/tools/icons/shapes.tsv`에서 만든다). 파일을 직접 고치면 안 되고 TSV에 한국어 열을 붙여 다시 만든다. **둘 다 업스트림 클론 안의 경로다** — 우리 저장소의 `tools/`가 아니고, TSV는 `cmdump shapedump`가 내는 생성물이라 클론에도 없다
 
 **캐릭터 생성은 마지막에 한다.** 순서상 마지막이기도 하고(§4), 그때까지 앞의 것으로 방식이 굳는다. 시작하기 전에 이 3,023건을 어떻게 지킬지부터 정한다 — 지금은 못 지킨다.
 

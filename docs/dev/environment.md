@@ -68,7 +68,7 @@ $USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | `devPlugins\vnavmesh` | 5.5MB의 대부분 | 남의 플러그인 |
 | `installedPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
 
-우리 것이 `installedPlugins`에 있는 이유는 [kr-runtime-setup.md](kr-runtime.md) §7이 갖는다. 개발 중에는 `devPlugins`에 놓이고, 그 둘은 **동시에 있으면 안 된다.**
+우리 것이 `installedPlugins`에 있는 이유는 [kr-runtime.md](kr-runtime.md) §7이 갖는다. 개발 중에는 `devPlugins`에 놓이고, 그 둘은 **동시에 있으면 안 된다.**
 
 ### 바꿀 수 있다. 우리가 따라간다 (2026-08-18)
 

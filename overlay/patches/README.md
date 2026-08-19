@@ -63,7 +63,7 @@ git submodule update --init
 업스트림 `Installer/`는 우리 사정과 정확히 같은 이유로 만들어졌다 — Dalamud 자체 플러그인 창이 ImGui라 스크린리더가 못 읽으니 devPlugins 경로로 우회한다. 그래서 새로 짜지 않고 KR로 돌렸다. 바꾼 것 넷.
 
 1. **프로필 루트** — `%APPDATA%\XIVLauncherKR`. 한국어 런처는 별개 프로그램이라 글로벌 폴더와 공존한다
-2. **그 프로필을 아무도 안 만든다** — 글로벌은 XIVLauncher가 첫 로그인에 만들어 주지만 한국어 런처는 안 하고, KR 업데이터도 "새 PC용 설치 프로그램이 아니다"라고 스스로 적어 뒀다. 이제 설치 프로그램이 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §3~4의 세 조각을 직접 만든다. **고약한 건 `DALAMUD_RUNTIME`이다 — 없으면 업데이터가 "적용 완료"라고 하고 게임 안에서 CLR만 조용히 안 뜬다.** 글로벌이 XIVLauncher를 받아 까는 자리에서는 KR 업데이터를 안내하고 멈춘다(그 파이프라인은 재배포하지 않는다)
+2. **그 프로필을 아무도 안 만든다** — 글로벌은 XIVLauncher가 첫 로그인에 만들어 주지만 한국어 런처는 안 하고, KR 업데이터도 "새 PC용 설치 프로그램이 아니다"라고 스스로 적어 뒀다. 이제 설치 프로그램이 [kr-runtime.md](../../docs/dev/kr-runtime.md) §3~4의 세 조각을 직접 만든다. **고약한 건 `DALAMUD_RUNTIME`이다 — 없으면 업데이터가 "적용 완료"라고 하고 게임 안에서 CLR만 조용히 안 뜬다.** 글로벌이 XIVLauncher를 받아 까는 자리에서는 KR 업데이터를 안내하고 멈춘다(그 파이프라인은 재배포하지 않는다)
 3. **플러그인 출처가 로컬 빌드** — 편의가 아니다. 업스트림 릴리스 바이너리는 CS 7.55 바인딩이고 KR Dalamud는 7.51을 고정하므로, 적재는 되고 첫 기어세트 호출에서 던진다. EXE 옆을 먼저 보고(배포 형태) 없으면 빌드 산출물까지 올라간다(개발 형태)
 4. **한국어 안내** — `Loc` 폴백을 독일어에서 **영어로** 바꿨다. 안 그러면 빠진 키가 한국어 사용자에게 독일어 문장으로 읽힌다. 한국어 사전은 이 흐름이 실제로 보여주는 키만 갖는다
 
@@ -127,7 +127,7 @@ git submodule update --init
 
     installedPlugins\FF14Accessibility\<버전>\FF14Accessibility.dll
 
-**셋이 적재를 가른다.** 전부 Dalamud 소스에서 확인했고, 어긋나면 오류가 아니라 침묵이다 — 자세한 것은 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §7.
+**셋이 적재를 가른다.** 전부 Dalamud 소스에서 확인했고, 어긋나면 오류가 아니라 침묵이다 — 자세한 것은 [kr-runtime.md](../../docs/dev/kr-runtime.md) §7.
 
 - 버전 폴더 이름이 버전으로 파싱될 것 (`CleanupPlugins`가 아닌 것을 지운다)
 - 매니페스트의 `InstalledFromUrl`이 `OFFICIAL`일 것 (아니면 `IsOrphaned`가 참이고 고아는 안 뜬다)

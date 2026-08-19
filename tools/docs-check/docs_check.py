@@ -48,12 +48,12 @@ GOLDEN = REPO / "tools" / "strings-golden" / "golden" / "de-en.json"
 CATALOG = REPO / "overlay" / "ko" / "ko.json"
 TERMS = REPO / "overlay" / "ko" / "terms.json"
 LINT = REPO / "tools" / "commit-lint" / "commit_lint.py"
-HAND_CASES_DOC = REPO / "docs" / "ko-hand-cases.md"
+HAND_CASES_DOC = REPO / "docs" / "korean" / "hand-cases.md"
 GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
 LOC_SKILL = ".claude/skills/ko-localization/SKILL.md"
 
-#: 살아 있는 문서만 본다. 날짜가 박힌 기록(`ko-review-2026-08-18.md`)과 동결한
-#: 조사 문서(`ko-client-port-feasibility.md`)는 **그때 그대로가 맞다.**
+#: 살아 있는 문서만 본다. 날짜가 박힌 기록(`frozen/ko-review-2026-08-18.md`)과
+#: 동결한 조사 문서(`frozen/port-feasibility.md`)는 **그때 그대로가 맞다.**
 #: 거기 숫자를 지금 값으로 맞추면 기록이 아니게 된다.
 
 
@@ -83,7 +83,7 @@ def lint_rule_max(path: Path = LINT) -> int:
 
 
 def hand_type_sum(path: Path = HAND_CASES_DOC) -> int:
-    """`ko-hand-cases.md` 유형별 표의 합. 표 자신이 근거다."""
+    """`korean/hand-cases.md` 유형별 표의 합. 표 자신이 근거다."""
     text = path.read_text(encoding="utf-8")
     section = text.split("## 유형별", 1)
     if len(section) != 2:
@@ -137,7 +137,7 @@ def facts(repo: Path = REPO) -> dict[str, int]:
         "카탈로그 문장": len(_json(repo / "overlay" / "ko" / "ko.json")["strings"]),
         "대장 낱말": len(_json(repo / "overlay" / "ko" / "terms.json")["terms"]),
         "손으로 옮긴 자리": hand_sites(repo),
-        "손으로 볼 자리": hand_type_sum(repo / "docs" / "ko-hand-cases.md"),
+        "손으로 볼 자리": hand_type_sum(repo / "docs" / "korean" / "hand-cases.md"),
         "커밋 규칙 최대": lint_rule_max(repo / "tools" / "commit-lint" / "commit_lint.py"),
     }
 
@@ -149,7 +149,7 @@ def facts(repo: Path = REPO) -> dict[str, int]:
 CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("README.md", "골든 쌍", r"독일어·영어 (\d+)쌍 스냅샷"),
     ("README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
-    ("docs/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
+    ("docs/dev/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
     ("docs/status.md", "골든 쌍", r"`AccessibilityStrings` 삼항 \| (\d+)쌍"),
     ("docs/status.md", "골든 쌍", r"문장을 한국어로 옮기기 \((\d+)쌍"),
     ("docs/status.md", "손으로 옮긴 자리", r"\+ 손 (\d+)곳\)"),
@@ -163,9 +163,9 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     (LOC_SKILL, "대장 낱말", r"지금 (\d+)개가 있다"),
     (LOC_SKILL, "손으로 볼 자리", r"손으로 봐야 하는 (\d+)곳"),
     ("overlay/patches/README.md", "골든 쌍", r"AccessibilityStrings\.cs`의 (\d+)쌍"),
-    ("docs/ko-hand-cases.md", "골든 미해석", r"\*\*(\d+)\*\* \| 스냅샷 파서가 못 읽은"),
-    ("docs/ko-hand-cases.md", "손으로 볼 자리", r"\*\*(\d+)\*\* \| 그중 진짜 손으로 볼"),
-    ("docs/ko-hand-cases.md", "손으로 옮긴 자리", r"\*\*(\d+)\*\* \| 실제로 한국어를 넣은"),
+    ("docs/korean/hand-cases.md", "골든 미해석", r"\*\*(\d+)\*\* \| 스냅샷 파서가 못 읽은"),
+    ("docs/korean/hand-cases.md", "손으로 볼 자리", r"\*\*(\d+)\*\* \| 그중 진짜 손으로 볼"),
+    ("docs/korean/hand-cases.md", "손으로 옮긴 자리", r"\*\*(\d+)\*\* \| 실제로 한국어를 넣은"),
     # 공식 가이드 코퍼스. 스킬이 대는 숫자는 전부 원문에서 다시 계산해 대조한다.
     (GUIDE_SKILL, "가이드 문서", r"원문 (\d+)건 \+ 대분류"),
     (GUIDE_SKILL, "가이드 대분류", r"\+ 대분류 (\d+)건"),
@@ -185,10 +185,10 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     (GUIDE_SKILL, "가이드 시각 그림 참조", r"\| 그림 참조 \| (\d+) \|"),
     (GUIDE_SKILL, "가이드 그림", r"그림 (\d+)장을 싣는데"),
     (GUIDE_SKILL, "가이드 대체 텍스트", r"붙은 것은 (\d+)장\*\*"),
-    ("docs/ko-guide-corpus.md", "가이드 문서", r"문서 (\d+)건을 받아"),
-    ("docs/ko-guide-corpus.md", "가이드 대분류", r"대분류 랜딩 (\d+)건"),
-    ("docs/ko-guide-corpus.md", "가이드 인용", r"지금 (\d+)줄이다"),
-    ("docs/ko-guide-corpus.md", "가이드 시각 의존", r"(\d+)곳을 센다"),
+    ("docs/korean/guide-corpus.md", "가이드 문서", r"문서 (\d+)건을 받아"),
+    ("docs/korean/guide-corpus.md", "가이드 대분류", r"대분류 랜딩 (\d+)건"),
+    ("docs/korean/guide-corpus.md", "가이드 인용", r"지금 (\d+)줄이다"),
+    ("docs/korean/guide-corpus.md", "가이드 시각 의존", r"(\d+)곳을 센다"),
 )
 
 

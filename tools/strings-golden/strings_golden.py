@@ -14,7 +14,7 @@
 
 지금 41개 중 하나는 진짜 문장이 아니다 - `AccessibilityStrings.Pick` 축약이
 `Loc.Pick(de, en, ko)`로 넘기는 줄이고, 인자가 문자열이 아니라 변수라서
-못 읽는다. 나머지 40개가 실제로 손으로 옮길 자리다(docs/ko-hand-cases.md).
+못 읽는다. 나머지 40개가 실제로 손으로 옮길 자리다(docs/korean/hand-cases.md).
 
 사용법:
     uv run --no-project python tools/strings-golden/strings_golden.py          # 대조
@@ -330,7 +330,7 @@ def main(argv: list[str]) -> int:
             "--write로 갱신해도 기존 문장은 안 바뀐다.",
             file=sys.stderr,
         )
-        print("새로 늘어난 만큼 한국어 번역이 밀린다 - docs/upstream-sync.md §7.", file=sys.stderr)
+        print("새로 늘어난 만큼 한국어 번역이 밀린다 - docs/upstream/sync.md §7.", file=sys.stderr)
     else:
         print(
             f"사라진 문장 {len(gone)}개. 업스트림을 올린 게 아니라면 옮기다 "

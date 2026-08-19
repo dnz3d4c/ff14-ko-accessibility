@@ -17,7 +17,7 @@
 
 KR 클라이언트의 `game\sqpack`을 Lumina로 직접 읽는다. **게임을 켤 필요가 없다.** 로그를 뒤지는 방법은 그 화면에 들어가 본 적이 있어야 하는데, 이건 그 제약이 없다.
 
-`PanicOnSheetChecksumMismatch`를 끈다. 추측이 아니라 KR 시트가 Lumina의 글로벌 기준 스키마와 체크섬이 어긋나기 때문이고, KR Dalamud 언어 패치도 같은 이유로 이걸 끈다([ko-client-port-feasibility.md](../../docs/ko-client-port-feasibility.md)).
+`PanicOnSheetChecksumMismatch`를 끈다. 추측이 아니라 KR 시트가 Lumina의 글로벌 기준 스키마와 체크섬이 어긋나기 때문이고, KR Dalamud 언어 패치도 같은 이유로 이걸 끈다([ko-client-port-feasibility.md](../../docs/frozen/port-feasibility.md)).
 
 `Lumina.dll`과 `Lumina.Excel.dll`은 `$(DALAMUD_HOME)`에서 참조한다. 재배포하지 않는다 — 업스트림 `tools/charamake-dump`와 같은 방식이다.
 
@@ -36,7 +36,7 @@ KR 클라이언트의 `game\sqpack`을 Lumina로 직접 읽는다. **게임을 �
 
 업스트림이 독일어 클라이언트에서 그 블록을 보고 `Alle auswählen`·`Alle abwählen`(모두 선택/모두 해제)이 있다고 적었다. KR에서 같은 자리는 **1273 `모두 켜기` / 1274 `모두 끄기`**다.
 
-같은 범위 안에서 배치가 맞아떨어진다. `docs/environment.md` §7의 1순위 미확인 항목("Addon 시트 행 ID가 KR에서 같은가")에 대한 첫 증거다 — 다만 이건 **한 블록의 일치**지 전수 대조가 아니다.
+같은 범위 안에서 배치가 맞아떨어진다. `docs/dev/environment.md` §7의 1순위 미확인 항목("Addon 시트 행 ID가 KR에서 같은가")에 대한 첫 증거다 — 다만 이건 **한 블록의 일치**지 전수 대조가 아니다.
 
 ## 게임 텍스트를 저장소에 넣지 않는다
 

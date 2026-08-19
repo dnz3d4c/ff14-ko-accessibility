@@ -32,13 +32,13 @@ var sqpack = Path.Combine(GameRoot, "game", "sqpack");
 if (!Directory.Exists(sqpack))
 {
     Console.Error.WriteLine($"게임 데이터가 없다: {sqpack}");
-    Console.Error.WriteLine("  설치 경로는 docs/environment.md 1절.");
+    Console.Error.WriteLine("  설치 경로는 docs/dev/environment.md 1절.");
     return 2;
 }
 
 // 체크섬 검사를 끄는 것은 추측이 아니다. KR 시트는 Lumina의 글로벌 기준
 // 스키마와 체크섬이 어긋나고, KR Dalamud 언어 패치도 같은 이유로 이걸 끈다
-// (docs/ko-client-port-feasibility.md).
+// (docs/frozen/port-feasibility.md).
 GameData game;
 try
 {

@@ -94,7 +94,7 @@ without a habitat keep exactly the wording they had before.
 
 ### 답이 오면
 
-- **병합되면**: 다음 동기화 rebase에서 `kr-port`의 이 커밋이 저절로 비어 사라지고 나머지가 그대로 얹혀야 한다. `upstream.json` 핀을 옮긴다 ([upstream-sync.md](../docs/upstream-sync.md))
+- **병합되면**: 다음 동기화 rebase에서 `kr-port`의 이 커밋이 저절로 비어 사라지고 나머지가 그대로 얹혀야 한다. `upstream.json` 핀을 옮긴다 ([upstream-sync.md](../docs/upstream/sync.md))
 - **고쳐 달라면**: `vendor`의 `upstream-habitat-separator`에서 고치고 force push한다. `kr-port`의 같은 커밋도 같이 고친 뒤 미러에 밀고 `git add vendor/ff14-accessibility`로 기록을 옮긴다 — 안 옮기면 `patch-check`가 잡는다
 - **거절되면**: 커밋은 `kr-port`에 그대로 남는다 — 로컬에는 계속 적용된다
 

@@ -14,15 +14,15 @@ FFXIV 글로벌 서버용 접근성 플러그인([derbruedi/ff14-accessibility](
 |------|---------------|
 | **[프로젝트 현황판](docs/status.md)** | **남은 일의 기준.** 다른 문서는 근거만 갖는다 |
 | **[한국어 README](overlay/ko/README.ko.md)** | **사용자가 읽는 문서.** 설치·실행·키·명령어·문제 해결 |
-| [한국 클라이언트 포팅 타당성 조사](docs/ko-client-port-feasibility.md) | 착수 전 조사. **당시 표현 그대로 동결**했다 |
-| [개발 환경 실측과 설치 결과](docs/environment.md) | 경로·버전·빌드 함정 |
-| [KR 실행 환경 구축 절차](docs/kr-runtime-setup.md) | 손으로 세울 때의 절차. 설치기가 이걸 대신한다 |
-| [단축키 한국어 표](docs/keys-ko.md) | 독일어 키 이름 대응과 KR에서 겹치는 키 |
-| [커밋 규칙](docs/commit-rules.md) | 갈래·트레일러와 검사기가 막는 것 |
-| [손으로 옮긴 36곳](docs/ko-hand-cases.md) | 생성기가 못 읽는 문장 모양과 조심할 것 |
-| [한국어 전수 검수](docs/ko-review-2026-08-18.md) | 50곳을 고친 기록과 대장을 못 믿게 된 이유 |
-| [업스트림 동기화](docs/upstream-sync.md) | 핀을 옮기는 절차 |
-| [업스트림 변경 이력 (한국어)](docs/upstream-changes.md) | 원문이 독일어라 옮겨 둔다 |
+| [한국 클라이언트 포팅 타당성 조사](docs/frozen/port-feasibility.md) | 착수 전 조사. **당시 표현 그대로 동결**했다 |
+| [개발 환경 실측과 설치 결과](docs/dev/environment.md) | 경로·버전·빌드 함정 |
+| [KR 실행 환경 구축 절차](docs/dev/kr-runtime.md) | 손으로 세울 때의 절차. 설치기가 이걸 대신한다 |
+| [단축키 한국어 표](docs/korean/keys.md) | 독일어 키 이름 대응과 KR에서 겹치는 키 |
+| [커밋 규칙](docs/dev/commit-rules.md) | 갈래·트레일러와 검사기가 막는 것 |
+| [손으로 옮긴 36곳](docs/korean/hand-cases.md) | 생성기가 못 읽는 문장 모양과 조심할 것 |
+| [한국어 전수 검수](docs/frozen/ko-review-2026-08-18.md) | 50곳을 고친 기록과 대장을 못 믿게 된 이유 |
+| [업스트림 동기화](docs/upstream/sync.md) | 핀을 옮기는 절차 |
+| [업스트림 변경 이력 (한국어)](docs/upstream/changes.md) | 원문이 독일어라 옮겨 둔다 |
 
 ## 왜 포팅이 가능한가 — 조사 결론
 
@@ -43,7 +43,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 
 ### 소스와 vendor
 
-- `vendor/ff14-accessibility/` — 비공개 미러의 **submodule**. 소스 변경의 원본은 `kr-port` 브랜치의 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. 왜 이 구조인지는 [vendor-submodule.md](docs/vendor-submodule.md)
+- `vendor/ff14-accessibility/` — 비공개 미러의 **submodule**. 소스 변경의 원본은 `kr-port` 브랜치의 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. 왜 이 구조인지는 [vendor-submodule.md](docs/upstream/vendor.md)
 - `patches/` — **업스트림에 보낼** 변경의 기준과 기록. 코드는 `kr-port`에 있다. 기각된 후보는 [rejected.md](patches/rejected.md)에 남고 다시 만들지 않는다
 - `overlay/patches/` — **한국 전용** 변경의 명세. 코드는 역시 `kr-port`에 있다 ([README](overlay/patches/README.md))
 - `overlay/ko/` — 한국어의 원본. `ko.json`이 `(독일어, 영어) → 한국어` 표이고, `terms.json`이 게임 한국어판에서 뽑은 용어 대장, `guide-quotes.json`이 공식 가이드에서 인용한 문장 대장, `README.ko.md`가 사용자에게 주는 문서다. **소스는 여기서 생성된다**
@@ -60,7 +60,7 @@ C:\project\games\ff14-ko-accessibility\run\play.bat
 
 사용자 문서:
 
-- `ko-guide/` — 파판14 **공식 가이드**를 받아 두고 우리가 베낄 형식을 뽑는다. 문체 규약과 "눈으로 읽는 자리"의 근거가 여기서 나온다. 원문은 저장소 밖이다 ([코퍼스 안내](docs/ko-guide-corpus.md), [스킬](.claude/skills/ko-user-guide/SKILL.md))
+- `ko-guide/` — 파판14 **공식 가이드**를 받아 두고 우리가 베낄 형식을 뽑는다. 문체 규약과 "눈으로 읽는 자리"의 근거가 여기서 나온다. 원문은 저장소 밖이다 ([코퍼스 안내](docs/korean/guide-corpus.md), [스킬](.claude/skills/ko-user-guide/SKILL.md))
 
 저장소 규율:
 
@@ -93,7 +93,7 @@ KR 검증 (전부 게임을 켜지 않고 돈다):
 - `/ff_sync check | up <태그> | notes | patches` — **위에서 오는 것.** 원본 모드 따라잡기
 - `/ff_env check | dalamud | vnavmesh | game` — **아래에서 오는 것.** KR 달라무드·vnavmesh·게임 패치
 
-**아래가 위보다 먼저다** ([upstream-sync.md](docs/upstream-sync.md) §9). 그리고 각 커맨드는 `## 멈추는 조건`을 갖는다 — 사람이 정할 것이 섞여 들어오면 커밋하지 않고 멈춘다.
+**아래가 위보다 먼저다** ([upstream-sync.md](docs/upstream/sync.md) §9). 그리고 각 커맨드는 `## 멈추는 조건`을 갖는다 — 사람이 정할 것이 섞여 들어오면 커밋하지 않고 멈춘다.
 
 ## 클론 직후 한 번
 
@@ -101,7 +101,7 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 
 `vendor/`는 비공개 미러의 submodule이라 접근 권한이 있어야 받아진다. 못 받은 상태에서는 vendor가 필요한 검사가 건너뛰어진다 — 오류가 아니다.
 
-빌드 환경 구성은 [docs/environment.md](docs/environment.md)를 본다. `DALAMUD_HOME`과 .NET SDK 경로에 함정이 있다.
+빌드 환경 구성은 [docs/dev/environment.md](docs/dev/environment.md)를 본다. `DALAMUD_HOME`과 .NET SDK 경로에 함정이 있다.
 
 ## 라이선스
 

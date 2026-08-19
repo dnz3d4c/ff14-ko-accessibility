@@ -27,9 +27,9 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 
 **종료 코드는 그대로다** — 0이 성공, 1이 실패. 멈추지 않는 대신 코드로 판정한다.
 
-`sync.bat`은 인자 없이는 **아무것도 안 옮긴다** — 재기만 한다. 올릴 때는 태그를 손으로 적는다(`run\sync.bat v5.87`). 실수로 최신에 끌려가지 않게 하려는 것이고, 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
+`sync.bat`은 인자 없이는 **아무것도 안 옮긴다** — 재기만 한다. 올릴 때는 태그를 손으로 적는다(`run\sync.bat v5.87`). 실수로 최신에 끌려가지 않게 하려는 것이고, 절차는 [docs/upstream/sync.md](../docs/upstream/sync.md).
 
-`setup.bat`과 설치기 EXE는 비슷한 일을 하지만 **플러그인을 놓는 자리가 다르다.** `build.bat`·`setup.bat`은 개발용 자리(`devPlugins`)에, 설치기는 정식 자리(`installedPlugins`)에 놓는다. 둘은 **상호 배타적**이고 서로를 걷어낸다 — 같이 있으면 Dalamud가 같은 모드를 두 번 적재한다. 근거와 조건은 [docs/kr-runtime-setup.md](../docs/kr-runtime-setup.md) §7.
+`setup.bat`과 설치기 EXE는 비슷한 일을 하지만 **플러그인을 놓는 자리가 다르다.** `build.bat`·`setup.bat`은 개발용 자리(`devPlugins`)에, 설치기는 정식 자리(`installedPlugins`)에 놓는다. 둘은 **상호 배타적**이고 서로를 걷어낸다 — 같이 있으면 Dalamud가 같은 모드를 두 번 적재한다. 근거와 조건은 [docs/dev/kr-runtime.md](../docs/dev/kr-runtime.md) §7.
 
 즉 **`build.bat`을 돌리면 그 머신은 개발 상태가 된다.** 배포 상태로 되돌리려면 `dist\FF14AccessibilityInstaller-KR.exe`를 다시 실행한다. 배포판을 인게임에서 검증하는 중이라면 그 사이에 `build.bat`을 돌리지 않는다.
 
@@ -43,13 +43,13 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 
     run\terms.bat dump tools\ko-terms\out
 
-`guide.bat`은 받아 둔 공식 가이드 코퍼스에서 낱말과 형식을 찾는다 (`find <낱말>`·`scan`·`fetch`·`md`). 사용자 문서를 쓸 때 이름을 지어내지 않기 위한 것이고, 자세한 것은 [docs/ko-guide-corpus.md](../docs/ko-guide-corpus.md).
+`guide.bat`은 받아 둔 공식 가이드 코퍼스에서 낱말과 형식을 찾는다 (`find <낱말>`·`scan`·`fetch`·`md`). 사용자 문서를 쓸 때 이름을 지어내지 않기 위한 것이고, 자세한 것은 [docs/korean/guide-corpus.md](../docs/korean/guide-corpus.md).
 
 `check.bat`은 커밋 전 일과 검사다 — pytest 전체, vendor 기록(gitlink·핀), KR·글로벌 양쪽 빌드. 손대기 전에 한 번 돌려 **시작 상태가 초록인지**부터 본다.
 
 ## 경로를 박아 넣지 않는다
 
-`_env.cmd`가 전부 환경변수에서 끌어낸다. 특히 **Dalamud hook 폴더는 이름이 버전이라 업데이터가 갱신할 때마다 바뀐다.** `docs/environment.md` §3이 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔 함정이고, `_env.cmd`가 `Hooks` 아래에서 최신을 골라 그 손질을 없앤다.
+`_env.cmd`가 전부 환경변수에서 끌어낸다. 특히 **Dalamud hook 폴더는 이름이 버전이라 업데이터가 갱신할 때마다 바뀐다.** `docs/dev/environment.md` §3이 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔 함정이고, `_env.cmd`가 `Hooks` 아래에서 최신을 골라 그 손질을 없앤다.
 
 ## 인코딩 — 손대기 전에 읽는다
 
@@ -67,6 +67,6 @@ uv run --no-project python -c "import pathlib,sys; p=pathlib.Path(sys.argv[1]); 
 
 ## log.bat이 판정하는 것
 
-`docs/kr-runtime-setup.md` §10의 판정을 `tools/kr-setup/check_log.py`가 대신 한다. 25만 자에서 다섯 줄을 눈으로 찾지 않기 위한 것이라 로그를 그대로 뱉지 않는다.
+`docs/dev/kr-runtime.md` §10의 판정을 `tools/kr-setup/check_log.py`가 대신 한다. 25만 자에서 다섯 줄을 눈으로 찾지 않기 위한 것이라 로그를 그대로 뱉지 않는다.
 
 **마지막 세션만 본다.** 로그는 세션을 이어 붙이므로 앞판의 성공 줄이 이번 판의 실패를 가린다.

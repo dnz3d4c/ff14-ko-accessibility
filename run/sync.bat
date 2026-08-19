@@ -10,7 +10,7 @@ rem
 rem   run\sync.bat            점검만
 rem   run\sync.bat v5.87      v5.87로 올린다 (패치가 깨끗이 붙을 때만)
 rem
-rem 절차와 판단 기준: docs/upstream-sync.md
+rem 절차와 판단 기준: docs/upstream/sync.md
 
 set "TOOL=%REPO%\tools\upstream-sync\upstream_sync.py"
 

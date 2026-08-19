@@ -2,11 +2,11 @@
 
 **우리만 쓰는** 변경의 대장. 업스트림에 올리지 않는 것들이다.
 
-**코드는 여기 없다.** 원본은 vendor(`kr-port` 브랜치)의 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다 — 패치 파일은 2026-08-19에 없앴다(W-11, 근거는 [docs/vendor-submodule.md](../../docs/vendor-submodule.md)). 이 문서는 **각 커밋이 무엇을 왜 하는지**를 갖는다. 아래 번호(`0001`~)는 옛 패치 시리즈 번호이자 `kr-port`의 커밋 순서이고, 다른 문서가 `overlay/patches/0009`처럼 이 번호로 여기 항목을 가리킨다. 번호는 재사용하지 않는다.
+**코드는 여기 없다.** 원본은 vendor(`kr-port` 브랜치)의 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다 — 패치 파일은 2026-08-19에 없앴다(W-11, 근거는 [docs/upstream/vendor.md](../../docs/upstream/vendor.md)). 이 문서는 **각 커밋이 무엇을 왜 하는지**를 갖는다. 아래 번호(`0001`~)는 옛 패치 시리즈 번호이자 `kr-port`의 커밋 순서이고, 다른 문서가 `overlay/patches/0009`처럼 이 번호로 여기 항목을 가리킨다. 번호는 재사용하지 않는다.
 
-**"한국이 나오는 것"이 아니라 "보낼 이유가 없는 것"이 기준이다**([commit-rules.md](../../docs/commit-rules.md) §0). 대부분은 KR 전용이라 여기 있지만, 한국과 무관한데도 **보내지 않기로 판정돼서** 여기 있는 것이 둘 있다 — `0007`에 접힌 `Loc` 재구성과 `0010` 타이틀 메뉴다. 판정 이유는 [patches/rejected.md](../../patches/rejected.md).
+**"한국이 나오는 것"이 아니라 "보낼 이유가 없는 것"이 기준이다**([commit-rules.md](../../docs/dev/commit-rules.md) §0). 대부분은 KR 전용이라 여기 있지만, 한국과 무관한데도 **보내지 않기로 판정돼서** 여기 있는 것이 둘 있다 — `0007`에 접힌 `Loc` 재구성과 `0010` 타이틀 메뉴다. 판정 이유는 [patches/rejected.md](../../patches/rejected.md).
 
-업스트림에 기여할 변경은 `[업스트림]` 갈래로 따로 표시하고, 명세는 [patches/README.md](../../patches/README.md)가 갖는다. 커밋 훅이 두 갈래를 섞는 커밋을 거부한다 — 근거는 [docs/commit-rules.md](../../docs/commit-rules.md) §2.2.
+업스트림에 기여할 변경은 `[업스트림]` 갈래로 따로 표시하고, 명세는 [patches/README.md](../../patches/README.md)가 갖는다. 커밋 훅이 두 갈래를 섞는 커밋을 거부한다 — 근거는 [docs/dev/commit-rules.md](../../docs/dev/commit-rules.md) §2.2.
 
 ## 받기와 작업
 
@@ -14,9 +14,9 @@ vendor는 submodule이다. 없으면 받는다.
 
 git submodule update --init
 
-작업은 `kr-port`에 커밋하는 것이다. 커밋했으면 `git add vendor/ff14-accessibility`로 기록을 옮기고 미러에 민다 — 절차와 검사는 [docs/upstream-sync.md](../../docs/upstream-sync.md) §3.
+작업은 `kr-port`에 커밋하는 것이다. 커밋했으면 `git add vendor/ff14-accessibility`로 기록을 옮기고 미러에 민다 — 절차와 검사는 [docs/upstream/sync.md](../../docs/upstream/sync.md) §3.
 
-**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** `main`은 클론한 날짜에 따라 다른 커밋을 가리키므로 기준이 못 된다 — 업스트림이 거의 매일 릴리스를 낸다. 검사기(`tools/patch-check`)가 핀이 `kr-port` 이력의 조상인지 본다. 근거: [docs/upstream-sync.md](../../docs/upstream-sync.md) §2.
+**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** `main`은 클론한 날짜에 따라 다른 커밋을 가리키므로 기준이 못 된다 — 업스트림이 거의 매일 릴리스를 낸다. 검사기(`tools/patch-check`)가 핀이 `kr-port` 이력의 조상인지 본다. 근거: [docs/upstream/sync.md](../../docs/upstream/sync.md) §2.
 
 ## 목록
 
@@ -44,7 +44,7 @@ git submodule update --init
 
 두 가지를 한다.
 
-1. **가시성**: `IsVisible` 함수는 KR 바이너리에 있고 호출부 패턴만 없다. KR 전용 본문 시그니처로 함수를 찾아 ClientStructs에 주소를 넘긴다 — 답이 게임의 답 그 자체가 된다. 근거와 재확인 절차는 `docs/environment.md` §6
+1. **가시성**: `IsVisible` 함수는 KR 바이너리에 있고 호출부 패턴만 없다. KR 전용 본문 시그니처로 함수를 찾아 ClientStructs에 주소를 넘긴다 — 답이 게임의 답 그 자체가 된다. 근거와 재확인 절차는 `docs/dev/environment.md` §6
 2. **보고**: `CompatReport`가 어떤 경로가 살아 있는지 로그에 남기고, **게임과 답이 달라질 수 있는 경로만** 기동 시 1회 말한다. `/acc compat`로 언제든 물을 수 있다
 
 세 겹으로 자기 차단한다 — CS가 주소를 못 채웠을 때만, 시그니처가 **정확히 1건** 잡힐 때만 주소를 넣고, 그게 실패하면 모드 내 구현으로 내려간다. 그 구현도 이제는 추론이 아니라 디스어셈블 전사다.
@@ -63,7 +63,7 @@ git submodule update --init
 업스트림 `Installer/`는 우리 사정과 정확히 같은 이유로 만들어졌다 — Dalamud 자체 플러그인 창이 ImGui라 스크린리더가 못 읽으니 devPlugins 경로로 우회한다. 그래서 새로 짜지 않고 KR로 돌렸다. 바꾼 것 넷.
 
 1. **프로필 루트** — `%APPDATA%\XIVLauncherKR`. 한국어 런처는 별개 프로그램이라 글로벌 폴더와 공존한다
-2. **그 프로필을 아무도 안 만든다** — 글로벌은 XIVLauncher가 첫 로그인에 만들어 주지만 한국어 런처는 안 하고, KR 업데이터도 "새 PC용 설치 프로그램이 아니다"라고 스스로 적어 뒀다. 이제 설치기가 [kr-runtime-setup.md](../../docs/kr-runtime-setup.md) §3~4의 세 조각을 직접 만든다. **고약한 건 `DALAMUD_RUNTIME`이다 — 없으면 업데이터가 "적용 완료"라고 하고 게임 안에서 CLR만 조용히 안 뜬다.** 글로벌이 XIVLauncher를 받아 까는 자리에서는 KR 업데이터를 안내하고 멈춘다(그 파이프라인은 재배포하지 않는다)
+2. **그 프로필을 아무도 안 만든다** — 글로벌은 XIVLauncher가 첫 로그인에 만들어 주지만 한국어 런처는 안 하고, KR 업데이터도 "새 PC용 설치 프로그램이 아니다"라고 스스로 적어 뒀다. 이제 설치기가 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §3~4의 세 조각을 직접 만든다. **고약한 건 `DALAMUD_RUNTIME`이다 — 없으면 업데이터가 "적용 완료"라고 하고 게임 안에서 CLR만 조용히 안 뜬다.** 글로벌이 XIVLauncher를 받아 까는 자리에서는 KR 업데이터를 안내하고 멈춘다(그 파이프라인은 재배포하지 않는다)
 3. **플러그인 출처가 로컬 빌드** — 편의가 아니다. 업스트림 릴리스 바이너리는 CS 7.55 바인딩이고 KR Dalamud는 7.51을 고정하므로, 적재는 되고 첫 기어세트 호출에서 던진다. EXE 옆을 먼저 보고(배포 형태) 없으면 빌드 산출물까지 올라간다(개발 형태)
 4. **한국어 안내** — `Loc` 폴백을 독일어에서 **영어로** 바꿨다. 안 그러면 빠진 키가 한국어 사용자에게 독일어 문장으로 읽힌다. 한국어 사전은 이 흐름이 실제로 보여주는 키만 갖는다
 
@@ -95,7 +95,7 @@ git submodule update --init
 
 ### 0009 — 생성기가 못 닿는 손 케이스
 
-중첩 삼항·이어붙이기·배열이라 `tools/ko-apply`가 못 읽는 자리들. **손으로 쓴 별도 커밋**이다 — 생성 커밋에 섞으면 다시 만들 때 그 줄만 조용히 사라진다(아래 [손 케이스는 생성 커밋에 넣지 않는다](#손-케이스는-생성-커밋에-넣지-않는다)). 유형별 정리는 [docs/ko-hand-cases.md](../../docs/ko-hand-cases.md).
+중첩 삼항·이어붙이기·배열이라 `tools/ko-apply`가 못 읽는 자리들. **손으로 쓴 별도 커밋**이다 — 생성 커밋에 섞으면 다시 만들 때 그 줄만 조용히 사라진다(아래 [손 케이스는 생성 커밋에 넣지 않는다](#손-케이스는-생성-커밋에-넣지-않는다)). 유형별 정리는 [docs/korean/hand-cases.md](../../docs/korean/hand-cases.md).
 
 ### 0010 — 타이틀 메뉴 항목 수를 메뉴가 완성된 뒤에 말한다
 
@@ -127,7 +127,7 @@ git submodule update --init
 
     installedPlugins\FF14Accessibility\<버전>\FF14Accessibility.dll
 
-**셋이 적재를 가른다.** 전부 Dalamud 소스에서 확인했고, 어긋나면 오류가 아니라 침묵이다 — 자세한 것은 [kr-runtime-setup.md](../../docs/kr-runtime-setup.md) §7.
+**셋이 적재를 가른다.** 전부 Dalamud 소스에서 확인했고, 어긋나면 오류가 아니라 침묵이다 — 자세한 것은 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §7.
 
 - 버전 폴더 이름이 버전으로 파싱될 것 (`CleanupPlugins`가 아닌 것을 지운다)
 - 매니페스트의 `InstalledFromUrl`이 `OFFICIAL`일 것 (아니면 `IsOrphaned`가 참이고 고아는 안 뜬다)
@@ -189,7 +189,7 @@ git submodule update --init
 2. uv run --no-project python tools/ko-apply/ko_apply.py --write
 3. vendor에서 **같은 제목으로** 커밋한다
 
-절차 전체는 [docs/upstream-sync.md](../../docs/upstream-sync.md) §5.4.
+절차 전체는 [docs/upstream/sync.md](../../docs/upstream/sync.md) §5.4.
 
 문장이 사라졌으면 도구가 이름을 대고 멈춘다 — "카탈로그에 있는데 소스에 없다". 그건 업스트림이 그 문장을 고쳤다는 뜻이고, 새 원문에 맞춰 `ko.json`을 고치면 된다. **diff 충돌이 아니라 목록으로 나온다.**
 
@@ -205,4 +205,4 @@ git submodule update --init
 
 ### 손 케이스는 생성 커밋에 넣지 않는다
 
-중첩 삼항·이어붙이기·배열 같은 자리는 도구가 못 다룬다([docs/ko-hand-cases.md](../../docs/ko-hand-cases.md)). 그건 **별도 커밋**(`0009`)으로 간다 — 생성 커밋에 손편집을 섞으면 다시 만들 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어 검사에도 안 걸린다.
+중첩 삼항·이어붙이기·배열 같은 자리는 도구가 못 다룬다([docs/korean/hand-cases.md](../../docs/korean/hand-cases.md)). 그건 **별도 커밋**(`0009`)으로 간다 — 생성 커밋에 손편집을 섞으면 다시 만들 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어 검사에도 안 걸린다.

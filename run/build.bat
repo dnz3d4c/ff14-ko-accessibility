@@ -4,7 +4,7 @@ call "%~dp0_env.cmd"
 
 rem KR 패치가 적용된 vendor 클론을 빌드하고 devPlugins에 배포한다.
 rem AutomaticReloading이 켜져 있어서 게임이 떠 있어도 덮어쓰면 반영된다
-rem (docs/kr-runtime-setup.md 7절).
+rem (docs/dev/kr-runtime.md 7절).
 rem
 rem 여기는 **개발 상태**를 만든다. 사용자에게 나가는 정식 설치는 설치기가
 rem installedPlugins에 넣는다. 둘은 상호 배타적이다 - 같이 있으면 Dalamud가
@@ -20,12 +20,12 @@ echo.
 
 if not exist "%DOTNET%" (
   echo [실패] .NET SDK를 못 찾았다: %DOTNET%
-  echo   PATH의 dotnet은 런타임만 있어서 못 쓴다. docs/environment.md 2절.
+  echo   PATH의 dotnet은 런타임만 있어서 못 쓴다. docs/dev/environment.md 2절.
   goto :fail
 )
 if not defined DALAMUD_HOME (
   echo [실패] Dalamud hook 폴더가 없다: %KR_PROFILE%\addon\Hooks
-  echo   업데이터에서 Check Update를 먼저 돌린다. docs/kr-runtime-setup.md 5절.
+  echo   업데이터에서 Check Update를 먼저 돌린다. docs/dev/kr-runtime.md 5절.
   goto :fail
 )
 if not exist "%PROJ%" (

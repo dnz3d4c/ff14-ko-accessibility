@@ -61,7 +61,7 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
 ## vendor 취급 [필수]
 
-`vendor/ff14-accessibility/`는 업스트림 클론이고, **우리 작업의 원본은 거기 `kr-port` 브랜치다.** 저장소가 담는 것은 그 팁을 가리키는 포인터 하나뿐이고 파일은 안 담는다. 왜 그렇게 하는지는 [docs/vendor-submodule.md](docs/vendor-submodule.md).
+`vendor/ff14-accessibility/`는 업스트림 클론이고, **우리 작업의 원본은 거기 `kr-port` 브랜치다.** 저장소가 담는 것은 그 팁을 가리키는 포인터 하나뿐이고 파일은 안 담는다. 왜 그렇게 하는지는 [docs/upstream/vendor.md](docs/upstream/vendor.md).
 
 - **작업은 `kr-port`에 커밋한다.** 커밋했으면 미러에 밀고 포인터를 갱신한다(`git add vendor/ff14-accessibility`). 밀기 전에 포인터를 커밋하면 받는 사람의 클론이 깨진다.
 - 포인터를 옮기는 커밋은 `[벤더]`·`[업스트림]`·`[한국전용]`만 낼 수 있다. 다른 갈래에 섞이면 훅 C11이 거부한다.
@@ -69,14 +69,14 @@ C:\Users\USER\AppData\Local\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 - **`patches/`에 새 후보를 올리기 전에 [patches/rejected.md](patches/rejected.md)를 먼저 본다.** 기각된 부류를 다시 만들지 않기 위한 목록이다. 기준 다섯을 다 넘겨야 하고([patches/README.md](patches/README.md)), 그중 둘이 특히 자주 걸린다 — **글섭 클라 없이 소스만으로 판정될 것**(우리한테 KR 클라뿐이다)과 **명백한 기존 로직의 오류일 것**(리팩터·구조 개선·"언젠가 편해지는 것"은 만들지 않는다).
 - **한국어 문장은 소스가 아니라 `overlay/ko/ko.json`에서 고친다.** 소스의 그 자리는 `tools/ko-apply`가 만드는 생성물이라 손대지 않는다 — 충돌하면 푸는 게 아니라 다시 만든다. 왜인지는 [overlay/patches/README.md](overlay/patches/README.md).
 - **붙는 자리는 `upstream.json`의 핀이지 `main`이 아니다.** 핀을 손으로 고치지 않는다 — `run\sync.bat`이 옮긴다.
-- **업스트림은 독일어로 개발된다.** 핀을 옮겼으면 [docs/upstream-changes.md](docs/upstream-changes.md)에 한국어로 남긴다. 안 남기면 훅 C10과 테스트가 막는다. 절차는 [docs/upstream-sync.md](docs/upstream-sync.md).
+- **업스트림은 독일어로 개발된다.** 핀을 옮겼으면 [docs/upstream/changes.md](docs/upstream/changes.md)에 한국어로 남긴다. 안 남기면 훅 C10과 테스트가 막는다. 절차는 [docs/upstream/sync.md](docs/upstream/sync.md).
 
 ## 나머지는 문서가 소유한다
 
 여기에 베끼지 않는다. 어긋나면 문서가 맞다.
 
-- 개발 환경·경로·빌드 명령: `docs/environment.md`
-- 공식 가이드 코퍼스(무엇을 받아 뒀고 어떻게 찾나): `docs/ko-guide-corpus.md`
-- 커밋 규칙: `docs/commit-rules.md`
-- 업스트림 동기화: `docs/upstream-sync.md`
-- 포팅 판단 근거: `docs/ko-client-port-feasibility.md`
+- 개발 환경·경로·빌드 명령: `docs/dev/environment.md`
+- 공식 가이드 코퍼스(무엇을 받아 뒀고 어떻게 찾나): `docs/korean/guide-corpus.md`
+- 커밋 규칙: `docs/dev/commit-rules.md`
+- 업스트림 동기화: `docs/upstream/sync.md`
+- 포팅 판단 근거: `docs/frozen/port-feasibility.md`

@@ -20,6 +20,6 @@
 # Upstream-Files: FF14Accessibility/...
 # Upstream-Subject: 영어 제목. PR 보낼 때 옮길지는 그때 정한다 (commit-rules 3.1)
 
-# [벤더] 커밋은 아래 한 줄이 필수다. 핀을 옮기면 docs/upstream-changes.md도
+# [벤더] 커밋은 아래 한 줄이 필수다. 핀을 옮기면 docs/upstream/changes.md도
 # 같이 건드려야 한다 - 업스트림은 독일어라 안 옮기면 아무도 못 읽는다.
 # Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)

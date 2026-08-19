@@ -11,7 +11,7 @@ if not exist "%DOTNET%" (
 )
 if not defined DALAMUD_HOME (
   echo [실패] Dalamud hook 폴더가 없다: %KR_PROFILE%\addon\Hooks
-  echo   Lumina.dll을 거기서 참조한다. docs/kr-runtime-setup.md 5절.
+  echo   Lumina.dll을 거기서 참조한다. docs/dev/kr-runtime.md 5절.
   goto :fail
 )
 

@@ -12,7 +12,7 @@
 
 ## 용법
 
-**저장소 루트에서** 실행한다. 별도 빌드가 필요 없다 (`dotnet run`이 빌드까지 한다). `dotnet`은 절대 경로로 부른다 — 이유는 `docs/environment.md` §2.
+**저장소 루트에서** 실행한다. 별도 빌드가 필요 없다 (`dotnet run`이 빌드까지 한다). `dotnet`은 절대 경로로 부른다 — 이유는 `docs/dev/environment.md` §2.
 
 C:/Users/USER/scoop/apps/dotnet-sdk/current/dotnet.exe run -c Release --project tools/asmref-check -- <플러그인DLL> <참조어셈블리디렉토리>
 

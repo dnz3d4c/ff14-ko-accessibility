@@ -1,6 +1,6 @@
 """커밋 메시지 검증기 테스트.
 
-규칙 근거: docs/commit-rules.md
+규칙 근거: docs/dev/commit-rules.md
 검증기가 막아야 하는 것은 "나중에 업스트림 PR을 조립할 수 없게 되는 커밋"이다.
 """
 
@@ -164,7 +164,7 @@ def test_빈_트레일러는_면제가_아니다():
 
 def test_문서_커밋은_현황판을_요구하지_않는다():
     # 근거 문서를 고치는 것 자체는 할 일의 이동이 아니다.
-    assert "C8" not in codes("[문서] 환경 문서에 실측 결과 추가", ["docs/environment.md"])
+    assert "C8" not in codes("[문서] 환경 문서에 실측 결과 추가", ["docs/dev/environment.md"])
 
 
 def test_벤더_커밋은_현황판을_요구하지_않는다():
@@ -184,7 +184,7 @@ def test_경로_목록이_비면_현황판_검사를_건너뛴다():
 
 
 VENDOR_RANGE = "Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)"
-VENDOR_PATHS = ["upstream.json", "docs/upstream-changes.md"]
+VENDOR_PATHS = ["upstream.json", "docs/upstream/changes.md"]
 
 
 def test_벤더_커밋에_올린_범위가_없으면_거부한다():
@@ -209,7 +209,7 @@ def test_핀을_안_건드리는_벤더_커밋은_이력을_요구하지_않는�
 
 
 def test_다른_영역은_이_규칙을_안_받는다():
-    assert "C9" not in codes("[문서] 동기화 절차 정리", ["docs/upstream-sync.md"])
+    assert "C9" not in codes("[문서] 동기화 절차 정리", ["docs/upstream/sync.md"])
     assert "C10" not in codes("[문서] 핀 설명 추가", ["upstream.json"])
 
 
@@ -223,7 +223,7 @@ def test_다른_영역은_이_규칙을_안_받는다():
 def test_문서_커밋이_vendor_포인터를_옮기면_거부한다():
     assert "C11" in codes(
         "[문서] 환경 문서 오타 수정",
-        ["docs/environment.md", "vendor/ff14-accessibility"],
+        ["docs/dev/environment.md", "vendor/ff14-accessibility"],
     )
 
 
@@ -237,7 +237,7 @@ def test_벤더_업스트림_한국전용_커밋은_vendor_포인터를_옮길_�
     # kr-port에 커밋이 쌓이면 포인터가 같이 움직인다. 그게 정상 경로다.
     assert "C11" not in codes(
         f"[벤더] 업스트림 v5.89로 올림\n\n{VENDOR_RANGE}\n",
-        ["upstream.json", "docs/upstream-changes.md", "vendor/ff14-accessibility"],
+        ["upstream.json", "docs/upstream/changes.md", "vendor/ff14-accessibility"],
     )
     assert "C11" not in codes(UPSTREAM_OK, ["vendor/ff14-accessibility"])
     assert "C11" not in codes(

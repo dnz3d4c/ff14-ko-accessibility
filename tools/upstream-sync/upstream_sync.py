@@ -31,7 +31,7 @@
 `--json`은 사람이 읽는 것과 **같은 조사 결과**를 낸다. 출력을 두 벌 만들면
 둘이 갈라지고, 갈라진 쪽을 아무도 안 본다.
 
-절차와 판단 기준: docs/upstream-sync.md
+절차와 판단 기준: docs/upstream/sync.md
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 VENDOR = REPO / "vendor" / "ff14-accessibility"
 PIN = REPO / "upstream.json"
-CHANGES = REPO / "docs" / "upstream-changes.md"
+CHANGES = REPO / "docs" / "upstream" / "changes.md"
 
 #: 번역이 안 된 자리. 이 표시가 남아 있으면 검사가 통과하지 않는다.
 UNTRANSLATED = "(미번역)"
@@ -478,7 +478,7 @@ def render_issue_body(found: dict) -> str | None:
         lines.append(f"- `{item['sha']}` {item['subject']}")
 
     lines += ["", "## 할 것", "", "```", f"run\\sync.bat {newest}", "```", ""]
-    lines.append("그다음 변경 이력을 한국어로 채운다 — `docs/upstream-sync.md` §6.")
+    lines.append("그다음 변경 이력을 한국어로 채운다 — `docs/upstream/sync.md` §6.")
     return "\n".join(lines) + "\n"
 
 
@@ -557,7 +557,7 @@ def _render(found: dict) -> None:
             print(f"\n다음: run\\sync.bat {newest}")
         else:
             print(f"\nkr-port가 {newest}에 안 얹힌다 (멈춘 곳: {found['failing_patch']})")
-            print("  손으로 얹어 충돌을 본다 - docs/upstream-sync.md §5")
+            print("  손으로 얹어 충돌을 본다 - docs/upstream/sync.md §5")
 
     if found["missing_notes"]:
         print(f"\n변경 이력에 없는 판: {', '.join(found['missing_notes'])}")
@@ -640,7 +640,7 @@ def cmd_to(tag: str, offline: bool) -> int:
     if failing is not None:
         print(f"kr-port가 {tag}에 안 얹힌다 (멈춘 곳: {failing}).", file=sys.stderr)
         print("아무것도 건드리지 않았다. 손으로 얹어 충돌을 본다 - "
-              "docs/upstream-sync.md §4", file=sys.stderr)
+              "docs/upstream/sync.md §4", file=sys.stderr)
         return 1
 
     # 되돌릴 자리를 먼저 만든다. 여기서부터 vendor를 건드린다.

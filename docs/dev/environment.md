@@ -52,7 +52,7 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 
 ### 프로필 루트 이름이 `XIVLauncherKR`인 이유
 
-**우리가 지은 이름이 아니고, 없는 런처를 가리키는 것도 아니다.** KR Dalamud 쪽 프로필 규약이고 업데이터가 그걸 전제한다. 한국어 런처가 이 구성에서 안 도는 것은 맞지만(`kr-runtime-setup.md` §9), 그렇다고 이름이 빈 것은 아니다.
+**우리가 지은 이름이 아니고, 없는 런처를 가리키는 것도 아니다.** KR Dalamud 쪽 프로필 규약이고 업데이터가 그걸 전제한다. 한국어 런처가 이 구성에서 안 도는 것은 맞지만(`docs/dev/kr-runtime.md` §9), 그렇다고 이름이 빈 것은 아니다.
 
 - 업데이터 설정 `UpdaterSettings.ProfileRoot`의 **기본값**이 `%APPDATA%\XIVLauncherKR`이다
 - `README-KR.txt`: "기존 `%APPDATA%\XIVLauncherKR` 프로필, 런타임, 설정과 플러그인을 사용합니다"
@@ -67,7 +67,7 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 | `devPlugins\vnavmesh` | 5.5MB의 대부분 | 남의 플러그인 |
 | `installedPlugins\FF14Accessibility`, `pluginConfigs\FF14Accessibility.json` | 나머지 | **우리** |
 
-우리 것이 `installedPlugins`에 있는 이유는 [kr-runtime-setup.md](kr-runtime-setup.md) §7이 갖는다. 개발 중에는 `devPlugins`에 놓이고, 그 둘은 **동시에 있으면 안 된다.**
+우리 것이 `installedPlugins`에 있는 이유는 [kr-runtime-setup.md](kr-runtime.md) §7이 갖는다. 개발 중에는 `devPlugins`에 놓이고, 그 둘은 **동시에 있으면 안 된다.**
 
 ### 바꿀 수 있다. 우리가 따라간다 (2026-08-18)
 
@@ -75,7 +75,7 @@ C:\Users\USER\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 
 **그 파일은 내부 값이 아니라 공개된 사용자 설정이다.** `README-KR.txt`가 직접 적어 뒀다 — "사용자 설정은 `%APPDATA%\KrDalamudUpdater\settings.json`에 보관됩니다". 업데이터가 옆에 `settings.json.bak`을 남기며 자기가 다시 쓴다.
 
-**전에는 우리가 세 군데에 박아 뒀다** — 설치기·`run/_env.cmd`·`tools/kr-setup/check_log.py`. 셋이 서로 맞는지도, 업데이터의 실제 설정과 맞는지도 아무도 안 봤다. 사용자가 값을 옮기면 설치기는 옛 폴더에 넣고 업데이터는 **빈 프로필을 새로 만들어 거기 주입한다** — 오류 없이 플러그인만 빠진다. [status.md](status.md) §3이 "아무 일도 안 일어난다의 원인은 늘 경로 중 하나다"라고 적어 둔 바로 그 실패다.
+**전에는 우리가 세 군데에 박아 뒀다** — 설치기·`run/_env.cmd`·`tools/kr-setup/check_log.py`. 셋이 서로 맞는지도, 업데이터의 실제 설정과 맞는지도 아무도 안 봤다. 사용자가 값을 옮기면 설치기는 옛 폴더에 넣고 업데이터는 **빈 프로필을 새로 만들어 거기 주입한다** — 오류 없이 플러그인만 빠진다. [status.md](../status.md) §3이 "아무 일도 안 일어난다의 원인은 늘 경로 중 하나다"라고 적어 둔 바로 그 실패다.
 
 **그래서 지금은 읽는다** (`overlay/patches/0011`). 순서는 셋이다.
 
@@ -206,7 +206,7 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 | 3 | addon 이름 90종 동일 | **대체로 해소** | `_TitleMenu`, `_CharaSelectListMenu`, `_CharaMake*` 9종이 그대로 잡힘 |
 | 4 | 플러그인 자체 오프셋 3곳 | **2/3 해소** | human.cmp 팔레트 46,688색 로드, LogFilter 278행·69채널 파싱(Broken 아님). 트리플 트라이어드는 미확인 |
 | 5 | 툴팁 후킹 3개 | **해소** | `[Tooltip] Hooks aktiv (Attach/Detach/DetachByAddon)` |
-| 6 | vnavmesh 동작 | **해소** | 인게임에서 자동 이동 전 구간 확인 — 적재·경로 탐색 9회 전부 성공 (2026-08-18, [status.md](status.md) §9). §7 |
+| 6 | vnavmesh 동작 | **해소** | 인게임에서 자동 이동 전 구간 확인 — 적재·경로 탐색 9회 전부 성공 (2026-08-18, [status.md](../status.md) §9). §7 |
 | 7 | CS 7.51 컴파일 | **해소** | §4 참조 |
 | 8 | KR에 영어 시트 존재 | **해소 — 없다** | `run\terms.bat langs`가 sqpack에서 읽어 낸 언어는 한국어 하나뿐이다(Addon 19,592행). 영어·일본어·독일어·프랑스어 전부 0. 그래서 용어를 "영어로 찾아 한국어를 읽는" 방식이 로컬에서는 안 되고, 행 번호로 짚어야 한다 (`tools/ko-terms/README.md`) |
 | 9 | UI 노드 ID/휴리스틱 | **부분 해소, 결함 1건 발견** | 아래 참조 |
@@ -218,7 +218,7 @@ curl -sS -o "C:\Users\USER\AppData\Local\Temp\dalamud-official.zip" https://goat
 
 1. **`AtkResNode.IsVisible()` 시그니처가 KR에서 해석되지 않는다** — 조사 §6-12가 예측한 항목이 그대로 나왔다. 60개 호출부가 전부 예외. 타이틀 메뉴 이동·창 전체 읽기·노드 덤프가 죽었다. `overlay/patches/0002`로 우회했고, **함수 자체는 KR 바이너리에 있다는 걸 확인해 `0004`에서 게임 함수 호출로 되돌렸다**(§6)
 2. **확인 버튼 라벨이 독일어 하드코딩** — 조사 §3 계층 3의 1번 항목. 캐릭터 생성을 빠져나갈 수 없었다. `overlay/patches/0003`으로 수정
-3. **KR 프로필 부트스트랩 3종이 없다** — 업데이터가 기존 프로필을 전제한다. `docs/kr-runtime-setup.md`
+3. **KR 프로필 부트스트랩 3종이 없다** — 업데이터가 기존 프로필을 전제한다. `docs/dev/kr-runtime.md`
 4. **키 이름 파서가 `Pos1`(Home)과 `Strg+F`를 모른다** — 바인딩 3개가 죽어 있다. KR 무관, 업스트림 결함
 5. **타이틀 메뉴 항목 수가 경로에 따라 다르다** — 메뉴 전체 안내는 "1 of 5", 화살표 이동은 "1 of 6"이라고 말한다. 2026-08-17 가시성 변경 **전후 로그가 똑같으므로 회귀가 아니다**(`dalamud-kr-gui.old.log`에도 5와 6이 같이 있다). KR 무관 추정, 미조사
 
@@ -321,9 +321,9 @@ uv run --no-project --with pytest pytest tools/sig-probe/tests -q
 
 ## 7. vnavmesh 사전 검증 (2026-08-18)
 
-게임을 켜지 않고 할 수 있는 검증은 전부 통과했고, **인게임 동작도 확인됐다** — 대상 지정부터 도착 안내까지, vnavmesh 적재·경로 탐색 9회 전부 성공(2026-08-18, [status.md](status.md) §9). 게임 패치 뒤에 다시 판정하는 방법은 `docs/kr-runtime-setup.md` §10 — 키를 사람이 눌러야 하고 이 클라이언트에는 키 주입이 통하지 않는다(§5).
+게임을 켜지 않고 할 수 있는 검증은 전부 통과했고, **인게임 동작도 확인됐다** — 대상 지정부터 도착 안내까지, vnavmesh 적재·경로 탐색 9회 전부 성공(2026-08-18, [status.md](../status.md) §9). 게임 패치 뒤에 다시 판정하는 방법은 `docs/dev/kr-runtime.md` §10 — 키를 사람이 눌러야 하고 이 클라이언트에는 키 주입이 통하지 않는다(§5).
 
-받은 것은 vnavmesh **1.2.3.13**이고 `https://puni.sh/api/repository/veyn` 매니페스트를 거쳤다. DalamudApiLevel 15, ApplicableVersion any. 업스트림 인스톨러가 쓰는 것과 같은 출처다(`Installer/InstallerService.cs:36`). 설치 경로와 절차는 `docs/kr-runtime-setup.md` §8.
+받은 것은 vnavmesh **1.2.3.13**이고 `https://puni.sh/api/repository/veyn` 매니페스트를 거쳤다. DalamudApiLevel 15, ApplicableVersion any. 업스트림 인스톨러가 쓰는 것과 같은 출처다(`Installer/InstallerService.cs:36`). 설치 경로와 절차는 `docs/dev/kr-runtime.md` §8.
 
 **재배포하지 않는다.** vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud 도구(§3)와 같은 취급이다.
 
@@ -371,7 +371,7 @@ vnavmesh는 양쪽을 다 쓴다. `#US`만 읽었으면 절반만 보고 통과�
 
 ## 8. 이 머신의 NVDA — 문서 표기가 실제로 어떻게 들리나 (2026-08-19)
 
-**이 값으로 문서 표기를 뒤집지 않는다.** NVDA 설정은 사용자가 직접 조절하고, 스크린리더 동작은 사용자가 더 잘 안다(2026-08-19 지시). 여기 적는 것은 "같은 조사를 다시 하지 않기 위한 기록"이지 표기를 바꿀 근거가 아니다. 표기는 [ko-user-guide 스킬](../.claude/skills/ko-user-guide/SKILL.md) §4가 정하고, 바꿔야 할 일이 생기면 사용자에게 묻는다.
+**이 값으로 문서 표기를 뒤집지 않는다.** NVDA 설정은 사용자가 직접 조절하고, 스크린리더 동작은 사용자가 더 잘 안다(2026-08-19 지시). 여기 적는 것은 "같은 조사를 다시 하지 않기 위한 기록"이지 표기를 바꿀 근거가 아니다. 표기는 [ko-user-guide 스킬](../../.claude/skills/ko-user-guide/SKILL.md) §4가 정하고, 바꿔야 할 일이 생기면 사용자에게 묻는다.
 
 아래는 **추정이 아니라 설정 파일을 직접 읽은 값이다.**
 

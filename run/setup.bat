@@ -3,7 +3,7 @@ setlocal
 call "%~dp0_env.cmd"
 
 rem 최초 1회. 프로필의 빠진 조각을 만들고 접근성 모드를 설정에 심는다.
-rem docs/kr-runtime-setup.md 3절, 7절.
+rem docs/dev/kr-runtime.md 3절, 7절.
 rem
 rem **여기가 심는 것은 개발 경로다**(devPlugins). 사용자에게 나가는 정식
 rem 설치는 설치기가 installedPlugins에 넣는다. 둘은 동시에 있으면 안 된다 -

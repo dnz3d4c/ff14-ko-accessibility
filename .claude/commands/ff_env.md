@@ -7,7 +7,7 @@ argument-hint: check | dalamud | vnavmesh | game
 
 받은 인자: `$ARGUMENTS` — 비었으면 `check`로 친다.
 
-동기화는 위에서만 오지 않는다. **아래에서도 온다** — 업스트림과 무관하게 우리만 깨지는 계층이 셋 있고, 그 규칙은 [docs/upstream-sync.md](../../docs/upstream-sync.md) §9가, 사실(버전·경로·측정값)은 [docs/environment.md](../../docs/environment.md)가 갖는다. 여기 베끼지 않는다.
+동기화는 위에서만 오지 않는다. **아래에서도 온다** — 업스트림과 무관하게 우리만 깨지는 계층이 셋 있고, 그 규칙은 [docs/upstream/sync.md](../../docs/upstream/sync.md) §9가, 사실(버전·경로·측정값)은 [docs/dev/environment.md](../../docs/dev/environment.md)가 갖는다. 여기 베끼지 않는다.
 
 **순서가 정해져 있다.** 게임이 패치되면 업스트림 동기화보다 이쪽이 먼저다. 이 계층이 깨진 채로 위를 올리면 무엇 때문에 깨졌는지 구분이 안 된다.
 
@@ -46,10 +46,10 @@ argument-hint: check | dalamud | vnavmesh | game
 
 KR 달라무드(`MiqoKR/kr-dalamud-updater`) 갱신. **버스 팩터 1인 계층이고 우리가 통제하지 못한다.**
 
-1. **먼저 지금 값을 적어 둔다** — `Hooks` 아래 버전 폴더, `docs/environment.md` §3의 값. 갱신 뒤 무엇이 움직였는지 대조할 기준이다.
+1. **먼저 지금 값을 적어 둔다** — `Hooks` 아래 버전 폴더, `docs/dev/environment.md` §3의 값. 갱신 뒤 무엇이 움직였는지 대조할 기준이다.
 2. **사용자에게 실행을 넘긴다.** 게임이 떠 있는 상태에서 업데이터를 돌린다. 실행 대상은 [CLAUDE.md](../../CLAUDE.md) `## 확정된 실행 대상`에 있는 것 하나를 그대로 준다. 무엇을 보고 성공을 판단하는지와 나에게 알려줄 것을 같이 적는다.
 3. **갱신됐다는 답을 받은 뒤에** 다시 잰다 — `Hooks` 버전이 바뀌었나, `run\check.bat`이 그대로 통과하나, `dist/`를 다시 내야 하나.
-4. **버전이 움직였으면 `docs/environment.md` §3을 옮긴다.** 그 문서가 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔 자리다.
+4. **버전이 움직였으면 `docs/dev/environment.md` §3을 옮긴다.** 그 문서가 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔 자리다.
 5. 필요하면 `run\pack.bat`으로 배포물을 다시 내고, `[도구]`나 `[문서]`로 커밋한다.
 
 ## vnavmesh
@@ -57,7 +57,7 @@ KR 달라무드(`MiqoKR/kr-dalamud-updater`) 갱신. **버스 팩터 1인 계층
 자동 걷기 플러그인(`awgil/ffxiv_navmesh`, puni.sh 매니페스트). **남의 것은 남이 관리하게 둔다** — 우리는 재기만 한다.
 
 1. 설치돼 있나. 없으면 결함이 아니라 미설치다(넘패드3에서 `Auto-walk not available`).
-2. 어셈블리 참조와 시그니처를 다시 잰다. 절차와 지난 실측(참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/environment.md` §7.
+2. 어셈블리 참조와 시그니처를 다시 잰다. 절차와 지난 실측(참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/dev/environment.md` §7.
 3. **설정 파일을 만들어 주지 않는다.** 그쪽 스키마에 우리가 묶인다(현황판 §4-3). 기동마다 뜨는 FileNotFound 1건이 정상 상태다.
 4. 설치기가 받아오므로, 판이 올라갔으면 `run\pack.bat`으로 다시 내고 `--check`로 확인한다.
 
@@ -70,7 +70,7 @@ KR 클라이언트가 패치된 뒤. **시그니처가 살아 있는지가 전�
        uv run --no-project --with pytest pytest tools/sig-probe/tests -q
 
    게임이 안 깔린 머신에서는 건너뛴다. 다른 경로면 `FFXIV_KR_GAME`으로 `game\ffxiv_dx11.exe`를 가리킨다.
-2. **도구 자신이 믿을 만한지도 같이 본다.** Dalamud가 실제 프로세스에서 해석해 캐시해 둔 시그니처와 우리 해석이 일치하는지 대조하는 모드가 있다(`--verify-cache`, `cachedSigs\cs.json`). 지난 실측은 2,203건 불일치 0이다(`docs/environment.md` §6).
+2. **도구 자신이 믿을 만한지도 같이 본다.** Dalamud가 실제 프로세스에서 해석해 캐시해 둔 시그니처와 우리 해석이 일치하는지 대조하는 모드가 있다(`--verify-cache`, `cachedSigs\cs.json`). 지난 실측은 2,203건 불일치 0이다(`docs/dev/environment.md` §6).
 3. 게임 버전이 KR Dalamud가 지원한다고 적어 둔 버전과 **같은지** 본다. 어긋나면 주입이 안 되고, 그건 우리 문제가 아니라 대기다.
-4. 시그니처가 깨졌으면 **거기서 멈춘다.** 새로 찾는 것은 `docs/environment.md` §6의 절차(위치 근거 + 본문 근거 두 갈래)를 따라야 하고, 짐작으로 넣을 자리가 아니다.
+4. 시그니처가 깨졌으면 **거기서 멈춘다.** 새로 찾는 것은 `docs/dev/environment.md` §6의 절차(위치 근거 + 본문 근거 두 갈래)를 따라야 하고, 짐작으로 넣을 자리가 아니다.
 5. 성했으면 그다음이 `/ff_sync`다.

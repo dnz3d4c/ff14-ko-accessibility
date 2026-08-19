@@ -1,16 +1,16 @@
 # patches — 업스트림에 올릴 변경
 
-한국을 언급하지 않고도 성립하는 변경만 이 갈래로 낸다. **KR 전용의 명세는 [overlay/patches/README.md](../overlay/patches/README.md)다.** 커밋 훅이 두 갈래를 섞는 커밋을 거부한다([docs/commit-rules.md](../docs/commit-rules.md) §2.2).
+한국을 언급하지 않고도 성립하는 변경만 이 갈래로 낸다. **KR 전용의 명세는 [overlay/patches/README.md](../overlay/patches/README.md)다.** 커밋 훅이 두 갈래를 섞는 커밋을 거부한다([docs/dev/commit-rules.md](../docs/dev/commit-rules.md) §2.2).
 
-**코드는 여기 없다.** 패치 파일은 2026-08-19에 없앴고(W-11, [docs/vendor-submodule.md](../docs/vendor-submodule.md)), 보낼 변경은 vendor `kr-port` 브랜치의 커밋으로 산다 — 우리 저장소 커밋에는 `[업스트림]` 접두와 `Upstream-Files`·`Upstream-Subject` 트레일러로 표시된다([commit-rules.md](../docs/commit-rules.md) §2.3). 이 디렉토리에 남는 것은 **기준·기각 목록·PR 기록**이다.
+**코드는 여기 없다.** 패치 파일은 2026-08-19에 없앴고(W-11, [docs/upstream/vendor.md](../docs/upstream/vendor.md)), 보낼 변경은 vendor `kr-port` 브랜치의 커밋으로 산다 — 우리 저장소 커밋에는 `[업스트림]` 접두와 `Upstream-Files`·`Upstream-Subject` 트레일러로 표시된다([commit-rules.md](../docs/dev/commit-rules.md) §2.3). 이 디렉토리에 남는 것은 **기준·기각 목록·PR 기록**이다.
 
 ## 보낼 것도 로컬에서 늘 적용된다
 
 "나중에 보낼 것을 쌓아 두는 곳"이 따로 없다. 보낼 변경도 `kr-port`에 같이 얹혀 있어서 **우리도 그 수정의 덕을 보고, 깨지면 우리가 먼저 안다** — 보내기 전에.
 
-보낼 커밋은 `kr-port`의 **앞머리**에 둔다. 패치 디렉토리가 없어진 지금은 이 위치가 두 갈래의 물리적 경계다([docs/vendor-submodule.md](../docs/vendor-submodule.md) §6 — 경계 표시를 더 강하게 할지는 현황판 §7 D-7). 업스트림에 병합되면 다음 동기화 rebase에서 그 커밋이 저절로 비어 사라지고, 나머지가 그대로 얹혀야 한다.
+보낼 커밋은 `kr-port`의 **앞머리**에 둔다. 패치 디렉토리가 없어진 지금은 이 위치가 두 갈래의 물리적 경계다([docs/upstream/vendor.md](../docs/upstream/vendor.md) §6 — 경계 표시를 더 강하게 할지는 현황판 §7 D-7). 업스트림에 병합되면 다음 동기화 rebase에서 그 커밋이 저절로 비어 사라지고, 나머지가 그대로 얹혀야 한다.
 
-**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** 업스트림을 올리는 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
+**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** 업스트림을 올리는 절차는 [docs/upstream/sync.md](../docs/upstream/sync.md).
 
 ## `[한국전용]`이 아니라 이 갈래에 넣는 기준
 
@@ -18,7 +18,7 @@
 
 1. **코드에 한국이 안 나온다.** 시그니처 바이트, `XIVLauncherKR`, KR 시트 ID 같은 것이 있으면 `[한국전용]`으로 간다
 2. **다른 클라이언트에서도 고쳐진다.** 독일어·프랑스어·일본어 사용자에게도 이익이어야 한다
-3. **업스트림 결정을 뒤집지 않는다.** 뒤집는다면 그건 먼저 물어볼 일이다([commit-rules.md](../docs/commit-rules.md) §3.6)
+3. **업스트림 결정을 뒤집지 않는다.** 뒤집는다면 그건 먼저 물어볼 일이다([commit-rules.md](../docs/dev/commit-rules.md) §3.6)
 
 증거가 KR에서만 나온 것은 괜찮다 — 우리는 KR 클라이언트밖에 없다. 그때는 **어디까지 측정했는지를 커밋 본문에 적는다.**
 
@@ -65,6 +65,6 @@ fork는 `dnz3d4c/ff14-accessibility`, 브랜치는 `upstream-habitat-separator`�
 
 **PR 초안 문서 이름에 번호를 안 쓴다.** 번호는 시리즈가 바뀔 때마다 밀린다 — 실제로 이 변경은 `0003`이었다가 `0001`이 됐다. 내용으로 부른다.
 
-**PR은 영어로 쓴다**(2026-08-18 결정, [commit-rules.md](../docs/commit-rules.md) §5). 커밋 본문이 이미 영어라 그대로 쓴다.
+**PR은 영어로 쓴다**(2026-08-18 결정, [commit-rules.md](../docs/dev/commit-rules.md) §5). 커밋 본문이 이미 영어라 그대로 쓴다.
 
 PR을 조립할 때는 `[업스트림]` 커밋의 `Upstream-Files` 트레일러만 모으면 건드릴 파일 목록이 나온다.

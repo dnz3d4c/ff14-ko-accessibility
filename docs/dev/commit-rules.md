@@ -60,7 +60,7 @@ Upstream-Subject: Read the confirm-button label per locale from data
 
 ### 2.4 코드가 움직이면 현황판도 움직인다
 
-`[업스트림]`·`[한국전용]`·`[검증]`·`[도구]` 커밋은 [docs/status.md](status.md)를 같이 건드리거나, **안 건드리는 이유를 트레일러로 밝혀야 한다.**
+`[업스트림]`·`[한국전용]`·`[검증]`·`[도구]` 커밋은 [docs/status.md](../status.md)를 같이 건드리거나, **안 건드리는 이유를 트레일러로 밝혀야 한다.**
 
 ```
 Status-Board: W-01 진행
@@ -82,7 +82,7 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 
 이게 없으면 "이 판에서 뭐가 들어왔나"를 되짚을 수 없다. 검사기는 C9다.
 
-**핀(`upstream.json`)을 옮기는 커밋은 [upstream-changes.md](upstream-changes.md)를 같이 건드려야 한다**(C10). 업스트림은 독일어로 개발되므로, 이력을 한국어로 안 남기면 우리 저장소에 무엇이 들어왔는지 **읽을 수 있는 사람이 없다.** 절차는 [upstream-sync.md](upstream-sync.md) §6.
+**핀(`upstream.json`)을 옮기는 커밋은 [upstream-changes.md](../upstream/changes.md)를 같이 건드려야 한다**(C10). 업스트림은 독일어로 개발되므로, 이력을 한국어로 안 남기면 우리 저장소에 무엇이 들어왔는지 **읽을 수 있는 사람이 없다.** 절차는 [upstream-sync.md](../upstream/sync.md) §6.
 
 패치를 다시 쓴 경우는 `[벤더]`로 묶지 않는다. 핀 이동만 `[벤더]`고, 다시 쓴 패치는 원래 갈래로 나눈다 — 섞으면 §0의 사고가 그대로 난다.
 
@@ -167,6 +167,6 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 ## 5. 아직 정하지 않은 것
 
 - ~~업스트림 PR의 언어~~ — **영어로 정해졌다**(2026-08-18, 사용자 결정). 트레일러(`Upstream-Subject`, §3.1)도 PR 제목·본문도 영어다. 업스트림에 묻지 않는다.
-- **무엇을 PR로 보낼 것인가** — 디렉토리 기준(`patches/` vs `overlay/`)보다 좁다. 기준 둘이 더 있고 못 넘기면 **패치를 만들지 않는다**: ① 글섭 클라 없이 소스만 읽어 판정될 것 ② 명백한 기존 로직의 오류일 것(리팩터·구조 개선 금지). 원천은 [patches/README.md](../patches/README.md).
-- ~~fork 저장소를 언제 만들 것인가~~ — **만들어졌다**(2026-08-18, `dnz3d4c/ff14-accessibility` — PR #8을 여기서 냈다). 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 쌓고(로컬에 늘 적용된다 — [patches/README.md](../patches/README.md)), `Upstream-Files`/`Upstream-Subject`가 그대로 PR 재료가 된다.
+- **무엇을 PR로 보낼 것인가** — 디렉토리 기준(`patches/` vs `overlay/`)보다 좁다. 기준 둘이 더 있고 못 넘기면 **패치를 만들지 않는다**: ① 글섭 클라 없이 소스만 읽어 판정될 것 ② 명백한 기존 로직의 오류일 것(리팩터·구조 개선 금지). 원천은 [patches/README.md](../../patches/README.md).
+- ~~fork 저장소를 언제 만들 것인가~~ — **만들어졌다**(2026-08-18, `dnz3d4c/ff14-accessibility` — PR #8을 여기서 냈다). 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 쌓고(로컬에 늘 적용된다 — [patches/README.md](../../patches/README.md)), `Upstream-Files`/`Upstream-Subject`가 그대로 PR 재료가 된다.
 - **AGPL-3.0 LICENSE 파일 추가 시점** — 코드가 들어오는 시점(현재는 문서·도구뿐).

@@ -1,9 +1,9 @@
 # 업스트림 동기화
 
 - 작성: 2026-08-18
-- 이 문서가 **동기화 규칙의 단일 원천**이다. [status.md](status.md)와 [ko-client-port-feasibility.md](ko-client-port-feasibility.md) §12는 여기를 가리키기만 한다.
-- 한국어 변경 이력은 [upstream-changes.md](upstream-changes.md)가 따로 갖는다.
-- 2026-08-19에 패치 파일을 없앴다(W-11). 원본은 vendor의 `kr-port` 브랜치 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. **왜 이 구조인지는 [vendor-submodule.md](vendor-submodule.md)가 갖는다** — 여기는 절차만 갖는다.
+- 이 문서가 **동기화 규칙의 단일 원천**이다. [status.md](../status.md)와 [ko-client-port-feasibility.md](../frozen/port-feasibility.md) §12는 여기를 가리키기만 한다.
+- 한국어 변경 이력은 [upstream-changes.md](changes.md)가 따로 갖는다.
+- 2026-08-19에 패치 파일을 없앴다(W-11). 원본은 vendor의 `kr-port` 브랜치 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다. **왜 이 구조인지는 [vendor-submodule.md](vendor.md)가 갖는다** — 여기는 절차만 갖는다.
 
 ## 1. 문제가 무엇인가
 
@@ -18,7 +18,7 @@
 | 무엇을 | 무엇이 막나 |
 |--------|-------------|
 | 기록(gitlink·핀)이 실물과 어긋나는 것 | `tools/patch-check` + pre-commit 훅 |
-| 업스트림이 앞서 간 것을 모르는 것 | `run\sync.bat` + [주 1회 감시](../.github/workflows/upstream-watch.yml) |
+| 업스트림이 앞서 간 것을 모르는 것 | `run\sync.bat` + [주 1회 감시](../../.github/workflows/upstream-watch.yml) |
 | 이력이 독일어로만 남는 것 | `(미번역)` 표시 + pytest + 커밋 훅 C10 |
 | 문장이 늘어난 걸 모르는 것 | `tools/strings-golden` |
 
@@ -128,7 +128,7 @@ rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 *
 2. uv run --no-project python tools/ko-apply/ko_apply.py --write
 3. vendor에서 **같은 제목으로** 커밋한다 — 제목이 다르면 도구가 생성 커밋을 못 찾는다
 
-업스트림이 우리가 옮긴 문장을 고쳤으면 도구가 **그 문장을 이름으로 대고 멈춘다** — "카탈로그에 있는데 소스에 없다". 새 원문에 맞춰 `overlay/ko/ko.json`을 고치면 된다. 이게 이 구조의 목적이다: **충돌이 목록으로 바뀐다.** 근거는 [overlay/patches/README.md](../overlay/patches/README.md).
+업스트림이 우리가 옮긴 문장을 고쳤으면 도구가 **그 문장을 이름으로 대고 멈춘다** — "카탈로그에 있는데 소스에 없다". 새 원문에 맞춰 `overlay/ko/ko.json`을 고치면 된다. 이게 이 구조의 목적이다: **충돌이 목록으로 바뀐다.** 근거는 [overlay/patches/README.md](../../overlay/patches/README.md).
 
 ## 6. 변경 이력을 한국어로
 
@@ -136,7 +136,7 @@ rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 *
 
     uv run --no-project python tools/upstream-sync/upstream_sync.py --notes
 
-도구가 [upstream-changes.md](upstream-changes.md)에 **원문과 함께 `(미번역)` 자리**를 만든다. 채우는 것은 사람이다. 기계 번역을 붙이지 않는다 — 이 저장소는 게임 용어를 지어낸 전례로 한 번 다쳤다(2026-08-18 `Aetheryte`).
+도구가 [upstream-changes.md](changes.md)에 **원문과 함께 `(미번역)` 자리**를 만든다. 채우는 것은 사람이다. 기계 번역을 붙이지 않는다 — 이 저장소는 게임 용어를 지어낸 전례로 한 번 다쳤다(2026-08-18 `Aetheryte`).
 
 **핀을 옮기기 전에 돌리든 뒤에 돌리든 된다.** 자리를 만들 대상에는 **핀 태그 자신**이 들어간다 — §5.2가 끝나면 핀은 이미 새 태그라 "새 태그"는 0개인데, 정작 없는 것이 그 판의 이력이기 때문이다. 한때 새것만 세서, `--check`는 "변경 이력에 없는 판"이라고 하는데 `--notes`는 "만들 자리가 없다"고 답했다(v5.88에서 실제로 걸렸다). 지금은 두 명령이 같은 목록을 본다.
 
@@ -171,7 +171,7 @@ rebase의 merge 백엔드는 3-way다. 업스트림이 우리가 고치는 줄 *
 
 ## 8. 커밋
 
-동기화 커밋은 `[벤더]`다. 현황판은 요구하지 않는다 — 업스트림 포인터를 옮기는 것 자체는 할 일의 이동이 아니다. 한 커밋에 셋이 같이 들어간다: `upstream.json`(핀), `vendor/ff14-accessibility`(gitlink — `[벤더]`가 옮길 수 있는 갈래다, C11), `docs/upstream-changes.md`(C10이 요구한다).
+동기화 커밋은 `[벤더]`다. 현황판은 요구하지 않는다 — 업스트림 포인터를 옮기는 것 자체는 할 일의 이동이 아니다. 한 커밋에 셋이 같이 들어간다: `upstream.json`(핀), `vendor/ff14-accessibility`(gitlink — `[벤더]`가 옮길 수 있는 갈래다, C11), `docs/upstream/changes.md`(C10이 요구한다).
 
 **우리 쪽 수정이 필요 없었던 깨끗한 동기화**의 본보기.
 
@@ -213,7 +213,7 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 
 ## 10. 주기 감시
 
-[.github/workflows/upstream-watch.yml](../.github/workflows/upstream-watch.yml)이 주 1회 돈다. 하는 일은 **알리는 것뿐이다.**
+[.github/workflows/upstream-watch.yml](../../.github/workflows/upstream-watch.yml)이 주 1회 돈다. 하는 일은 **알리는 것뿐이다.**
 
 - 러너가 업스트림을 클론하고 **비공개 미러에서 `kr-port`를 받아** 개발 머신과 같은 배치를 만든 뒤, `--json`으로 재고 새 태그가 있으면 이슈를 연다(태그당 하나)
 - 미러는 읽기 전용 deploy key(secret `MIRROR_DEPLOY_KEY`)로 받는다. **키가 없으면 경고를 남기고 건너뛴다** — 초록불로 조용히 지나가면 감시가 죽은 것을 아무도 모른다
@@ -233,7 +233,7 @@ Upstream-Range: v5.85..v5.87 (3051202..a8ac7c5)
 - **자동 병합·자동 커밋.** 인게임 확인 없이 올린 것은 확인된 게 아니다. 도구는 로컬에서 사람이 부를 때만 옮긴다
 - **커밋 단위 추종.** 태그 단위다(§4)
 - **기계 번역으로 이력 채우기.** 용어를 지어내는 것보다 `(미번역)`이 낫다
-- **업스트림 fork에 이력을 쌓지 않는다.** 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 표시해 두고, PR 시점에 fork 브랜치로 조립한다([commit-rules.md](commit-rules.md) §5). 비공개 미러는 fork가 아니다 — fork 네트워크 밖이고, PR 재료를 담지 않는다([vendor-submodule.md](vendor-submodule.md) §5)
+- **업스트림 fork에 이력을 쌓지 않는다.** 보낼 것은 `kr-port`의 `[업스트림]` 커밋으로 표시해 두고, PR 시점에 fork 브랜치로 조립한다([commit-rules.md](../dev/commit-rules.md) §5). 비공개 미러는 fork가 아니다 — fork 네트워크 밖이고, PR 재료를 담지 않는다([vendor-submodule.md](vendor.md) §5)
 
 ## 12. 건강 지표
 

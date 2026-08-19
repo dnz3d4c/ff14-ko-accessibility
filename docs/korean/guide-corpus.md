@@ -2,11 +2,11 @@
 
 - 출처: [파이널판타지14 공식 가이드](https://guide.ff14.co.kr/lodestone/playguide) (액토즈소프트)
 - 받은 판: 7.55 / 2026. 08. 04 · 받은 날: 2026-08-18
-- 쓰는 규칙은 [ko-user-guide 스킬](../.claude/skills/ko-user-guide/SKILL.md)이 갖는다. 여기는 **무엇이 있고 어떻게 다시 뽑나**만 갖는다
+- 쓰는 규칙은 [ko-user-guide 스킬](../../.claude/skills/ko-user-guide/SKILL.md)이 갖는다. 여기는 **무엇이 있고 어떻게 다시 뽑나**만 갖는다
 
 ## 1. 왜 받아 두나
 
-우리 사용자 문서는 **공식 가이드와 같은 모양**으로 쓰기로 했다. 그런데 "공식 가이드 형식"이 무엇인지를 기억으로 적으면 확인한 것과 그럴듯한 것이 섞인다 — 이 저장소는 `Aetheryte → 에테라이트`로 그걸 한 번 겪었다([ko-localization 스킬](../.claude/skills/ko-localization/SKILL.md) §3).
+우리 사용자 문서는 **공식 가이드와 같은 모양**으로 쓰기로 했다. 그런데 "공식 가이드 형식"이 무엇인지를 기억으로 적으면 확인한 것과 그럴듯한 것이 섞인다 — 이 저장소는 `Aetheryte → 에테라이트`로 그걸 한 번 겪었다([ko-localization 스킬](../../.claude/skills/ko-localization/SKILL.md) §3).
 
 그래서 원문을 받아 두고 **거기서 세서** 규칙을 적는다. 쓰임은 둘이다.
 
@@ -49,7 +49,7 @@
 
 받은 것은 `tools/ko-guide/out/`에 있다. `html/`이 원문이고 `md/`가 정규화한 것이다.
 
-**`find`가 이름 찾기의 2순위 창구다.** 1순위는 `run\terms.bat`(게임 데이터)이고, 순서와 경계는 [ko-user-guide 스킬 §6](../.claude/skills/ko-user-guide/SKILL.md).
+**`find`가 이름 찾기의 2순위 창구다.** 1순위는 `run\terms.bat`(게임 데이터)이고, 순서와 경계는 [ko-user-guide 스킬 §6](../../.claude/skills/ko-user-guide/SKILL.md).
 
 ## 4. 저장소에 원문을 넣지 않는다
 

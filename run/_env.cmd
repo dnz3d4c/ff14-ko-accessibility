@@ -2,7 +2,7 @@
 rem 공통 경로 해석. 다른 배치가 call 해서 쓴다. 직접 실행하는 파일이 아니다.
 rem
 rem 경로를 박아 넣지 않는다 - 전부 환경변수에서 끌어낸다. 특히 Dalamud hook
-rem 폴더는 이름이 버전이라 업데이터가 갱신할 때마다 바뀐다. docs/environment.md
+rem 폴더는 이름이 버전이라 업데이터가 갱신할 때마다 바뀐다. docs/dev/environment.md
 rem §3이 "빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다"고 적어 둔
 rem 함정이고, 그걸 손으로 고치지 않게 하려고 여기서 자동으로 최신을 고른다.
 

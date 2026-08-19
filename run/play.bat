@@ -4,7 +4,7 @@ call "%~dp0_env.cmd"
 
 rem 게임을 띄우고, 로그인이 끝나면 Dalamud를 붙인다.
 rem 업데이터는 게임을 실행하지 않는다 - 돌고 있는 프로세스에 주입할 뿐이라
-rem 순서가 고정이다. docs/kr-runtime-setup.md §9.
+rem 순서가 고정이다. docs/dev/kr-runtime.md §9.
 
 echo == FF14 한국 서버 + 접근성 모드 ==
 echo.
@@ -17,7 +17,7 @@ if not exist "%GAME_LNK%" (
 if not exist "%UPDATER%" (
   echo [실패] KR Dalamud 업데이터를 못 찾았다:
   echo   %UPDATER%
-  echo   설치 절차는 docs/kr-runtime-setup.md 2절.
+  echo   설치 절차는 docs/dev/kr-runtime.md 2절.
   goto :fail
 )
 

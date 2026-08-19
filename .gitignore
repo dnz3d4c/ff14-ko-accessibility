@@ -1,6 +1,6 @@
 # upstream 클론의 파일은 우리 저장소에 담지 않는다. 담는 것은 커밋 포인터
 # 하나뿐이고(gitlink), 그래서 예외를 한 줄 둔다. 왜 그렇게 하는지는
-# docs/vendor-submodule.md.
+# docs/upstream/vendor.md.
 vendor/*
 !vendor/ff14-accessibility
 

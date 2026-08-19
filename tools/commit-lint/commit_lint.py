@@ -5,7 +5,7 @@
 둘이 한 커밋에 섞이면 나중에 보낼 것만 떼어낼 수가 없고, 그때 남는 방법은
 이력을 다시 쓰는 것뿐이다. 그 사고를 커밋할 때 막는다.
 
-규칙과 근거: docs/commit-rules.md
+규칙과 근거: docs/dev/commit-rules.md
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-#: 제목 앞에 붙일 수 있는 말. docs/commit-rules.md 표와 같아야 한다.
+#: 제목 앞에 붙일 수 있는 말. docs/dev/commit-rules.md 표와 같아야 한다.
 AREAS = ("업스트림", "한국전용", "검증", "문서", "벤더", "도구")
 
 #: 갈래별로 건드리면 안 되는 경로. 걸리면 커밋을 쪼개라는 뜻이다.
@@ -42,7 +42,7 @@ REQUIRED_VENDOR_TRAILERS = ("Upstream-Range",)
 
 #: 핀을 옮기는 파일과, 그때 한국어로 남겨야 하는 이력.
 PIN_PATH = "upstream.json"
-CHANGES_PATH = "docs/upstream-changes.md"
+CHANGES_PATH = "docs/upstream/changes.md"
 
 #: 현황판을 같이 고쳐야 하는 갈래. 코드나 설비가 움직이는 쪽만이다.
 #: `[문서]`와 `[벤더]`는 뺀다 - 근거 문서를 고치거나 업스트림 포인터를 옮기는
@@ -267,7 +267,7 @@ def main(argv: list[str]) -> int:
     if not violations:
         return 0
 
-    print("커밋 메시지가 규칙에 안 맞는다 (docs/commit-rules.md):", file=sys.stderr)
+    print("커밋 메시지가 규칙에 안 맞는다 (docs/dev/commit-rules.md):", file=sys.stderr)
     for violation in violations:
         print(f"  {violation}", file=sys.stderr)
     return 1

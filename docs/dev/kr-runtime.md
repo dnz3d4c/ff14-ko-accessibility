@@ -4,7 +4,7 @@
 - 상태: **이 절차 그대로 캐릭터 생성 완료까지 검증됨**
 - 대상: 프로필이 없는 머신에서 KR 클라이언트에 플러그인을 붙이기까지
 
-`docs/environment.md`가 "무엇이 어디 있는가"를 적는다면 이 문서는 "무엇을 어떤 순서로 하는가"를 적는다.
+`docs/dev/environment.md`가 "무엇이 어디 있는가"를 적는다면 이 문서는 "무엇을 어떤 순서로 하는가"를 적는다.
 
 ## 이 절차가 왜 따로 필요한가
 
@@ -20,7 +20,7 @@ KR Dalamud 업데이터는 **기존 `%APPDATA%\XIVLauncherKR` 프로필이 있�
 
 ## 0. 설치기가 이 절차를 대신한다
 
-아래 §3~§8은 **손으로 하는 경우의 절차**다. 지금은 설치기가 같은 일을 한다 — `run\pack.bat`이 낸 `dist/` 폴더를 옮기고 그 안의 EXE를 실행하면 프로필 부트스트랩부터 vnavmesh 시딩까지 끝난다. KR화한 지점과 근거는 [overlay/patches/README.md](../overlay/patches/README.md) `0006`.
+아래 §3~§8은 **손으로 하는 경우의 절차**다. 지금은 설치기가 같은 일을 한다 — `run\pack.bat`이 낸 `dist/` 폴더를 옮기고 그 안의 EXE를 실행하면 프로필 부트스트랩부터 vnavmesh 시딩까지 끝난다. KR화한 지점과 근거는 [overlay/patches/README.md](../../overlay/patches/README.md) `0006`.
 
 이 문서를 남겨 두는 이유는 둘이다. **설치기가 무엇을 왜 하는지의 근거**이고, 설치기가 막혔을 때 손으로 짚는 순서다.
 
@@ -32,7 +32,7 @@ dist\FF14AccessibilityInstaller-KR.exe --check
 
 - 한국어 FFXIV 클라이언트
 - Microsoft .NET 10 Desktop Runtime x64 (시스템 설치, `C:\Program Files\dotnet`)
-- .NET 10 SDK — 빌드용. 이 머신은 scoop에 있고 PATH가 가리므로 **절대 경로로 부른다**(`docs/environment.md` §2)
+- .NET 10 SDK — 빌드용. 이 머신은 scoop에 있고 PATH가 가리므로 **절대 경로로 부른다**(`docs/dev/environment.md` §2)
 
 ## 2. KR Dalamud 업데이터 설치
 
@@ -141,7 +141,7 @@ vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud
 
 **1.2.3.13**(DalamudApiLevel 15, ApplicableVersion any). 2026-08-18에 동작 확인용으로 손수 받아 넣은 것이고, 이후 갱신은 설치기가 맡는다 — 매니페스트에 더 새 판이 올라오면 그때 덮는다.
 
-게임을 켜지 않고 한 사전 검증(어셈블리 참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/environment.md` §7에 있다. 인게임 동작은 2026-08-18 확인됐다.
+게임을 켜지 않고 한 사전 검증(어셈블리 참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/dev/environment.md` §7에 있다. 인게임 동작은 2026-08-18 확인됐다.
 
 ## 9. 실행 순서
 

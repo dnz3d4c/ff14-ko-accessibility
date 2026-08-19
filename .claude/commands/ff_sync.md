@@ -7,7 +7,7 @@ argument-hint: check | up <태그> | notes | patches
 
 받은 인자: `$ARGUMENTS` — 비었으면 `check`로 친다.
 
-**규칙의 단일 원천은 [docs/upstream-sync.md](../../docs/upstream-sync.md)다.** 이 파일은 순서와 멈출 자리만 갖는다. 판정 기준을 여기 베끼지 않는다 — 베끼면 그게 두 번째 사본이 되고, `tools/docs-check`가 안 보는 자리라 조용히 낡는다.
+**규칙의 단일 원천은 [docs/upstream/sync.md](../../docs/upstream/sync.md)다.** 이 파일은 순서와 멈출 자리만 갖는다. 판정 기준을 여기 베끼지 않는다 — 베끼면 그게 두 번째 사본이 되고, `tools/docs-check`가 안 보는 자리라 조용히 낡는다.
 
 ## 멈추는 조건 — 먼저 읽는다
 
@@ -51,7 +51,7 @@ argument-hint: check | up <태그> | notes | patches
 
        git add vendor/ff14-accessibility
 
-6. **이력을 한국어로.** `docs/upstream-changes.md`에 자리를 만들고 채운다. **핀을 옮긴 뒤에 돌려도 된다** — 핀 태그 자신도 대상이다.
+6. **이력을 한국어로.** `docs/upstream/changes.md`에 자리를 만들고 채운다. **핀을 옮긴 뒤에 돌려도 된다** — 핀 태그 자신도 대상이다.
 
        uv run --no-project python tools/upstream-sync/upstream_sync.py --notes
 
@@ -61,19 +61,19 @@ argument-hint: check | up <태그> | notes | patches
        uv run --no-project python tools/strings-golden/strings_golden.py
        uv run --no-project python tools/ko-apply/ko_apply.py
 
-   **쌍 수만 보면 놓친다.** 갈림길이 보간 문자열 안에 들어 있으면 파서가 아예 못 세서, 문장이 늘어도 쌍은 그대로다(v5.88 `ConfigPageWithCount`가 그랬다). `unparsed`가 움직였는지 같이 본다 — 늘었으면 손 케이스이고, [ko-localization 스킬](../skills/ko-localization/SKILL.md)과 [docs/ko-hand-cases.md](../../docs/ko-hand-cases.md)를 따라 손 케이스 커밋(`0009`)에 넣는다.
+   **쌍 수만 보면 놓친다.** 갈림길이 보간 문자열 안에 들어 있으면 파서가 아예 못 세서, 문장이 늘어도 쌍은 그대로다(v5.88 `ConfigPageWithCount`가 그랬다). `unparsed`가 움직였는지 같이 본다 — 늘었으면 손 케이스이고, [ko-localization 스킬](../skills/ko-localization/SKILL.md)과 [docs/korean/hand-cases.md](../../docs/korean/hand-cases.md)를 따라 손 케이스 커밋(`0009`)에 넣는다.
 8. `cmd //c "set FF14_NOPAUSE=1 && run\check.bat"` — 전부 통과할 것.
-9. **문서를 옮긴다.** [docs/status.md](../../docs/status.md)(핀, §1 직전, §9 한 줄, 인용 숫자), `docs/upstream-changes.md`, 손 케이스가 늘었으면 `docs/ko-hand-cases.md`·`README.md`. 숫자를 새로 손으로 적으면 `tools/docs-check`의 `CITATIONS`에 등록한다.
+9. **문서를 옮긴다.** [docs/status.md](../../docs/status.md)(핀, §1 직전, §9 한 줄, 인용 숫자), `docs/upstream/changes.md`, 손 케이스가 늘었으면 `docs/korean/hand-cases.md`·`README.md`. 숫자를 새로 손으로 적으면 `tools/docs-check`의 `CITATIONS`에 등록한다.
 10. **배포물이 뒤졌으면 다시 낸다.** 소스 판이 올라갔는데 `dist/`가 옛 판이면 그 자체가 결함이다(실제로 5.85 압축을 5.87 소스라고 들고 있었다).
 
         cmd //c "set FF14_NOPAUSE=1 && run\pack.bat"
 
-11. **커밋.** [docs/commit-rules.md](../../docs/commit-rules.md) §2.5 — 핀·gitlink 이동은 `[벤더]`(`Upstream-Range` 필수, `upstream-changes.md`를 같이 건드려야 C10 통과, gitlink 갈래는 C11이 본다). 충돌을 풀며 우리 커밋의 내용을 다시 썼으면 본문에 밝힌다([upstream-sync.md](../../docs/upstream-sync.md) §8). 그다음 push.
+11. **커밋.** [docs/dev/commit-rules.md](../../docs/dev/commit-rules.md) §2.5 — 핀·gitlink 이동은 `[벤더]`(`Upstream-Range` 필수, `docs/upstream/changes.md`를 같이 건드려야 C10 통과, gitlink 갈래는 C11이 본다). 충돌을 풀며 우리 커밋의 내용을 다시 썼으면 본문에 밝힌다([upstream-sync.md](../../docs/upstream/sync.md) §8). 그다음 push.
 12. **인게임 판정은 사용자 몫이다.** 기계는 여기까지 못 온다. 실행 대상은 [CLAUDE.md](../../CLAUDE.md) `## 확정된 실행 대상`에서 그대로 주고, **무엇을 귀로 확인하고 무엇을 알려줘야 하는지**까지 적는다.
 
 ## notes
 
-`docs/upstream-changes.md`에 빠진 판의 자리를 만들고 한국어로 채운다. `up`의 6단계만 따로 돌리는 것이다.
+`docs/upstream/changes.md`에 빠진 판의 자리를 만들고 한국어로 채운다. `up`의 6단계만 따로 돌리는 것이다.
 
     uv run --no-project python tools/upstream-sync/upstream_sync.py --notes
 

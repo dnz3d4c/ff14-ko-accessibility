@@ -36,7 +36,7 @@ uv run --no-project python tools/pack-check/pack_check.py --e2e
 
 `--e2e`가 설치기를 **버리는 프로필 루트**(`FF14ACC_KR_PROFILE`)에 대고 `--install --skip-vnavmesh`로 실제로 돌린다. 네트워크를 타지 않고, 이 머신의 프로필도 건드리지 않는다.
 
-재는 것은 [kr-runtime-setup.md](../../docs/kr-runtime-setup.md) §7이 적어 둔 셋이다.
+재는 것은 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §7이 적어 둔 셋이다.
 
 - 버전 폴더 이름이 버전으로 파싱되나 (아니면 Dalamud가 폴더를 지운다)
 - 매니페스트의 `InstalledFromUrl`이 `OFFICIAL`인가 (아니면 고아로 보고 적재를 건너뛴다)

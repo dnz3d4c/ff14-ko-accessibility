@@ -159,7 +159,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 1. `ko.json`에 그 묶음의 문장을 더한다
 2. `ko_apply.py --write`로 소스에 반영한다
 3. `run\check.bat` — **독일어·영어가 한 자도 안 바뀐 것**을 스냅샷이 증명한다
-4. vendor의 `kr-port`에 **고정 제목**(`Korean: the mod's own strings, generated from the catalogue`)으로 커밋한다 — `tools/ko-apply`가 제목으로 생성 커밋을 찾는다. 미러에 밀고 `git add vendor/ff14-accessibility`로 기록을 옮긴다 ([upstream-sync.md](../../../docs/upstream-sync.md) §3)
+4. vendor의 `kr-port`에 **고정 제목**(`Korean: the mod's own strings, generated from the catalogue`)으로 커밋한다 — `tools/ko-apply`가 제목으로 생성 커밋을 찾는다. 미러에 밀고 `git add vendor/ff14-accessibility`로 기록을 옮긴다 ([upstream-sync.md](../../../docs/upstream/sync.md) §3)
 5. 현황판을 갱신하고 커밋한다 (`Status-Board:` 트레일러는 훅이 요구한다)
 
 **생성 커밋에 손을 대지 않는다.** 반영은 언제나 도구가 한다 — 손편집을 섞으면 다음 재생성 때 그 줄만 사라지고, 사라지는 게 한국어라 독일어·영어 검사에는 안 걸린다.
@@ -188,7 +188,7 @@ description: FF14 접근성 모드의 안내 문장을 한국어로 옮길 때 �
 
 ### 6-1. 손으로 봐야 하는 41곳
 
-단순 삼항이 아니라 못 읽은 자리다. **유형별로 조심할 것이 [ko-hand-cases.md](../../../docs/ko-hand-cases.md)에 정리돼 있다** — 옮기기 전에 읽어라. 현재 줄 번호는 `strings_golden.py --write`가 찍는다.
+단순 삼항이 아니라 못 읽은 자리다. **유형별로 조심할 것이 [ko-hand-cases.md](../../../docs/korean/hand-cases.md)에 정리돼 있다** — 옮기기 전에 읽어라. 현재 줄 번호는 `strings_golden.py --write`가 찍는다.
 
 특히 둘.
 

@@ -29,7 +29,7 @@ if not defined DALAMUD_HOME (
 )
 
 set "DOTNET_CLI_UI_LANGUAGE=en"
-echo 1/4  플러그인을 KR(7.51)로 다시 빌드한다.
+echo 1/5  플러그인을 KR(7.51)로 다시 빌드한다.
 set "PLUGINPROJ=%REPO%\vendor\ff14-accessibility\FF14Accessibility\FF14Accessibility.csproj"
 "%DOTNET%" build -c Release "%PLUGINPROJ%" -v quiet --nologo
 if errorlevel 1 (
@@ -42,7 +42,7 @@ if not exist "%PLUGINZIP%" (
 )
 
 echo.
-echo 2/4  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
+echo 2/5  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
 "%DOTNET%" publish -c Release "%INSTALLER%"
 if errorlevel 1 (
   echo [실패] 설치기 빌드가 깨졌다.
@@ -50,7 +50,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo 3/4  배포 폴더에 모은다.
+echo 3/5  배포 폴더에 모은다.
 if not exist "%OUT%" mkdir "%OUT%"
 copy /y "%PUBLISH%\FF14AccessibilityInstaller-KR.exe" "%OUT%\" >nul
 if errorlevel 1 goto :fail
@@ -63,7 +63,18 @@ copy /y "%REPO%\overlay\ko\README.ko.md" "%OUT%\사용 안내.md" >nul
 if errorlevel 1 goto :fail
 
 echo.
-echo 4/4  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
+echo 4/5  릴리스에 같이 올릴 매니페스트를 산출물에서 만든다.
+rem 자기 갱신은 installer.json을, Dalamud 커스텀 저장소는 repo.json을 읽는다.
+rem 릴리스에 이 둘이 안 올라가면 받는 쪽은 오류가 아니라 "새 판이 없다"로
+rem 읽는다. 값은 손으로 안 적고 방금 낸 산출물에서 뽑는다.
+uv run --no-project python "%REPO%\tools\release-manifest\release_manifest.py"
+if errorlevel 1 (
+  echo [실패] 릴리스 매니페스트를 못 만들었다. 위 이유를 본다.
+  goto :fail
+)
+
+echo.
+echo 5/5  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
 uv run --no-project python "%REPO%\tools\pack-check\pack_check.py" --e2e --kr-dalamud "%DALAMUD_HOME%" --dotnet "%DOTNET%"
 if errorlevel 1 (
   echo [실패] 배포 검사가 걸렸다. 위 목록을 본다.

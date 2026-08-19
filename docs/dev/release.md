@@ -43,17 +43,28 @@ GitHub가 `releases/latest`에 404를 주고, 설치 프로그램이 이렇게 �
 2. `run\release.bat`으로 **첫 릴리스를 올린다**
 3. 그 다음에 EXE를 배포한다
 
-## 3. 릴리스 자산 다섯
+## 3. 릴리스 자산 여섯 — 사람이 받는 것은 하나다
 
-한 릴리스에 이 다섯이 같이 올라간다. **하나라도 빠지면 받는 쪽은 오류가 아니라 "새 판이 없다"로 읽는다.**
+한 릴리스에 이 여섯이 같이 올라간다. **하나라도 빠지면 받는 쪽은 오류가 아니라 "새 판이 없다"로 읽는다.**
 
-| 자산 | 무엇 | 누가 만드나 |
-|------|------|-------------|
-| `FF14AccessibilityInstaller-KR.exe` | 자체 포함 단일 EXE | `run\pack.bat` |
-| `FF14Accessibility.zip` | KR 패치가 들어간 플러그인 빌드 | `run\pack.bat` |
-| `사용 안내.md` | 사용자 문서 | `run\pack.bat` |
-| `repo.json` | Dalamud가 보는 저장소 매니페스트 | `tools/release-manifest` |
-| `installer.json` | 설치 프로그램 자기 갱신용 (버전 + SHA-256) | `tools/release-manifest` |
+| 자산 | 누가 받나 | 누가 만드나 |
+|------|-----------|-------------|
+| `FF14Accessibility-KR-Setup.zip` | **사람. 이것만 받으면 된다** | `tools/release-manifest` |
+| `FF14AccessibilityInstaller-KR.exe` | 설치 프로그램 자기 갱신 | `run\pack.bat` |
+| `FF14Accessibility.zip` | Dalamud, 그리고 설치 프로그램의 플러그인 갱신 | `run\pack.bat` |
+| `README.ko.md` | 사람 (문서만 따로 볼 때) | `run\pack.bat` |
+| `repo.json` | Dalamud | `tools/release-manifest` |
+| `installer.json` | 설치 프로그램 자기 갱신 (버전 + SHA-256) | `tools/release-manifest` |
+
+**개별 자산을 없애고 아카이브만 남길 수는 없다.** 뒤의 넷은 **기계가 인증 없는 고정 URL로 직접 받는다** — Dalamud는 `repo.json`이 가리키는 zip을, 설치 프로그램은 `installer.json`의 `AssetName`이 가리키는 EXE를 받는다. 묶어 버리면 갱신 경로가 통째로 죽는다. 그래서 사람이 받을 것을 **하나 더 만들고**, 릴리스 노트에서 나머지를 맨 아래로 내린다.
+
+**아카이브는 `dist` 루트의 셋을 그대로 담는다.** 따로 만들면 두 벌이 되어 갈린다. 압축을 풀면 **폴더 한 겹**이 나와야 한다 — 없이 담으면 푼 자리에 파일이 흩어지고, 그건 `--check`가 잡는다.
+
+**`사용 안내.md`는 릴리스에서 `README.ko.md`가 된다.** `gh`가 윈도에서 한글 파일 이름을 못 다룬다 — 첫 릴리스에서 `default.md`로 올라갔고 **오류도 안 났으며 `gh release upload`는 0으로 끝났다.** 내는 사람 화면에서는 성공이고 받는 사람만 설치를 시작할 문서를 못 찾는다. `tools/release-manifest`의 `--release`가 잡았다.
+
+**argv는 괜찮다.** 릴리스 제목에는 한글이 들어가고 CP949 배치에서 넘겨도 그대로 도착한다(실측). 깨지는 것은 **자산 파일 이름 경로**뿐이다.
+
+**아카이브 안의 이름은 한글 그대로다.** 사용자가 푼 뒤에 보는 것이라 `gh`를 안 거친다.
 
 **매니페스트 둘은 손으로 안 적는다.** `tools/release-manifest`가 산출물에서 값을 다시 계산한다 — 압축 안의 `FF14Accessibility.json`과 EXE의 PE 버전 자원을 직접 읽는다. 왜 그렇게까지 하는지는 그 도구의 모듈 문서가 갖는다. 요지는 하나다. **손으로 옮겨 적은 숫자가 낡아서 이 저장소는 이미 다친 적이 있고**(현황판 §8-1), 릴리스 매니페스트는 그중에서도 낡은 것이 **제일 늦게 드러나는** 자리다 — 해시가 어긋나면 설치 프로그램이 갱신을 거부하는데 그건 받는 사람 화면에서만 보인다.
 

@@ -37,14 +37,15 @@ vnavmesh를 설치하지 않아도 나머지 기능은 그대로 동작합니다
 
 https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest
 
-**`FF14AccessibilityInstaller-KR.exe` 하나만 받아서 실행하면 설치가 끝납니다.** 모드 본체는 설치 프로그램이 릴리스에서 받아 옵니다.
+**`FF14Accessibility-KR-Setup.zip` 하나만 받으면 됩니다.** 압축을 풀면 `FF14Accessibility-KR` 폴더가 만들어지고, 그 안에 설치에 필요한 것이 모두 들어 있습니다.
 
-인터넷에 연결되지 않은 컴퓨터에 설치하거나 파일을 미리 받아 두려면, 아래 둘을 함께 받아 설치 프로그램과 같은 폴더에 둡니다.
-
+- `FF14AccessibilityInstaller-KR.exe` — 설치 프로그램. 이것을 실행합니다
 - `FF14Accessibility.zip` — 모드 본체
-- `README.ko.md` — 이 문서
+- `사용 안내.md` — 이 문서
 
-같은 폴더에 압축 파일이 있으면 설치 프로그램이 인터넷에 연결하지 않고 그 파일로 설치합니다.
+**설치 프로그램만 따로 받아도 됩니다.** 모드 본체는 설치 프로그램이 릴리스에서 받아 오므로, 인터넷에 연결되어 있다면 `FF14AccessibilityInstaller-KR.exe` 하나로 설치가 끝납니다. 같은 폴더에 압축 파일이 있으면 인터넷에 연결하지 않고 그 파일로 설치합니다.
+
+릴리스 페이지의 나머지 파일(`repo.json`, `installer.json`)은 자동 업데이트가 사용합니다. 직접 받을 필요는 없습니다.
 
 업데이트할 때도 `FF14AccessibilityInstaller-KR.exe` 하나만 있으면 됩니다. 설치 프로그램이 같은 폴더의 압축 파일과 인터넷의 최신 판을 비교해서 더 새로운 쪽을 설치합니다.
 

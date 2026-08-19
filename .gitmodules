@@ -1,0 +1,4 @@
+[submodule "vendor/ff14-accessibility"]
+	path = vendor/ff14-accessibility
+	url = https://github.com/dnz3d4c/ff14-accessibility-mirror.git
+	branch = kr-port

@@ -57,7 +57,41 @@ BOARD_TRAILER = "Status-Board"
 
 SUBJECT_MAX = 72
 
+#: 제목에 쓰지 않는 말. 고른 기준은 취향이 아니라 실측이다 - 이력 166건에서
+#: 대상을 지우고 그 자리에 들어앉은 것들이고, 여섯 달 뒤에 `git log --oneline`을
+#: 읽는 사람이 무슨 커밋인지 복원할 수 없게 만든 낱말이다.
+#: 오탐이 나면 여기서 빼면 된다. 목록이 규칙의 전부고 다른 곳에 근거가 없다.
+#: 활용형을 따로 적는다. 한글은 음절이 단위라 `걷어낸다`에 `걷어내`가 없다
+#: (`걷어`+`낸다`로 쪼개진다). 어간만 넣거나 형태를 나열해야 실제로 걸린다.
+SUBJECT_BANNED = (
+    "삼키",
+    "삼킨",
+    "삼켰",
+    "걷어",
+    "말하게",
+    "임자",
+    "꼬리를",
+    "같은 얼굴",
+    "세운다",
+    "세우기",
+    "세웠",
+    "박는다",
+    "박아",
+    "박힌",
+    "밀다",
+    "밀게",
+    "민다",
+)
+
 _SUBJECT_RE = re.compile(r"^\[(?P<area>[^\]]+)\]\s+(?P<rest>.*)$")
+
+#: `[영역] 대상: 무엇이 어떻게`. 대상은 고친 것의 이름 그대로 - 파일명, 도구명,
+#: 클래스, 명령. 첫 콜론에서 자르므로 설명 안에 콜론이 또 있어도 된다.
+_TARGET_RE = re.compile(r"^(?P<target>[^:]+):\s*(?P<what>.+)$")
+
+#: `판`은 `docs/status.md`를 가리키는 은어로 쓰였다. `현황판`처럼 앞에 한글이
+#: 붙은 낱말은 제대로 된 이름이므로 건드리지 않는다.
+_BOARD_SLANG_RE = re.compile(r"(?<![가-힣])판[이가을를은는에]")
 _CONVENTIONAL_RE = re.compile(
     r"^(feat|fix|chore|docs|refactor|test|style|perf|build|ci|revert)"
     r"(\([^)]*\))?!?:",
@@ -142,6 +176,33 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
 
     if subject.endswith("."):
         violations.append(Violation("C4", "제목을 마침표로 끝내지 않는다"))
+
+    # C12/C13은 갈래를 제대로 붙인 제목에만 묻는다. C1이 이미 걸린 줄에
+    # 두 개를 더 얹으면 무엇부터 고쳐야 하는지가 안 보인다.
+    if area is not None:
+        target = _TARGET_RE.match(rest)
+        if target is None or not target.group("target").strip():
+            violations.append(
+                Violation(
+                    "C12",
+                    "제목에 대상이 없다. `[갈래] 대상: 무엇이 어떻게` 모양으로 "
+                    "고친 것의 이름을 앞세워라 - 파일명, 도구명, 클래스, 명령. "
+                    "이름을 못 고르겠으면 대개 커밋이 너무 크다는 뜻이다",
+                )
+            )
+
+        banned = [word for word in SUBJECT_BANNED if word in rest]
+        if _BOARD_SLANG_RE.search(rest):
+            banned.append("판(→ status.md)")
+        if banned:
+            violations.append(
+                Violation(
+                    "C13",
+                    f"제목에 비유·은어를 쓰지 않는다: {', '.join(banned)}. "
+                    "본문에는 써도 된다 - 막는 것은 `git log --oneline`에 "
+                    "남는 한 줄뿐이다",
+                )
+            )
 
     if area == "업스트림":
         missing = [

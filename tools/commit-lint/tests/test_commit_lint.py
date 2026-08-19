@@ -24,7 +24,7 @@ def test_알려지지_않은_영역은_거부한다():
 
 
 def test_알려진_영역은_통과한다():
-    assert codes("[문서] 조사 보고서에 빌드 검증 결과 추가", ["docs/x.md"]) == []
+    assert codes("[문서] port-feasibility.md: 빌드 검증 결과 추가", ["docs/x.md"]) == []
 
 
 def test_영역_목록_전체가_받아들여진다():
@@ -68,7 +68,7 @@ def test_제목이_마침표로_끝나면_거부한다():
 # --- C5 업스트림 커밋 트레일러 -------------------------------------------------
 
 UPSTREAM_OK = (
-    "[업스트림] 확인 버튼 라벨을 로케일별 데이터로 분리\n"
+    "[업스트림] UIReaderService: 확인 버튼 라벨을 로케일별 데이터로 분리\n"
     "\n"
     "독일어 리터럴이 박혀 있어 다른 클라이언트에서 눌리지 않는다.\n"
     "\n"
@@ -260,7 +260,7 @@ def test_경로_목록이_비면_vendor_검사를_건너뛴다():
 
 
 def test_주석줄은_무시한다():
-    msg = "# 이 줄은 git이 지운다\n[문서] 실제 제목\n"
+    msg = "# 이 줄은 git이 지운다\n[문서] x.md: 실제 제목\n"
     assert codes(msg, ["docs/x.md"]) == []
 
 
@@ -270,12 +270,72 @@ def test_빈_메시지는_거부한다():
 
 def test_가위선_아래는_검사하지_않는다():
     msg = (
-        "[문서] 제목\n"
+        "[문서] x.md: 제목\n"
         "# ------------------------ >8 ------------------------\n"
         "# 아래는 diff 미리보기\n"
         "feat: 이건 diff 안의 남의 커밋 인용\n"
     )
     assert codes(msg, ["docs/x.md"]) == []
+
+
+# --- C12 제목에 대상 이름 --------------------------------------------------
+#
+# 이력 166건이 전부 대상 없이 쓰였고, 여섯 달 뒤에 `git log --oneline`만 보고는
+# 무엇을 고친 커밋인지 알 수 없었다. 실제 사례를 그대로 시험값으로 쓴다.
+
+
+def test_대상을_안_적으면_거부한다():
+    assert "C12" in codes(
+        "[도구] gh가 한글 자산 이름을 삼키는 것을 피한다", ["run/release.bat"]
+    )
+
+
+def test_콜론으로_대상을_앞세우면_통과한다():
+    assert "C12" not in codes(
+        "[도구] release_manifest: 한글 자산명이 default.md로 올라가던 것 수정",
+        ["tools/release-manifest/release_manifest.py"],
+    )
+
+
+def test_콜론만_있고_대상이_비면_거부한다():
+    assert "C12" in codes("[문서] : 뭔가 고침", ["docs/x.md"])
+
+
+def test_대상이_한글_파일명이어도_통과한다():
+    assert "C12" not in codes(
+        "[문서] 사용 안내.md: 설치 절차를 압축 하나 받는 흐름으로 고침",
+        ["overlay/ko/README.ko.md"],
+    )
+
+
+# --- C13 제목의 비유·은어 ---------------------------------------------------
+
+
+def test_제목의_비유_동사를_거부한다():
+    assert "C13" in codes("[문서] status.md: 끝난 일을 걷어낸다", ["docs/status.md"])
+
+
+def test_제목의_은어를_거부한다():
+    assert "C13" in codes("[도구] check.bat: 판에 옮긴다", ["run/check.bat"])
+
+
+def test_의인화를_거부한다():
+    assert "C13" in codes(
+        "[문서] release.md: 문서가 말하게 한다", ["docs/dev/release.md"]
+    )
+
+
+def test_본문에_쓴_같은_말은_막지_않는다():
+    # 제목만 본다. `git log --oneline`이 보여 주는 것이 제목이고, 본문까지
+    # 단속하면 사고 경위를 제 말로 적을 수가 없다.
+    msg = (
+        "[문서] status.md: 완료 기록을 지워 49,774자를 23,783자로 줄임\n"
+        "\n"
+        "끝난 일의 서사를 걷어냈다. 판이 남은 일만 갖게 했다.\n"
+        "\n"
+        "Status-Board: W-49 진행\n"
+    )
+    assert "C13" not in codes(msg, ["docs/status.md"])
 
 
 # --- staged_paths 실패 경로 -----------------------------------------------

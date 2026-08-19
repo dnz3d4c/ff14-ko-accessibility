@@ -251,7 +251,7 @@ uv run --no-project --with pytest pytest tools -q
 
 ### 자동으로 도는 검사
 
-- `commit-lint` — 커밋 메시지 규칙 C1~C11
+- `commit-lint` — 커밋 메시지 규칙 C1~C13
 - `patch-check` — 저장소가 기록한 vendor 포인터가 `kr-port` 팁이고 핀이 그 조상인지
 - `docs-check` — **문서가 인용한 숫자를 산출물에서 다시 계산해 대조합니다.** 손으로 옮겨 적은 값이 낡으면 검사가 실패합니다. 단축키 목록이 두 문서와 소스에서 갈라지는 것도 여기서 잡습니다
 - [`ko-words`](tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다

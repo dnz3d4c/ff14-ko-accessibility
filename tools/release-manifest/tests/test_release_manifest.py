@@ -348,9 +348,9 @@ def test_멀쩡한_릴리스는_통과한다(tmp_path):
 
 
 def test_자산이_다섯이_아니면_잡는다(tmp_path):
-    남은것 = tuple(n for n in rm.RELEASE_ASSETS if n != rm.GUIDE_NAME)
+    남은것 = tuple(n for n in rm.RELEASE_ASSETS if n != rm.GUIDE_ASSET_NAME)
     problems = rm.release_problems(release_facts(tmp_path, asset_names=남은것))
-    assert any(rm.GUIDE_NAME in p for p in problems)
+    assert any(rm.GUIDE_ASSET_NAME in p for p in problems)
 
 
 def test_대소문자만_다른_자산은_그렇게_말한다(tmp_path):

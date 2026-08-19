@@ -52,6 +52,17 @@ echo 태그: %TAG%
 echo 저장소: %GHREPO%
 echo.
 
+rem gh가 윈도에서 한글 파일 이름을 못 다룬다. 첫 릴리스에서 `사용 안내.md`가
+rem `default.md`로 올라갔고 오류도 안 났다 - 받는 사람 화면에서만 이름이
+rem 틀린다. 그래서 올릴 때만 ASCII 이름의 사본을 쓴다. 폴더에 나가는
+rem 이름은 그대로다.
+set "TMPGUIDE=%TEMP%\README.ko.md"
+copy /y "%OUT%\사용 안내.md" "%TMPGUIDE%" > NUL
+if errorlevel 1 (
+  echo [실패] 안내 문서 사본을 못 만들었다.
+  goto :fail
+)
+
 gh release view "%TAG%" --repo "%GHREPO%" > NUL 2>&1
 if errorlevel 1 (
   echo 새 릴리스를 만든다.
@@ -60,7 +71,7 @@ if errorlevel 1 (
     "%OUT%\FF14Accessibility.zip" ^
     "%OUT%\repo.json" ^
     "%OUT%\installer.json" ^
-    "%OUT%\사용 안내.md"
+    "%TMPGUIDE%"
   if errorlevel 1 goto :fail
 ) else (
   echo 같은 태그가 이미 있다. 자산만 덮어쓴다.
@@ -69,7 +80,7 @@ if errorlevel 1 (
     "%OUT%\FF14Accessibility.zip" ^
     "%OUT%\repo.json" ^
     "%OUT%\installer.json" ^
-    "%OUT%\사용 안내.md"
+    "%TMPGUIDE%"
   if errorlevel 1 goto :fail
 )
 

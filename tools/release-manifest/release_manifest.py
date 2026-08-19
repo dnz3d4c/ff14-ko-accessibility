@@ -58,10 +58,17 @@ INSTALLER_NAME = "FF14AccessibilityInstaller-KR.exe"
 REPO_MANIFEST_NAME = "repo.json"
 INSTALLER_MANIFEST_NAME = "installer.json"
 
-#: 받는 폴더에 같이 나가는 안내 문서. 원본은 `overlay/ko/README.ko.md`다.
-#: 같은 이름을 `tools/pack-check`도 갖고 있다 - 거기는 `dist`에 있나를 보고
-#: 여기는 릴리스에 올라갔나를 본다.
-GUIDE_NAME = "사용 안내.md"
+#: 안내 문서가 **릴리스에 올라갈 때의 이름**이다. 폴더에 나갈 때는
+#: `사용 안내.md`이고 그쪽은 `tools/pack-check`가 본다.
+#:
+#: **`gh`가 윈도에서 한글 파일 이름을 못 다룬다.** 2026-08-19 첫 릴리스에서
+#: `사용 안내.md`가 `default.md`로 올라갔다. 오류도 안 났고 `gh release
+#: upload`는 0으로 끝났다 - 받는 사람 화면에서만 이름이 틀린 것이라, 이
+#: 검사가 아니었으면 그대로 나갔다.
+#:
+#: 폴더에 나가는 이름은 그대로 둔다. 거기서는 한글이 문제가 없고, 받는
+#: 사람이 무슨 파일인지 아는 쪽이 낫다.
+GUIDE_ASSET_NAME = "README.ko.md"
 
 #: 우리 저장소. 업스트림(derbruedi)이 아니라 여기로 받아야 한다.
 REPO_URL = "https://github.com/dnz3d4c/ff14-ko-accessibility"
@@ -77,7 +84,13 @@ REPO_JSON_URL = f"{REPO_URL}/releases/latest/download/{REPO_MANIFEST_NAME}"
 
 #: 한 릴리스에 같이 올라가야 하는 자산. `run\\release.bat`이 올리는 목록이다.
 #: 하나라도 빠지면 받는 쪽은 오류가 아니라 "새 판이 없다"로 읽는다.
-RELEASE_ASSETS = (INSTALLER_NAME, ZIP_NAME, GUIDE_NAME, REPO_MANIFEST_NAME, INSTALLER_MANIFEST_NAME)
+RELEASE_ASSETS = (
+    INSTALLER_NAME,
+    ZIP_NAME,
+    GUIDE_ASSET_NAME,
+    REPO_MANIFEST_NAME,
+    INSTALLER_MANIFEST_NAME,
+)
 
 #: `repo.json`에서 내려받기 주소를 담는 자리. 셋이 같아야 한다.
 DOWNLOAD_FIELDS = ("DownloadLinkInstall", "DownloadLinkUpdate", "DownloadLinkTesting")

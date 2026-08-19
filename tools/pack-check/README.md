@@ -8,7 +8,7 @@ uv run --no-project python tools/pack-check/pack_check.py --e2e
 
 두 문장은 다른 주장이다.
 
-- "설치기가 성공이라고 말했다"
+- "설치 프로그램이 성공이라고 말했다"
 - "파일이 Dalamud가 보는 자리에 있다"
 
 앞의 것만 믿다가 문서 25곳이 실제와 갈라진 적이 있다(현황판 §8-1). 그래서 여기서는 **산출물에서 다시 계산해** 대조한다.
@@ -34,7 +34,7 @@ uv run --no-project python tools/pack-check/pack_check.py --e2e
 
 ### 모양 — 설치 결과가 적재되는 모양인가
 
-`--e2e`가 설치기를 **버리는 프로필 루트**(`FF14ACC_KR_PROFILE`)에 대고 `--install --skip-vnavmesh`로 실제로 돌린다. 네트워크를 타지 않고, 이 머신의 프로필도 건드리지 않는다.
+`--e2e`가 설치 프로그램을 **버리는 프로필 루트**(`FF14ACC_KR_PROFILE`)에 대고 `--install --skip-vnavmesh`로 실제로 돌린다. 네트워크를 타지 않고, 이 머신의 프로필도 건드리지 않는다.
 
 재는 것은 [kr-runtime-setup.md](../../docs/dev/kr-runtime.md) §7이 적어 둔 셋이다.
 

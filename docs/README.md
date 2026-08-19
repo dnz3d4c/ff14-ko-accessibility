@@ -9,7 +9,7 @@
 ## dev/ — 세우고 만드는 것
 
 - [environment.md](dev/environment.md) — 경로·버전·빌드 함정. KR 클라이언트와 글로벌이 갈리는 자리
-- [kr-runtime.md](dev/kr-runtime.md) — KR 실행 환경을 손으로 세우는 절차. 설치기가 이 절차를 대신한다
+- [kr-runtime.md](dev/kr-runtime.md) — KR 실행 환경을 손으로 세우는 절차. 설치 프로그램이 이 절차를 대신한다
 - [commit-rules.md](dev/commit-rules.md) — 커밋 갈래와 트레일러, 검사기가 막는 것
 
 ## korean/ — 한국어로 옮기는 것

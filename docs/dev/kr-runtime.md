@@ -18,11 +18,11 @@ KR Dalamud 업데이터는 **기존 `%APPDATA%\XIVLauncherKR` 프로필이 있�
 | `DALAMUD_RUNTIME` 환경변수 | "적용 완료"가 뜨는데 실제로는 게임 안에서 CLR이 안 뜸 |
 | 플러그인 설정 시딩 (§7) | 플러그인이 **조용히** 안 뜸 (오류도 없음) |
 
-## 0. 설치기가 이 절차를 대신한다
+## 0. 설치 프로그램이 이 절차를 대신한다
 
-아래 §3~§8은 **손으로 하는 경우의 절차**다. 지금은 설치기가 같은 일을 한다 — `run\pack.bat`이 낸 `dist/` 폴더를 옮기고 그 안의 EXE를 실행하면 프로필 부트스트랩부터 vnavmesh 시딩까지 끝난다. KR화한 지점과 근거는 [overlay/patches/README.md](../../overlay/patches/README.md) `0006`.
+아래 §3~§8은 **손으로 하는 경우의 절차**다. 지금은 설치 프로그램이 같은 일을 한다 — `run\pack.bat`이 낸 `dist/` 폴더를 옮기고 그 안의 EXE를 실행하면 프로필 부트스트랩부터 vnavmesh 시딩까지 끝난다. KR화한 지점과 근거는 [overlay/patches/README.md](../../overlay/patches/README.md) `0006`.
 
-이 문서를 남겨 두는 이유는 둘이다. **설치기가 무엇을 왜 하는지의 근거**이고, 설치기가 막혔을 때 손으로 짚는 순서다.
+이 문서를 남겨 두는 이유는 둘이다. **설치 프로그램이 무엇을 왜 하는지의 근거**이고, 설치 프로그램이 막혔을 때 손으로 짚는 순서다.
 
 무엇을 찾았는지만 보려면(설치는 안 한다):
 
@@ -85,11 +85,11 @@ DALAMUD_HOME="$APPDATA\XIVLauncherKR\addon\Hooks\15.0.3.2" $USERPROFILE\scoop\ap
 | | 정식 (사용자가 받는 것) | 개발 (이 저장소에서 고칠 때) |
 |---|---|---|
 | 놓는 곳 | `installedPlugins\FF14Accessibility\<버전>\` | `devPlugins\FF14Accessibility\` |
-| 누가 | 설치기 (`dist\FF14AccessibilityInstaller-KR.exe`) | `run\build.bat` |
+| 누가 | 설치 프로그램 (`dist\FF14AccessibilityInstaller-KR.exe`) | `run\build.bat` |
 | Dalamud가 뭐라고 부르나 | 보통 플러그인 | 개발용 플러그인 |
 | 고친 것 반영 | 게임 재시작 | **파일만 덮으면 몇 초 안에 다시 적재** |
 
-`run\build.bat`은 정식 설치본을 먼저 지우고, 설치기는 dev 사본을 먼저 지운다. 그래서 마지막에 돌린 쪽이 그 머신의 상태다.
+`run\build.bat`은 정식 설치본을 먼저 지우고, 설치 프로그램은 dev 사본을 먼저 지운다. 그래서 마지막에 돌린 쪽이 그 머신의 상태다.
 
 ### 정식 경로에서 적재를 가르는 것 셋
 
@@ -97,7 +97,7 @@ Dalamud 소스(`PluginManager`·`LocalPlugin`)에서 확인한 것이고, **어�
 
 - **버전 폴더 이름이 버전으로 파싱돼야 한다.** `CleanupPlugins`가 아닌 폴더를 지운다 — 플러그인이 조용히 사라진다
 - **매니페스트에 `InstalledFromUrl`이 있어야 한다.** 어느 저장소와도 안 맞으면 `LocalPlugin.IsOrphaned`가 참이 되고, 고아는 적재를 건너뛴다. `OFFICIAL`(`SpecialPluginSource.MainRepo`)이면 제3자 매니페스트가 아니게 되어 기본 저장소가 받아 준다. **커스텀 저장소를 등록하지 않아도 되는 이유가 이것이다**
-- **프로필 항목이 매니페스트와 같은 `WorkingPluginId`를 가져야 한다.** 설치기가 양쪽을 같이 심고, 갱신할 때도 같은 값을 물려준다 — 안 그러면 프로필에 죽은 항목이 쌓인다
+- **프로필 항목이 매니페스트와 같은 `WorkingPluginId`를 가져야 한다.** 설치 프로그램이 양쪽을 같이 심고, 갱신할 때도 같은 값을 물려준다 — 안 그러면 프로필에 죽은 항목이 쌓인다
 
 ### 개발 경로 시딩
 
@@ -113,7 +113,7 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 `run\log.bat`이 말해 준다(`적재 경로: 정식 플러그인 / 개발용 플러그인`). 둘 다 뜨면 **실패로 세고** 걷어내라고 한다. Dalamud 로그의 원문은 `Loading plugin FF14Accessibility`와 `Loading dev plugin FF14Accessibility`다.
 
-## 8. vnavmesh — 설치기가 갖는다
+## 8. vnavmesh — 설치 프로그램이 갖는다
 
 자동 이동 계열 단축키가 이 플러그인을 부른다. 없으면 넘패드3에서 `Auto-walk not available. The vnavmesh plugin is missing or not loaded.`가 들린다. 결함이 아니라 미설치다.
 
@@ -121,25 +121,25 @@ uv run --no-project python tools/kr-setup/seed_devplugin.py "%APPDATA%\XIVLaunch
 
 ### 손으로 깔지 않는다
 
-**업스트림 방식을 그대로 따른다** — 설치기가 puni.sh 매니페스트(`https://puni.sh/api/repository/veyn`)에서 최신 판을 받고, `devPlugins\vnavmesh\vnavmesh.json`의 버전과 비교해 새 것일 때만 덮는다(`Installer/InstallerService.cs:278-300`).
+**업스트림 방식을 그대로 따른다** — 설치 프로그램이 puni.sh 매니페스트(`https://puni.sh/api/repository/veyn`)에서 최신 판을 받고, `devPlugins\vnavmesh\vnavmesh.json`의 버전과 비교해 새 것일 때만 덮는다(`Installer/InstallerService.cs:278-300`).
 
-**손으로 받아 심으면 그 버전에 묶여 갱신이 멈춘다.** 그래서 `run\setup.bat`은 vnavmesh를 건드리지 않는다. 설치기를 쓴다.
+**손으로 받아 심으면 그 버전에 묶여 갱신이 멈춘다.** 그래서 `run\setup.bat`은 vnavmesh를 건드리지 않는다. 설치 프로그램을 쓴다.
 
 run\pack.bat
 
-설치기는 처음 설치할 때만 묻는다("자동 이동을 쓰려면 필요한데 받을까?"). 이미 있으면 버전만 비교하고 지나간다.
+설치 프로그램은 처음 설치할 때만 묻는다("자동 이동을 쓰려면 필요한데 받을까?"). 이미 있으면 버전만 비교하고 지나간다.
 
 ### 재배포하지 않는다
 
-vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud 도구와 같은 취급이라 우리는 배포하지 않고, 설치기가 원 저장소에서 받게만 한다.
+vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud 도구와 같은 취급이라 우리는 배포하지 않고, 설치 프로그램이 원 저장소에서 받게만 한다.
 
 ### Dalamud 플러그인 창을 왜 안 쓰나
 
-그 창이 ImGui라 스크린리더에 읽히지 않는다. 그래서 설치기가 파일을 직접 놓는다 — 업스트림이 설치기를 만든 이유가 그거다. vnavmesh는 남의 플러그인이라 dev 경로에 그대로 둔다. 정식 경로로 옮기려면 그쪽 저장소를 **사용자의 Dalamud 설정에 등록**해야 하고, 그건 §4-3이 막는 "남의 설정에 쓰는" 쪽에 가깝다.
+그 창이 ImGui라 스크린리더에 읽히지 않는다. 그래서 설치 프로그램이 파일을 직접 놓는다 — 업스트림이 설치 프로그램을 만든 이유가 그거다. vnavmesh는 남의 플러그인이라 dev 경로에 그대로 둔다. 정식 경로로 옮기려면 그쪽 저장소를 **사용자의 Dalamud 설정에 등록**해야 하고, 그건 §4-3이 막는 "남의 설정에 쓰는" 쪽에 가깝다.
 
 ### 이 머신에 깔린 판
 
-**1.2.3.13**(DalamudApiLevel 15, ApplicableVersion any). 2026-08-18에 동작 확인용으로 손수 받아 넣은 것이고, 이후 갱신은 설치기가 맡는다 — 매니페스트에 더 새 판이 올라오면 그때 덮는다.
+**1.2.3.13**(DalamudApiLevel 15, ApplicableVersion any). 2026-08-18에 동작 확인용으로 손수 받아 넣은 것이고, 이후 갱신은 설치 프로그램이 맡는다 — 매니페스트에 더 새 판이 올라오면 그때 덮는다.
 
 게임을 켜지 않고 한 사전 검증(어셈블리 참조 659건 미해결 0, 시그니처 6건 전부 유일)은 `docs/dev/environment.md` §7에 있다. 인게임 동작은 2026-08-18 확인됐다.
 

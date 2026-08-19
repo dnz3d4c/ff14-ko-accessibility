@@ -159,11 +159,11 @@
 - **[KR Dalamud 업데이터](https://github.com/MiqoKR/kr-dalamud-updater)** — 한국 서버에는 XIVLauncher가 없어서 이 프로그램이 돌고 있는 게임에 Dalamud를 붙입니다. 이것이 없으면 모드를 설치해도 게임에 올라오지 않습니다
 - **[vnavmesh](https://github.com/awgil/ffxiv_navmesh)** — 자동 이동, 따라가기, 경로 미리 듣기에 필요합니다. 없어도 나머지 기능은 그대로 동작합니다
 
-**KR Dalamud 업데이터와 vnavmesh는 재배포하지 않습니다.** 설치기가 각각의 원 저장소에서 사용자 대신 받아 옵니다.
+**KR Dalamud 업데이터와 vnavmesh는 재배포하지 않습니다.** 설치 프로그램이 각각의 원 저장소에서 사용자 대신 받아 옵니다.
 
 ## 5. 제안과 문제 신고
 
-- **이 저장소의 이슈** — 한국 서버에서 겪은 것, 한국어 문장이 어색하거나 게임 표기와 다른 것, 설치기가 실패하는 것
+- **이 저장소의 이슈** — 한국 서버에서 겪은 것, 한국어 문장이 어색하거나 게임 표기와 다른 것, 설치 프로그램이 실패하는 것
 - **[원본 저장소의 이슈](https://github.com/derbruedi/ff14-accessibility/issues)** — 한국 서버와 무관하게 모드 자체가 갖는 문제. 어느 쪽인지 모르겠으면 이쪽 저장소에 적으면 됩니다. 우리가 갈라서 올립니다
 
 문제를 알릴 때 아래 넷을 함께 보내면 원인을 훨씬 빨리 찾을 수 있습니다.
@@ -248,7 +248,7 @@ uv run --no-project --with pytest pytest tools -q
 - `docs-check` — **문서가 인용한 숫자를 산출물에서 다시 계산해 대조합니다.** 손으로 옮겨 적은 값이 낡으면 검사가 실패합니다. 단축키 목록이 두 문서와 소스에서 갈라지는 것도 여기서 잡습니다
 - [`ko-words`](tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다
 - [`ko-speech`](tools/ko-speech/README.md) — 번역 표를 안 거치고 소스에 맨몸으로 박힌 외국어 문장을 잡습니다. 그런 자리는 한국어가 없어도 조용히 지나가므로, 목록 자체를 고정해 늘어나면 실패시킵니다
-- [`pack-check`](tools/pack-check/README.md) — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치기를 임시 프로필에 실제로 돌려 봅니다
+- [`pack-check`](tools/pack-check/README.md) — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치 프로그램을 임시 프로필에 실제로 돌려 봅니다
 - [`asmref-check`](tools/asmref-check/README.md) · `sig-probe` · `cs-api-diff` · [`asmstr`](tools/asmstr/README.md) — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
 
 ### 한국 서버와 무관한 것은 원본을 봅니다

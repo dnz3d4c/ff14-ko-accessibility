@@ -163,3 +163,46 @@ def test_유형별_절이_없으면_소리를_낸다(tmp_path):
     path.write_text("# 앞\n\n아무것도 없다\n", encoding="utf-8")
     with pytest.raises(ValueError):
         docs_check.hand_type_sum(path)
+
+
+# --- 단축키 대장 (W-39) ----------------------------------------------------
+#
+# 키 목록이 저장소 안에 두 벌이다. 루트 README는 저장소를 여는 사람이 보고,
+# 사용 안내는 배포물에 그것만 나가서 뺄 수가 없다. W-04에서 키 이름 표가
+# 둘로 갈려 기본 바인딩 셋이 조용히 죽은 적이 있어서, 여기서 못박는다.
+
+
+def test_단축키가_문서끼리_그리고_소스와_맞는다():
+    bad = docs_check.check_keys()
+    assert bad == [], "\n".join(bad)
+
+
+def test_문서_한쪽에서_키가_빠지면_걸린다(monkeypatch):
+    real = docs_check.doc_keys
+    빠뜨릴_문서 = docs_check.KEY_DOCS[1]
+
+    def 한쪽만_모자라게(rel):
+        names = real(rel)
+        return names - {"KeyHelp"} if rel == 빠뜨릴_문서 else names
+
+    monkeypatch.setattr(docs_check, "doc_keys", 한쪽만_모자라게)
+    bad = docs_check.check_keys()
+    assert any("KeyHelp" in line for line in bad), bad
+
+
+def test_소스에만_있는_키가_잡힌다(monkeypatch):
+    if docs_check.source_keys() is None:
+        pytest.skip("vendor를 못 받은 상태")
+    문서에_있는_것 = docs_check.doc_keys(docs_check.KEY_DOCS[0])
+    monkeypatch.setattr(
+        docs_check, "source_keys", lambda: 문서에_있는_것 | {"KeyNieDokumentiert"}
+    )
+    bad = docs_check.check_keys()
+    assert any("KeyNieDokumentiert" in line for line in bad), bad
+
+
+def test_vendor가_없으면_문서끼리만_본다(monkeypatch):
+    # 권한 없이 클론하면 vendor가 안 받아진다. 그때도 두 문서 대조는 돌아야
+    # 한다 - 소스를 못 봐도 문서끼리 갈라진 것은 잡을 수 있다.
+    monkeypatch.setattr(docs_check, "source_keys", lambda: None)
+    assert docs_check.check_keys() == []

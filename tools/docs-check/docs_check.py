@@ -52,6 +52,17 @@ HAND_CASES_DOC = REPO / "docs" / "korean" / "hand-cases.md"
 GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
 LOC_SKILL = ".claude/skills/ko-localization/SKILL.md"
 
+CONFIG_CS = REPO / "vendor" / "ff14-accessibility" / "FF14Accessibility" / "Configuration.cs"
+
+#: 단축키 목록을 갖는 문서 둘. **양쪽에 다 있어야 한다** - 배포물에는 사용
+#: 안내만 나가고(빼면 모드를 못 쓴다), 저장소를 여는 사람은 루트 README를
+#: 먼저 본다. 그래서 두 벌이고, 그래서 갈라진다. W-04가 그 사고였다: 키 이름
+#: 표가 저장소 안에 둘이었고 서로 갈라져서 기본 바인딩 셋이 조용히 죽었다.
+KEY_DOCS = ("README.md", "overlay/ko/README.ko.md")
+
+_KEY_IN_SOURCE = re.compile(r"^\s*public string (Key\w+)\s*=", re.M)
+_KEY_IN_DOC = re.compile(r"`(Key\w+)`")
+
 #: 살아 있는 문서만 본다. 날짜가 박힌 기록(`frozen/ko-review-2026-08-18.md`)과
 #: 동결한 조사 문서(`frozen/port-feasibility.md`)는 **그때 그대로가 맞다.**
 #: 거기 숫자를 지금 값으로 맞추면 기록이 아니게 된다.
@@ -305,18 +316,60 @@ def check_board(path: Path = BOARD) -> list[str]:
     return bad
 
 
+# --------------------------------------------------------------- 단축키 대조
+
+
+def source_keys() -> set[str] | None:
+    """`Configuration.cs`가 선언한 키 설정 이름. vendor가 없으면 `None`."""
+    if not CONFIG_CS.is_file():
+        return None
+    return set(_KEY_IN_SOURCE.findall(CONFIG_CS.read_text(encoding="utf-8")))
+
+
+def doc_keys(rel: str) -> set[str]:
+    """문서가 백틱으로 적어 둔 키 설정 이름."""
+    return set(_KEY_IN_DOC.findall((REPO / rel).read_text(encoding="utf-8")))
+
+
+def check_keys() -> list[str]:
+    """키 목록이 문서끼리, 그리고 소스와 어긋나는 자리.
+
+    **먼저 문서끼리 본다.** vendor가 없어도(권한 없이 클론한 경우) 이 대조는
+    돌아야 한다 - 두 문서가 갈라지는 것이 제일 흔한 사고다.
+    """
+    bad = []
+    docs = {rel: doc_keys(rel) for rel in KEY_DOCS}
+    left, right = KEY_DOCS
+    for name in sorted(docs[left] - docs[right]):
+        bad.append(f"{name}: `{left}`에만 있다")
+    for name in sorted(docs[right] - docs[left]):
+        bad.append(f"{name}: `{right}`에만 있다")
+
+    src = source_keys()
+    if src is None:
+        return bad  # vendor를 못 받은 상태. 다른 검사와 같은 규약으로 건너뛴다
+
+    for rel, names in docs.items():
+        for name in sorted(names - src):
+            bad.append(f"{name}: `{rel}`에 있는데 `Configuration.cs`에 없다")
+        for name in sorted(src - names):
+            bad.append(f"{name}: `Configuration.cs`에 있는데 `{rel}`에 없다")
+    return bad
+
+
 # ------------------------------------------------------------------- 실행
 
 
 def main(argv: list[str]) -> int:
-    bad = check_citations() + check_board()
+    bad = check_citations() + check_board() + check_keys()
     if bad:
         print("문서가 실제와 어긋난다:", file=sys.stderr)
         for item in bad:
             print(f"  {item}", file=sys.stderr)
         return 1
 
-    print(f"통과 - 인용 {len(CITATIONS)}자리와 현황판 정합")
+    keys = doc_keys(KEY_DOCS[0])
+    print(f"통과 - 인용 {len(CITATIONS)}자리, 현황판 정합, 단축키 {len(keys)}개")
     return 0
 
 

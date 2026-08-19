@@ -247,6 +247,7 @@ uv run --no-project --with pytest pytest tools -q
 - `patch-check` — 저장소가 기록한 vendor 포인터가 `kr-port` 팁이고 핀이 그 조상인지
 - `docs-check` — **문서가 인용한 숫자를 산출물에서 다시 계산해 대조합니다.** 손으로 옮겨 적은 값이 낡으면 검사가 실패합니다. 단축키 목록이 두 문서와 소스에서 갈라지는 것도 여기서 잡습니다
 - [`ko-words`](tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조합니다. 용어 대장에 적는 것을 잊어도 잡힙니다
+- [`ko-speech`](tools/ko-speech/README.md) — 번역 표를 안 거치고 소스에 맨몸으로 박힌 외국어 문장을 잡습니다. 그런 자리는 한국어가 없어도 조용히 지나가므로, 목록 자체를 고정해 늘어나면 실패시킵니다
 - [`pack-check`](tools/pack-check/README.md) — 배포 산출물이 바닐라인지, 설치 결과가 Dalamud가 읽는 모양인지. 설치기를 임시 프로필에 실제로 돌려 봅니다
 - [`asmref-check`](tools/asmref-check/README.md) · `sig-probe` · `cs-api-diff` · [`asmstr`](tools/asmstr/README.md) — 플러그인이 부르는 타입과 시그니처가 KR에 실제로 있는지
 

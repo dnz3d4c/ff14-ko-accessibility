@@ -9,8 +9,6 @@
 두 갈래를 따로 시험한다. 한 규칙으로 묶으면 오탐이 섞여 둘 다 죽기 때문이다.
 """
 
-import json
-
 import ko_speech
 import pytest
 

@@ -1,0 +1,362 @@
+From 5af4fd8bd74fdedd00fd1283821f16ba6276d4d8 Mon Sep 17 00:00:00 2001
+From: dnz3d4c <dnz3d4c@users.noreply.github.com>
+Date: Wed, 19 Aug 2026 10:01:27 +0900
+Subject: [PATCH] Compat: fetch the Korean Dalamud updater instead of sending
+ the user away
+
+Dalamud reaches the Korean client through a separate program (MiqoKR's
+KR Dalamud updater), and until now the installer stopped when it was
+missing and printed a path for the user to go find. The vnavmesh step in
+the same run does the opposite - it downloads its dependency from the
+author's own release. Two foreign plugins of the same kind, one fetched
+and one handed off.
+
+So this fetches it too, the same way:
+
+  - the latest release is asked for by API, no pinned tag
+  - only the "Portable" asset is taken. The release also publishes a
+    "Payload" zip for the updater's own self-update; that one extracts
+    cleanly and leaves nothing runnable behind, which is why the choice
+    is a named rule and not "the first zip"
+  - it unpacks whole into %LOCALAPPDATA%\KR-Dalamud-Updater\app, because
+    the archive is flat and UpdaterReleaseConfig.json has to stay beside
+    the exe for the updater's self-update to work
+
+This is a download, not a redistribution. That repository carries no
+license, so the archive must not travel inside ours - taking it from
+upstream on the user's behalf touches nothing the license would cover.
+
+What is still left to the user is the one button: Dalamud itself only
+arrives when Check Update is pressed in the updater's own window, so the
+installer opens that window and says so. Being able to tell "the updater
+is missing" from "Dalamud is missing" is the point - the first is ours to
+solve, the second is not.
+
+The five constants that decide where it comes from and where it lands are
+mirrored in tools/kr-setup/kr_profile.py, and a test fails if the two
+drift apart. Same guard as the profile root: a path we unpack to and a
+path we look in must not disagree silently.
+---
+ Installer/InstallerService.cs | 152 ++++++++++++++++++++++++++++++++--
+ Installer/KrProfile.cs        |  42 +++++++++-
+ Installer/Loc.cs              |  51 ++++++++++++
+ 3 files changed, 236 insertions(+), 9 deletions(-)
+
+diff --git a/Installer/InstallerService.cs b/Installer/InstallerService.cs
+index 57b5763..c43861a 100644
+--- a/Installer/InstallerService.cs
++++ b/Installer/InstallerService.cs
+@@ -132,7 +132,7 @@ public sealed class InstallerService
+         try
+         {
+             Info(Loc.Get("KrCheckingProfile"));
+-            if (!PrepareKrProfile())
++            if (!await PrepareKrProfileAsync())
+                 return false; // Dalamud fehlt - der Nutzer muss erst den Updater laufen lassen.
+             Info(string.Empty);
+ 
+@@ -163,12 +163,12 @@ public sealed class InstallerService
+     /// prueft danach, ob Dalamud ueberhaupt da ist. Gibt false zurueck, wenn der
+     /// Nutzer erst den KR-Updater laufen lassen muss.
+     ///
+-    /// Der globale Installer laedt an dieser Stelle XIVLauncher herunter. Das
+-    /// geht hier nicht: den koreanischen Client bedient ein eigener Launcher,
+-    /// und Dalamud kommt aus einer fremden Patch-Pipeline, die wir bewusst nicht
+-    /// weiterverteilen.
++    /// Der globale Installer laedt an dieser Stelle XIVLauncher herunter. Wir
++    /// laden stattdessen den KR-Dalamud-Updater - nicht als Weiterverteilung,
++    /// sondern aus seinem eigenen Release, genau wie beim vnavmesh-Schritt.
++    /// Was danach uebrig bleibt, ist der eine Knopf in dessen Fenster.
+     /// </summary>
+-    private bool PrepareKrProfile()
++    private async Task<bool> PrepareKrProfileAsync()
+     {
+         // Immer nennen, auch wenn alles stimmt. Landet das Plugin im falschen
+         // Ordner, meldet nichts einen Fehler - der Updater legt sein eigenes
+@@ -192,13 +192,153 @@ public sealed class InstallerService
+         if (KrProfile.DalamudInstalled)
+             return true;
+ 
++        // Two different situations wear the same face here, and telling them
++        // apart is the whole point: the updater being absent is ours to fix,
++        // Dalamud being absent needs a button pressed in the updater's window.
++        if (!KrProfile.UpdaterInstalled && !await SetupKrUpdaterAsync())
++            return false;
++
+         Warn(Loc.Get("KrDalamudMissing"));
+         Info(Loc.Get("KrDalamudGetIt"));
+         Info("  " + KrProfile.UpdaterPath);
+         Info(Loc.Get("KrDalamudThenCheckUpdate"));
++
++        // Opening it saves the one step the user would otherwise have to find a
++        // path for. Failing to open it changes nothing - the path is printed above.
++        if (KrProfile.TryLaunchUpdater())
++            Info(Loc.Get("KrUpdaterLaunched"));
++
+         return false;
+     }
+ 
++    /// <summary>
++    /// Fetches the Korean Dalamud updater from its own GitHub release and unpacks
++    /// it. Returns false when the user declined or the fetch failed - the caller
++    /// then falls back to printing the path and the manual instruction.
++    ///
++    /// This is a download, not a redistribution. The repository carries no
++    /// license, so the archive must not travel inside ours; taking it from the
++    /// upstream release on the user's behalf is the same shape as the vnavmesh
++    /// step and touches nothing the license would cover.
++    /// </summary>
++    private async Task<bool> SetupKrUpdaterAsync()
++    {
++        Info(string.Empty);
++        Info(Loc.Get("KrUpdaterWhatItIs1"));
++        Info(Loc.Get("KrUpdaterWhatItIs2"));
++        Info(Loc.Get("KrUpdaterWhatItIs3"));
++
++        if (!(AskYesNo?.Invoke(Loc.Get("AskSetupKrUpdater")) ?? false))
++        {
++            Info(Loc.Get("KrUpdaterSkipped"));
++            return false;
++        }
++
++        string? downloadUrl;
++        try
++        {
++            Info(Loc.Get("KrUpdaterCheckingRelease"));
++            var json = await _http.GetStringAsync(KrProfile.UpdaterReleaseApi);
++            downloadUrl = PickUpdaterAsset(JsonNode.Parse(json)?["assets"]?.AsArray());
++        }
++        catch (HttpRequestException ex)
++        {
++            Warn(Loc.Get("KrUpdaterUnreachable", ex.Message));
++            return false;
++        }
++        catch (TaskCanceledException)
++        {
++            Warn(Loc.Get("KrUpdaterTimeout"));
++            return false;
++        }
++        catch (Exception ex)
++        {
++            Warn(Loc.Get("KrUpdaterUnexpectedError", ex.Message));
++            return false;
++        }
++
++        if (downloadUrl == null)
++        {
++            Warn(Loc.Get("KrUpdaterNoAsset", KrProfile.UpdaterAssetMarker));
++            return false;
++        }
++
++        var zipPath = Path.Combine(Path.GetTempPath(), "kr_dalamud_updater_" + Guid.NewGuid() + ".zip");
++        try
++        {
++            Info(Loc.Get("KrUpdaterDownloading"));
++            await DownloadFileAsync(downloadUrl, zipPath, Loc.Get("KrUpdaterDownloadLabel"));
++
++            // The archive is flat, so it goes into the app folder whole. Overwrite
++            // rather than merge: a half-updated set of the three files is worse
++            // than either version of them.
++            Directory.CreateDirectory(KrProfile.UpdaterExtractDir);
++            ZipFile.ExtractToDirectory(zipPath, KrProfile.UpdaterExtractDir, overwriteFiles: true);
++        }
++        catch (IOException ex)
++        {
++            Error(Loc.Get("KrUpdaterCouldNotWrite", ex.Message));
++            return false;
++        }
++        catch (Exception ex)
++        {
++            Error(Loc.Get("KrUpdaterDownloadFailed", ex.Message));
++            return false;
++        }
++        finally
++        {
++            TryDeleteFile(zipPath);
++        }
++
++        // Unpacking into the right folder is not the same as having a working
++        // updater. Say which, so "nothing happened" has a place to start.
++        if (!KrProfile.UpdaterInstalled)
++        {
++            Error(Loc.Get("KrUpdaterExeMissing", KrProfile.UpdaterPath));
++            return false;
++        }
++
++        Info(Loc.Get("KrUpdaterInstalledAt", KrProfile.UpdaterExtractDir));
++        return true;
++    }
++
++    /// <summary>
++    /// Picks the release asset to download. Mirrored in tools/kr-setup/kr_profile.py
++    /// (<c>pick_updater_asset</c>), where the cases are tested.
++    ///
++    /// Only the "Portable" zip carries an executable. The release also publishes a
++    /// "Payload" zip for the updater's own self-update; downloading that one
++    /// extracts perfectly and leaves nothing to run.
++    /// </summary>
++    private static string? PickUpdaterAsset(JsonArray? assets)
++    {
++        if (assets == null) return null;
++
++        foreach (var entry in assets)
++        {
++            var name = entry?["name"]?.GetValue<string>();
++            var url = entry?["browser_download_url"]?.GetValue<string>();
++            if (name == null || url == null) continue;
++
++            if (name.Contains(KrProfile.UpdaterAssetMarker, StringComparison.OrdinalIgnoreCase) &&
++                name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
++                return url;
++        }
++        return null;
++    }
++
++    private static void TryDeleteFile(string path)
++    {
++        try
++        {
++            if (File.Exists(path)) File.Delete(path);
++        }
++        catch (Exception)
++        {
++            // Leaving a temp file behind must not fail the install.
++        }
++    }
++
+     // ── Eigenes Plugin (FF14Accessibility) ────────────────────────────────
+ 
+     /// <summary>
+diff --git a/Installer/KrProfile.cs b/Installer/KrProfile.cs
+index c3de77d..ccfd242 100644
+--- a/Installer/KrProfile.cs
++++ b/Installer/KrProfile.cs
+@@ -190,10 +190,46 @@ internal static class KrProfile
+     public static readonly string ConfigPath = Path.Combine(Root, "dalamudConfig.json");
+     public static readonly string LogPath = Path.Combine(Root, "dalamud-kr-gui.log");
+ 
+-    /// <summary>Where the Korean Dalamud updater installs itself by default.</summary>
+-    public static readonly string UpdaterPath = Path.Combine(
++    // ── The Korean Dalamud updater ────────────────────────────────────────
++    //
++    // These five constants are mirrored in tools/kr-setup/kr_profile.py and a
++    // test fails if the two drift apart. They decide where the updater is
++    // fetched from and where it lands; if the installer unpacks it somewhere
++    // other than UpdaterPath, it downloads the thing and then reports it
++    // missing.
++
++    /// <summary>Latest release of the Korean Dalamud updater. No pinned tag - we
++    /// ask for whatever is current, the same way the vnavmesh step does.</summary>
++    public const string UpdaterReleaseApi =
++        "https://api.github.com/repos/MiqoKR/kr-dalamud-updater/releases/latest";
++
++    /// <summary>Which of the release assets to take. The release also carries a
++    /// "Payload" zip, which is what the updater uses to update itself - it has no
++    /// executable in it, and taking it would extract cleanly and leave nothing
++    /// runnable behind.</summary>
++    public const string UpdaterAssetMarker = "Portable";
++
++    /// <summary>Under LocalApplicationData: no elevation needed, and it satisfies
++    /// the "ordinary writable folder" the updater's own README-KR.txt asks for.</summary>
++    public const string UpdaterInstallFolder = "KR-Dalamud-Updater";
++    public const string UpdaterAppFolder = "app";
++    public const string UpdaterExeName = "Dalamud.Updater.exe";
++
++    /// <summary>Where the release zip is unpacked. The archive is flat - the exe,
++    /// README-KR.txt and UpdaterReleaseConfig.json all sit at its root - and
++    /// UpdaterReleaseConfig.json has to stay next to the exe for the updater's
++    /// self-update to work, so the three are never split apart.</summary>
++    public static readonly string UpdaterExtractDir = Path.Combine(
+         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+-        "KR-Dalamud-Updater", "app", "Dalamud.Updater.exe");
++        UpdaterInstallFolder, UpdaterAppFolder);
++
++    /// <summary>Where the Korean Dalamud updater installs itself by default.</summary>
++    public static readonly string UpdaterPath = Path.Combine(UpdaterExtractDir, UpdaterExeName);
++
++    /// <summary>True once the updater's executable is on disk. Distinct from
++    /// <see cref="DalamudInstalled"/>: having the updater is our problem to solve,
++    /// having Dalamud needs the user to press Check Update in its window.</summary>
++    public static bool UpdaterInstalled => File.Exists(UpdaterPath);
+ 
+     /// <summary>
+     /// Minimal seed for dalamudConfig.json. Dalamud fills in every other default
+diff --git a/Installer/Loc.cs b/Installer/Loc.cs
+index ad85daa..2d96f4d 100644
+--- a/Installer/Loc.cs
++++ b/Installer/Loc.cs
+@@ -271,6 +271,23 @@ public static class Loc
+             ["KrDalamudMissing"] = "Koreanisches Dalamud ist noch nicht installiert.",
+             ["KrDalamudGetIt"] = "Bitte zuerst den KR-Dalamud-Updater ausfuehren und \"Check Update\" druecken:",
+             ["KrDalamudThenCheckUpdate"] = "Danach dieses Programm erneut starten.",
++            ["KrUpdaterWhatItIs1"] = "Der KR-Dalamud-Updater fehlt. Er bringt Dalamud in den koreanischen Client;",
++            ["KrUpdaterWhatItIs2"] = "auf der globalen Seite macht das der XIVLauncher. Er stammt von einem anderen",
++            ["KrUpdaterWhatItIs3"] = "Autor (MiqoKR) und wird aus dessen Release geladen, nicht von uns weitergegeben.",
++            ["AskSetupKrUpdater"] = "Soll der KR-Dalamud-Updater jetzt heruntergeladen werden?",
++            ["KrUpdaterSkipped"] = "KR-Dalamud-Updater uebersprungen.",
++            ["KrUpdaterCheckingRelease"] = "Suche neuestes Release des KR-Dalamud-Updaters ...",
++            ["KrUpdaterDownloading"] = "Lade den KR-Dalamud-Updater herunter ...",
++            ["KrUpdaterDownloadLabel"] = "KR-Dalamud-Updater",
++            ["KrUpdaterInstalledAt"] = "KR-Dalamud-Updater entpackt nach: {0}",
++            ["KrUpdaterLaunched"] = "Der Updater wurde geoeffnet.",
++            ["KrUpdaterUnreachable"] = "GitHub nicht erreichbar ({0}). Der Updater muss von Hand geholt werden.",
++            ["KrUpdaterTimeout"] = "Zeitueberschreitung bei GitHub. Der Updater muss von Hand geholt werden.",
++            ["KrUpdaterNoAsset"] = "Im Release ist kein \"{0}\"-Archiv. Der Updater muss von Hand geholt werden.",
++            ["KrUpdaterDownloadFailed"] = "Download des Updaters fehlgeschlagen ({0}).",
++            ["KrUpdaterCouldNotWrite"] = "Updater konnte nicht geschrieben werden ({0}).",
++            ["KrUpdaterExeMissing"] = "Archiv entpackt, aber es liegt keine EXE hier: {0}",
++            ["KrUpdaterUnexpectedError"] = "Unerwarteter Fehler beim Updater ({0}).",
+             ["KrLookingForLocalBuild"] = "Suche den lokalen Build des Plugins ...",
+             ["KrNoLocalBuild"] = "Kein gebautes Plugin gefunden.",
+             ["KrBuildHint"] = "Bitte zuerst run\build.bat ausfuehren.",
+@@ -453,6 +470,23 @@ public static class Loc
+             ["KrDalamudMissing"] = "Korean Dalamud is not installed yet.",
+             ["KrDalamudGetIt"] = "Run the KR Dalamud updater first and press \"Check Update\":",
+             ["KrDalamudThenCheckUpdate"] = "Then start this program again.",
++            ["KrUpdaterWhatItIs1"] = "The KR Dalamud updater is missing. It puts Dalamud into the Korean client;",
++            ["KrUpdaterWhatItIs2"] = "on the global side XIVLauncher does that. It comes from a different author",
++            ["KrUpdaterWhatItIs3"] = "(MiqoKR) and is loaded from their release, not redistributed by us.",
++            ["AskSetupKrUpdater"] = "Download the KR Dalamud updater now?",
++            ["KrUpdaterSkipped"] = "Skipped the KR Dalamud updater.",
++            ["KrUpdaterCheckingRelease"] = "Looking for the latest KR Dalamud updater release ...",
++            ["KrUpdaterDownloading"] = "Downloading the KR Dalamud updater ...",
++            ["KrUpdaterDownloadLabel"] = "KR Dalamud updater",
++            ["KrUpdaterInstalledAt"] = "KR Dalamud updater unpacked to: {0}",
++            ["KrUpdaterLaunched"] = "The updater has been opened.",
++            ["KrUpdaterUnreachable"] = "GitHub is unreachable ({0}). The updater has to be fetched by hand.",
++            ["KrUpdaterTimeout"] = "GitHub timed out. The updater has to be fetched by hand.",
++            ["KrUpdaterNoAsset"] = "The release carries no \"{0}\" archive. The updater has to be fetched by hand.",
++            ["KrUpdaterDownloadFailed"] = "Downloading the updater failed ({0}).",
++            ["KrUpdaterCouldNotWrite"] = "Could not write the updater ({0}).",
++            ["KrUpdaterExeMissing"] = "The archive extracted, but there is no EXE here: {0}",
++            ["KrUpdaterUnexpectedError"] = "Unexpected error while fetching the updater ({0}).",
+             ["KrLookingForLocalBuild"] = "Looking for the locally built plugin ...",
+             ["KrNoLocalBuild"] = "No built plugin found.",
+             ["KrBuildHint"] = "Run run\build.bat first.",
+@@ -486,6 +520,23 @@ public static class Loc
+             ["KrDalamudMissing"] = "한국 서버용 Dalamud가 아직 없다.",
+             ["KrDalamudGetIt"] = "먼저 KR Dalamud 업데이터를 실행해 \"Check Update\"를 누른다:",
+             ["KrDalamudThenCheckUpdate"] = "그 다음 이 프로그램을 다시 실행한다.",
++            ["KrUpdaterWhatItIs1"] = "KR Dalamud 업데이터가 없다. 게임에 Dalamud를 붙여 주는 프로그램이다.",
++            ["KrUpdaterWhatItIs2"] = "이 프로그램은 우리가 만든 것이 아니고 재배포하지도 않는다 - 원 저장소에서 직접 받는다.",
++            ["KrUpdaterWhatItIs3"] = "이것이 없으면 모드를 설치해도 게임에 올라오지 않는다.",
++            ["AskSetupKrUpdater"] = "KR Dalamud 업데이터를 지금 받을까?",
++            ["KrUpdaterSkipped"] = "KR Dalamud 업데이터를 건너뛰었다.",
++            ["KrUpdaterCheckingRelease"] = "KR Dalamud 업데이터의 최신 판을 확인한다 ...",
++            ["KrUpdaterDownloading"] = "KR Dalamud 업데이터를 내려받는다 ...",
++            ["KrUpdaterDownloadLabel"] = "KR Dalamud 업데이터",
++            ["KrUpdaterInstalledAt"] = "KR Dalamud 업데이터를 풀었다: {0}",
++            ["KrUpdaterLaunched"] = "업데이터를 열었다.",
++            ["KrUpdaterUnreachable"] = "GitHub에 연결하지 못했다: {0}. 업데이터는 직접 받아야 한다.",
++            ["KrUpdaterTimeout"] = "GitHub 응답이 없다. 업데이터는 직접 받아야 한다.",
++            ["KrUpdaterNoAsset"] = "최신 판에 \"{0}\" 압축이 없다. 업데이터는 직접 받아야 한다.",
++            ["KrUpdaterDownloadFailed"] = "업데이터를 내려받지 못했다: {0}",
++            ["KrUpdaterCouldNotWrite"] = "업데이터를 쓰지 못했다: {0}",
++            ["KrUpdaterExeMissing"] = "압축은 풀렸는데 실행 파일이 여기 없다: {0}",
++            ["KrUpdaterUnexpectedError"] = "업데이터를 받다가 예상 못 한 오류가 났다: {0}",
+ 
+             ["KrLookingForLocalBuild"] = "빌드해 둔 플러그인을 찾는다 ...",
+             ["KrNoLocalBuild"] = "빌드된 플러그인이 없다.",
+-- 
+2.55.0.windows.3
+

@@ -1,24 +1,22 @@
 # patches — 업스트림에 올릴 변경
 
-한국을 언급하지 않고도 성립하는 변경만 여기 둔다. **KR 전용은 `overlay/patches/`다.** 커밋 훅이 두 경로를 섞는 커밋을 거부한다([docs/commit-rules.md](../docs/commit-rules.md) §2.2).
+한국을 언급하지 않고도 성립하는 변경만 이 갈래로 낸다. **KR 전용의 명세는 [overlay/patches/README.md](../overlay/patches/README.md)다.** 커밋 훅이 두 갈래를 섞는 커밋을 거부한다([docs/commit-rules.md](../docs/commit-rules.md) §2.2).
 
-## 여기 있어도 로컬에서 적용된다
+**코드는 여기 없다.** 패치 파일은 2026-08-19에 없앴고(W-11, [docs/vendor-submodule.md](../docs/vendor-submodule.md)), 보낼 변경은 vendor `kr-port` 브랜치의 커밋으로 산다 — 우리 저장소 커밋에는 `[업스트림]` 접두와 `Upstream-Files`·`Upstream-Subject` 트레일러로 표시된다([commit-rules.md](../docs/commit-rules.md) §2.3). 이 디렉토리에 남는 것은 **기준·기각 목록·PR 기록**이다.
 
-이 디렉토리는 "나중에 보낼 것을 쌓아 두는 곳"이 아니다. **먼저 적용된다.** 그래야 우리도 그 수정의 덕을 보고, 무엇보다 **깨지면 우리가 먼저 안다** — 보내기 전에.
+## 보낼 것도 로컬에서 늘 적용된다
 
-vendor 클론에서 실행한다. 순서가 중요하다.
+"나중에 보낼 것을 쌓아 두는 곳"이 따로 없다. 보낼 변경도 `kr-port`에 같이 얹혀 있어서 **우리도 그 수정의 덕을 보고, 깨지면 우리가 먼저 안다** — 보내기 전에.
 
-cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../patches/*.patch ../../overlay/patches/*.patch
+보낼 커밋은 `kr-port`의 **앞머리**에 둔다. 패치 디렉토리가 없어진 지금은 이 위치가 두 갈래의 물리적 경계다([docs/vendor-submodule.md](../docs/vendor-submodule.md) §6 — 경계 표시를 더 강하게 할지는 현황판 §7 D-7). 업스트림에 병합되면 다음 동기화 rebase에서 그 커밋이 저절로 비어 사라지고, 나머지가 그대로 얹혀야 한다.
 
-`patches/`가 앞이다. 업스트림에 병합되면 그 패치는 여기서 사라지고, 나머지는 그대로 붙어야 한다. 뒤에 두면 받아들여진 뒤 우리 패치들이 전부 어긋난다.
+**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** 업스트림을 올리는 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
 
-**붙는 자리는 `main`이 아니라 `upstream.json`의 핀이다** — 위 명령의 `main`을 핀 커밋으로 바꿔 읽는다. 업스트림을 올리는 절차는 [docs/upstream-sync.md](../docs/upstream-sync.md).
-
-## `overlay/`가 아니라 여기에 넣는 기준
+## `[한국전용]`이 아니라 이 갈래에 넣는 기준
 
 셋을 다 만족해야 한다.
 
-1. **코드에 한국이 안 나온다.** 시그니처 바이트, `XIVLauncherKR`, KR 시트 ID 같은 것이 있으면 `overlay/`로 간다
+1. **코드에 한국이 안 나온다.** 시그니처 바이트, `XIVLauncherKR`, KR 시트 ID 같은 것이 있으면 `[한국전용]`으로 간다
 2. **다른 클라이언트에서도 고쳐진다.** 독일어·프랑스어·일본어 사용자에게도 이익이어야 한다
 3. **업스트림 결정을 뒤집지 않는다.** 뒤집는다면 그건 먼저 물어볼 일이다([commit-rules.md](../docs/commit-rules.md) §3.6)
 
@@ -26,7 +24,7 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 ## 실제로 보내는 기준은 더 좁다 (2026-08-18 결정)
 
-위 셋은 **어느 디렉토리에 두느냐**를 가른다. 여기 있다고 다 보내는 것이 아니다. 보내려면 둘을 더 만족해야 하고, **만족 못 하면 패치를 아예 만들지 않는다.**
+위 셋은 **어느 갈래에 두느냐**를 가른다. 이 갈래에 있다고 다 보내는 것이 아니다. 보내려면 둘을 더 만족해야 하고, **만족 못 하면 변경을 아예 만들지 않는다.**
 
 4. **글섭 클라 없이 판정된다.** 우리한테는 KR 클라이언트뿐이다. *고치기 전이 틀렸다*는 것도 *고친 뒤가 맞다*는 것도 **소스를 읽어서** 나와야 한다. 돌려 봐야 아는 것(타이밍·레이스·프레임 순서)은 다른 클라에서 맞는지 확인할 방법이 없으므로 안 낸다.
 5. **명백한 기존 로직의 오류다.** 리팩터, 구조 개선, "언젠가 편해지는 것"은 안 낸다. 코드를 읽은 사람이 "이건 버그다"에서 갈리지 않아야 한다.
@@ -37,7 +35,7 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 ## 목록
 
-**하나뿐이다.** 여기 있는 것은 보내는 것이고, 안 보내기로 한 것은 `overlay/patches/`로 내렸다 — 판정과 이유는 [rejected.md](rejected.md).
+**하나뿐이다.** 여기 있는 것은 보내는 것이고, 안 보내기로 한 것은 `[한국전용]` 쪽 명세로 내렸다 — 판정과 이유는 [rejected.md](rejected.md).
 
 ### 0001 — 서식지와 지역을 붙여 읽던 것
 
@@ -63,10 +61,10 @@ lives in 지평선 가장자리in the area 서부 다날란
 
 **보냈다 — [PR #8](https://github.com/derbruedi/ff14-accessibility/pull/8)** (2026-08-18, base `main`, 파일 1개 `+4 -1`). 제목·본문은 [pr-habitat-separator.md](pr-habitat-separator.md)에 그대로 남아 있다.
 
-fork는 `dnz3d4c/ff14-accessibility`, 브랜치는 `upstream-habitat-separator`다. **병합되면 이 패치는 여기서 사라지고 나머지가 그대로 붙어야 한다** — 그때 `upstream.json` 핀을 옮기고 다시 뽑는다. 그러면 이 디렉토리가 빈다.
+fork는 `dnz3d4c/ff14-accessibility`, 브랜치는 `upstream-habitat-separator`다. **병합되면 다음 동기화 rebase에서 이 커밋이 저절로 비어 사라지고 나머지가 그대로 얹혀야 한다** — 그때 `upstream.json` 핀을 옮긴다. 그러면 이 목록이 빈다.
 
-**PR 초안 문서 이름에 패치 번호를 안 쓴다.** 번호는 시리즈가 바뀔 때마다 밀린다 — 실제로 이 패치는 `0003`이었다가 `0001`이 됐다. 내용으로 부른다.
+**PR 초안 문서 이름에 번호를 안 쓴다.** 번호는 시리즈가 바뀔 때마다 밀린다 — 실제로 이 변경은 `0003`이었다가 `0001`이 됐다. 내용으로 부른다.
 
-**PR은 영어로 쓴다**(2026-08-18 결정, [commit-rules.md](../docs/commit-rules.md) §5). `0003`의 커밋 본문이 이미 영어라 그대로 쓴다.
+**PR은 영어로 쓴다**(2026-08-18 결정, [commit-rules.md](../docs/commit-rules.md) §5). 커밋 본문이 이미 영어라 그대로 쓴다.
 
 PR을 조립할 때는 `[업스트림]` 커밋의 `Upstream-Files` 트레일러만 모으면 건드릴 파일 목록이 나온다.

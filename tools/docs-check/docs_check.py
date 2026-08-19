@@ -50,6 +50,7 @@ TERMS = REPO / "overlay" / "ko" / "terms.json"
 LINT = REPO / "tools" / "commit-lint" / "commit_lint.py"
 HAND_CASES_DOC = REPO / "docs" / "ko-hand-cases.md"
 GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
+LOC_SKILL = ".claude/skills/ko-localization/SKILL.md"
 
 #: 살아 있는 문서만 본다. 날짜가 박힌 기록(`ko-review-2026-08-18.md`)과 동결한
 #: 조사 문서(`ko-client-port-feasibility.md`)는 **그때 그대로가 맞다.**
@@ -154,6 +155,14 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("docs/status.md", "손으로 옮긴 자리", r"\+ 손 (\d+)곳\)"),
     ("docs/status.md", "손으로 볼 자리", r"복잡해 못 읽은 것 \| (\d+)곳 중"),
     ("docs/status.md", "대장 낱말", r"대장은 (\d+)개가 됐고"),
+    # 한국어화 스킬. 2026-08-19까지 여기 한 자리도 없어서 숫자 넷이 낡은 채
+    # 남았다 - 등록 안 한 인용은 아무도 안 지킨다.
+    (LOC_SKILL, "골든 쌍", r"(\d+)문장이고, 결정은"),
+    (LOC_SKILL, "골든 쌍", r"de-en\.json`에 (\d+)쌍"),
+    (LOC_SKILL, "골든 쌍", r"(\d+)쌍을 한 자 단위로 대조"),
+    (LOC_SKILL, "대장 낱말", r"지금 (\d+)개가 있다"),
+    (LOC_SKILL, "손으로 볼 자리", r"손으로 봐야 하는 (\d+)곳"),
+    ("overlay/patches/README.md", "골든 쌍", r"AccessibilityStrings\.cs`의 (\d+)쌍"),
     ("docs/ko-hand-cases.md", "골든 미해석", r"\*\*(\d+)\*\* \| 스냅샷 파서가 못 읽은"),
     ("docs/ko-hand-cases.md", "손으로 볼 자리", r"\*\*(\d+)\*\* \| 그중 진짜 손으로 볼"),
     ("docs/ko-hand-cases.md", "손으로 옮긴 자리", r"\*\*(\d+)\*\* \| 실제로 한국어를 넣은"),

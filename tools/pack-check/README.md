@@ -1,6 +1,6 @@
 # pack-check — 배포 산출물을 다시 잰다
 
-`run\pack.bat`이 낸 것이 **정말 바닐라인지**, 그리고 그것이 **Dalamud가 정식 플러그인으로 읽는 모양인지**를 검사한다. 패킹 3단계에서 자동으로 돌고, 걸리면 패킹이 실패한다.
+`run\pack.bat`이 낸 것이 **정말 바닐라인지**, 그리고 그것이 **Dalamud가 정식 플러그인으로 읽는 모양인지**를 검사한다. 패킹의 마지막 단계에서 자동으로 돌고, 걸리면 패킹이 실패한다.
 
 uv run --no-project python tools/pack-check/pack_check.py --e2e
 

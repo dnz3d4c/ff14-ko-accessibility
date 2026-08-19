@@ -8,9 +8,11 @@
 |------|------|-----------|
 | `play.bat` | **평소 실행.** 게임 켜고 → 로그인 → Dalamud 붙이기 | 꺼져 있어야 함 |
 | `build.bat` | 소스를 고친 뒤 반영 | 켜져 있어도 됨 |
+| `check.bat` | 커밋 전 일과 검사. 테스트 → vendor 기록 → KR·글로벌 양쪽 빌드 | 아무 때나 |
 | `log.bat` | 이번 판이 정상인지 판정 | 아무 때나 |
 | `sync.bat` | 업스트림이 앞서 갔는지 보고, 깨끗하면 올린다 | 아무 때나 |
 | `terms.bat` | 게임이 쓰는 한국어 낱말 찾기 (sqpack 직독) | **꺼져 있어도 됨** |
+| `guide.bat` | 공식 가이드에서 낱말·형식 찾기 (`find <낱말>`·`scan`) | 아무 때나 |
 | `setup.bat` | **최초 1회.** 프로필 부트스트랩 + 개발용 시딩 | **꺼져 있어야 함** |
 | `pack.bat` | 남에게 줄 배포 폴더 만들기 (+ 낸 것을 다시 잰다) | 아무 때나 |
 | `_env.cmd` | 직접 실행하지 않는다. 나머지가 경로를 얻는 곳 | — |
@@ -40,6 +42,10 @@ cmd //c "set FF14_NOPAUSE=1 && run\build.bat"
 `terms.bat`은 게임을 안 켜고 `game\sqpack`을 직접 읽는다. 그래서 한국어화 중에 "게임이 이걸 뭐라고 부르지"가 막힐 때 사용자를 기다릴 필요가 없다. 자세한 것은 [tools/ko-terms/README.md](../tools/ko-terms/README.md).
 
     run\terms.bat dump tools\ko-terms\out
+
+`guide.bat`은 받아 둔 공식 가이드 코퍼스에서 낱말과 형식을 찾는다 (`find <낱말>`·`scan`·`fetch`·`md`). 사용자 문서를 쓸 때 이름을 지어내지 않기 위한 것이고, 자세한 것은 [docs/ko-guide-corpus.md](../docs/ko-guide-corpus.md).
+
+`check.bat`은 커밋 전 일과 검사다 — pytest 전체, vendor 기록(gitlink·핀), KR·글로벌 양쪽 빌드. 손대기 전에 한 번 돌려 **시작 상태가 초록인지**부터 본다.
 
 ## 경로를 박아 넣지 않는다
 

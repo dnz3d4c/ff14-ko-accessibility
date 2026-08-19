@@ -4,7 +4,7 @@
 - 보낸 곳: [derbruedi/ff14-accessibility PR #8](https://github.com/derbruedi/ff14-accessibility/pull/8) (base `main`)
 - 브랜치: `upstream-habitat-separator` — 업스트림 `07e0769` 위에 커밋 하나
 - 바뀌는 것: `FF14Accessibility/Services/NavigationService.cs` 한 파일, `+4 -1`
-- 우리 쪽 패치: `patches/0001` (시리즈 정리 전에는 `0003`이었다)
+- 우리 쪽 변경: `kr-port`의 해당 커밋 — [patches/README.md](README.md) 항목 `0001` (보낸 시점에는 패치 파일 `patches/0001`이었고, 시리즈 정리 전에는 `0003`이었다. 패치 파일은 W-11에서 없앴다)
 
 **§2와 §3이 GitHub에 올라간 문장 그대로다.** 한국어는 §4에만 있고 PR에는 안 들어갔다.
 
@@ -94,9 +94,9 @@ without a habitat keep exactly the wording they had before.
 
 ### 답이 오면
 
-- **병합되면**: 이 패치가 `patches/`에서 사라지고 나머지가 그대로 붙어야 한다. `upstream.json` 핀을 옮기고 다시 뽑는다 ([upstream-sync.md](../docs/upstream-sync.md))
-- **고쳐 달라면**: `vendor`의 `upstream-habitat-separator`에서 고치고 force push한다. `kr-port`의 같은 커밋도 같이 옮겨야 `patch-check`가 통과한다
-- **거절되면**: 패치는 `patches/`에 그대로 둔다 — 로컬에는 계속 적용된다
+- **병합되면**: 다음 동기화 rebase에서 `kr-port`의 이 커밋이 저절로 비어 사라지고 나머지가 그대로 얹혀야 한다. `upstream.json` 핀을 옮긴다 ([upstream-sync.md](../docs/upstream-sync.md))
+- **고쳐 달라면**: `vendor`의 `upstream-habitat-separator`에서 고치고 force push한다. `kr-port`의 같은 커밋도 같이 고친 뒤 미러에 밀고 `git add vendor/ff14-accessibility`로 기록을 옮긴다 — 안 옮기면 `patch-check`가 잡는다
+- **거절되면**: 커밋은 `kr-port`에 그대로 남는다 — 로컬에는 계속 적용된다
 
 ## 6. 안 보내는 것
 

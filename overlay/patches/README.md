@@ -1,24 +1,22 @@
-# overlay/patches
+# overlay/patches — 우리 변경의 명세
 
-**우리만 쓰는** 소스 패치. 업스트림에 올리지 않는다.
+**우리만 쓰는** 변경의 대장. 업스트림에 올리지 않는 것들이다.
+
+**코드는 여기 없다.** 원본은 vendor(`kr-port` 브랜치)의 커밋이고, 우리 저장소는 그 팁을 gitlink으로 기록한다 — 패치 파일은 2026-08-19에 없앴다(W-11, 근거는 [docs/vendor-submodule.md](../../docs/vendor-submodule.md)). 이 문서는 **각 커밋이 무엇을 왜 하는지**를 갖는다. 아래 번호(`0001`~)는 옛 패치 시리즈 번호이자 `kr-port`의 커밋 순서이고, 다른 문서가 `overlay/patches/0009`처럼 이 번호로 여기 항목을 가리킨다. 번호는 재사용하지 않는다.
 
 **"한국이 나오는 것"이 아니라 "보낼 이유가 없는 것"이 기준이다**([commit-rules.md](../../docs/commit-rules.md) §0). 대부분은 KR 전용이라 여기 있지만, 한국과 무관한데도 **보내지 않기로 판정돼서** 여기 있는 것이 둘 있다 — `0007`에 접힌 `Loc` 재구성과 `0010` 타이틀 메뉴다. 판정 이유는 [patches/rejected.md](../../patches/rejected.md).
 
-업스트림에 기여할 변경은 여기가 아니라 `patches/`에 둔다. 커밋 훅이 두 경로를 섞는 커밋을 거부한다 — 근거는 [docs/commit-rules.md](../../docs/commit-rules.md) §2.2.
+업스트림에 기여할 변경은 `[업스트림]` 갈래로 따로 표시하고, 명세는 [patches/README.md](../../patches/README.md)가 갖는다. 커밋 훅이 두 갈래를 섞는 커밋을 거부한다 — 근거는 [docs/commit-rules.md](../../docs/commit-rules.md) §2.2.
 
-## 왜 패치 파일인가
+## 받기와 작업
 
-`vendor/ff14-accessibility/`는 업스트림 클론이고 **우리 저장소의 버전 관리 밖**이다(`.gitignore`). 거기에 직접 손대면 우리 저장소에 아무 기록도 남지 않고, 업스트림 태그를 올리는 순간 조용히 사라진다. 그래서 변경은 vendor 클론의 `kr-port` 브랜치에 커밋하고, `git format-patch`로 떼어내 여기에 둔다.
+vendor는 submodule이다. 없으면 받는다.
 
-## 적용
+git submodule update --init
 
-vendor 클론에서 실행한다. **`patches/`가 먼저다** — 이유는 [patches/README.md](../../patches/README.md).
+작업은 `kr-port`에 커밋하는 것이다. 커밋했으면 `git add vendor/ff14-accessibility`로 기록을 옮기고 미러에 민다 — 절차와 검사는 [docs/upstream-sync.md](../../docs/upstream-sync.md) §3.
 
-cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../patches/*.patch ../../overlay/patches/*.patch
-
-이미 `kr-port` 브랜치가 있으면 `git checkout kr-port`로 충분하다.
-
-**붙는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** `main`은 클론한 날짜에 따라 다른 커밋을 가리키므로 기준이 못 된다 — 업스트림이 거의 매일 릴리스를 낸다. 위 명령의 `main`을 핀 커밋으로 바꿔 읽는다. 검사기(`tools/patch-check`)는 이미 핀을 본다. 근거: [docs/upstream-sync.md](../../docs/upstream-sync.md) §2.
+**얹히는 자리는 `main`이 아니라 `upstream.json`의 핀이다.** `main`은 클론한 날짜에 따라 다른 커밋을 가리키므로 기준이 못 된다 — 업스트림이 거의 매일 릴리스를 낸다. 검사기(`tools/patch-check`)가 핀이 `kr-port` 이력의 조상인지 본다. 근거: [docs/upstream-sync.md](../../docs/upstream-sync.md) §2.
 
 ## 목록
 
@@ -87,7 +85,7 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 ### 0008 — 언어 전환 안내를 한국어로 (생성물)
 
-**이 패치는 손으로 고치지 않는다.** `overlay/ko/ko.json`에서 `tools/ko-apply`가 만든다. 자세한 것은 아래 [한국어 패치는 생성물이다](#한국어-패치는-생성물이다).
+**이 커밋은 손으로 고치지 않는다.** `overlay/ko/ko.json`에서 `tools/ko-apply`가 만든다. 자세한 것은 아래 [한국어 커밋은 생성물이다](#한국어-커밋은-생성물이다).
 
 실제로 `Pick(de, en, ko)`를 타는 첫 여섯 문장. 언어 이름 셋, 확인 둘, 사용법 하나. **일부러 작게 잡았다** — 682줄이 올라타기 전에 방식이 되는지 보는 자리다.
 
@@ -95,9 +93,9 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 문체는 확인 둘이 **명사형**(`언어가 한국어로 변경됨`), 사용법 하나가 해라체다. 처음엔 셋 다 해라체로 썼다가 인게임에서 되돌렸다 — 근거와 판정 기준은 [ko-localization 스킬](../../.claude/skills/ko-localization/SKILL.md) §2.
 
-### 0009 — 생성기가 못 닿는 35곳
+### 0009 — 생성기가 못 닿는 손 케이스
 
-중첩 삼항·이어붙이기·배열이라 `tools/ko-apply`가 못 읽는 자리들. **손으로 쓴 별도 패치**다 — 생성 패치에 섞으면 다시 만들 때 그 줄만 조용히 사라진다(아래 [손으로 옮길 40곳은 여기 넣지 않는다](#손으로-옮길-40곳은-여기-넣지-않는다)). 유형별 정리는 [docs/ko-hand-cases.md](../../docs/ko-hand-cases.md).
+중첩 삼항·이어붙이기·배열이라 `tools/ko-apply`가 못 읽는 자리들. **손으로 쓴 별도 커밋**이다 — 생성 커밋에 섞으면 다시 만들 때 그 줄만 조용히 사라진다(아래 [손 케이스는 생성 커밋에 넣지 않는다](#손-케이스는-생성-커밋에-넣지-않는다)). 유형별 정리는 [docs/ko-hand-cases.md](../../docs/ko-hand-cases.md).
 
 ### 0010 — 타이틀 메뉴 항목 수를 메뉴가 완성된 뒤에 말한다
 
@@ -169,11 +167,11 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 
 출처와 푸는 자리를 정하는 상수 다섯은 `tools/kr-setup/kr_profile.py`에 같이 있고, 갈라지면 테스트가 빨개진다. 프로필 루트와 같은 장치다(`0011`) — **우리가 푼 자리와 우리가 찾는 자리가 다르면 받아 놓고도 없다고 말한다.**
 
-## 한국어 패치는 생성물이다
+## 한국어 커밋은 생성물이다
 
-**마지막 패치(`0008`)만 다르다.** 나머지는 손으로 쓴 diff고, 이건 `overlay/ko/ko.json`에서 기계가 만든다.
+**`0008`만 다르다.** 나머지는 손으로 쓴 변경이고, 이건 `overlay/ko/ko.json`에서 기계가 만든다. 커밋 제목이 고정형(`Korean: the mod's own strings, generated from the catalogue`)인 것도 그래서다 — `tools/ko-apply`가 제목으로 이 커밋을 찾는다.
 
-한국어는 결국 `AccessibilityStrings.cs`의 688쌍에 붙는데, **그 파일을 업스트림이 거의 매 릴리스마다 고친다** — 8일에 릴리스 7개다. 손으로 쓴 700줄짜리 diff를 그 속도로 계속 다시 병합하는 것은 성립하지 않는다. 근거와 실측은 [docs/status.md](../../docs/status.md) §4-6.
+한국어는 결국 `AccessibilityStrings.cs`의 688쌍에 붙는데, **그 파일을 업스트림이 거의 매 릴리스마다 고친다** — 8일에 릴리스 7개다. 손으로 쓴 700줄짜리 diff를 그 속도로 계속 다시 병합하는 것은 성립하지 않는다. 근거와 실측은 [docs/status.md](../../docs/status.md) §5-4.
 
 그래서 **저장하는 것은 diff가 아니라 표**다.
 
@@ -181,15 +179,17 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 |------|------|------|
 | `(독일어, 영어) → 한국어` 표 | `overlay/ko/ko.json` | **원본.** 여기만 손으로 고친다 |
 | 표를 소스에 써 넣는 도구 | `tools/ko-apply` | 원본 |
-| 그 결과인 C# 변경 | `overlay/patches/0008` | **생성물.** 손대지 않는다 |
+| 그 결과인 C# 변경 | `kr-port`의 생성 커밋 (`0008`) | **생성물.** 손대지 않는다 |
 
 ### 업스트림을 올릴 때
 
-`0008`이 안 붙으면 **충돌을 풀지 않는다.** 버리고 다시 만든다.
+생성 커밋이 안 얹히면 **충돌을 풀지 않는다.** 버리고 다시 만든다.
 
-1. `0007`까지만 붙인다
+1. rebase가 그 커밋에서 멈추면 `git rebase --skip`으로 버리고 끝까지 얹는다
 2. uv run --no-project python tools/ko-apply/ko_apply.py --write
-3. vendor에서 커밋하고 `format-patch`로 `0008`을 다시 뽑는다
+3. vendor에서 **같은 제목으로** 커밋한다
+
+절차 전체는 [docs/upstream-sync.md](../../docs/upstream-sync.md) §5.4.
 
 문장이 사라졌으면 도구가 이름을 대고 멈춘다 — "카탈로그에 있는데 소스에 없다". 그건 업스트림이 그 문장을 고쳤다는 뜻이고, 새 원문에 맞춰 `ko.json`을 고치면 된다. **diff 충돌이 아니라 목록으로 나온다.**
 
@@ -198,11 +198,11 @@ cd vendor/ff14-accessibility && git checkout -b kr-port main && git am ../../pat
 `tools/ko-apply`의 테스트 셋이 pytest에서 돈다(`run\check.bat` 1단계).
 
 - **소스가 카탈로그대로인가** — 소스에만 있는 한국어를 잡는다
-- **끝 커밋이 생성기의 출력과 같은가** — 부모 커밋에서 도구를 다시 돌려 트리를 대조한다. `0008`을 손으로 고치면 여기가 빨개진다
+- **생성 커밋이 생성기의 출력과 같은가** — 제목으로 커밋을 찾고, 그 부모에서 도구를 다시 돌려 대조한다. 그 커밋을 손으로 고치면 여기가 빨개진다
 - **카탈로그에 고아가 없는가** — 업스트림이 문장을 고치면 여기가 먼저 빨개진다
 
 독일어·영어가 안 바뀐 것은 그대로 `tools/strings-golden`이 지킨다. 도구는 세 번째 인자를 붙일 뿐 앞의 둘을 읽기만 한다.
 
-### 손으로 옮길 40곳은 여기 넣지 않는다
+### 손 케이스는 생성 커밋에 넣지 않는다
 
-중첩 삼항·이어붙이기·배열 같은 자리는 도구가 못 다룬다([docs/ko-hand-cases.md](../../docs/ko-hand-cases.md)). 그건 **별도 패치**로 간다 — 생성 패치에 손편집을 섞으면 다시 만들 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어 검사에도 안 걸린다.
+중첩 삼항·이어붙이기·배열 같은 자리는 도구가 못 다룬다([docs/ko-hand-cases.md](../../docs/ko-hand-cases.md)). 그건 **별도 커밋**(`0009`)으로 간다 — 생성 커밋에 손편집을 섞으면 다시 만들 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어 검사에도 안 걸린다.

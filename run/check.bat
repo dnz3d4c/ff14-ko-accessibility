@@ -19,9 +19,9 @@ uv run --no-project --with pytest pytest "%REPO%\tools" -q
 if errorlevel 1 set "FAILED=!FAILED! 테스트"
 echo.
 
-echo [2/3] 패치 묶음 - 순서대로 붙고 kr-port와 같은가
+echo [2/3] vendor 기록 - 포인터가 kr-port 팁이고 핀이 그 조상인가
 uv run --no-project python "%REPO%\tools\patch-check\patch_check.py"
-if errorlevel 1 set "FAILED=!FAILED! 패치"
+if errorlevel 1 set "FAILED=!FAILED! vendor기록"
 echo.
 
 

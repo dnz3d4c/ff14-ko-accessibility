@@ -53,6 +53,15 @@ GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
 LOC_SKILL = ".claude/skills/ko-localization/SKILL.md"
 
 CONFIG_CS = REPO / "vendor" / "ff14-accessibility" / "FF14Accessibility" / "Configuration.cs"
+INSTALLER_LOC = REPO / "vendor" / "ff14-accessibility" / "Installer" / "Loc.cs"
+
+#: 설치 프로그램 사전의 언어 블록 머리와 그 안의 키. 블록은 `},`로 닫힌다 -
+#: 키 줄은 그보다 깊게 들여쓰기되므로 이 경계로 언어끼리 안 섞인다.
+_LOC_LANG = re.compile(
+    r"^\s*\[(German|English|Korean)\]\s*=\s*new Dictionary<string, string>", re.M
+)
+_LOC_KEY = re.compile(r'^\s+\["(\w+)"\]\s*=', re.M)
+_LOC_END = "\n        },"
 
 #: 단축키 목록을 갖는 문서 둘. **양쪽에 다 있어야 한다** - 배포물에는 사용
 #: 안내만 나가고(빼면 모드를 못 쓴다), 저장소를 여는 사람은 루트 README를
@@ -106,6 +115,39 @@ def hand_type_sum(path: Path = HAND_CASES_DOC) -> int:
     return sum(int(n) for n in rows)
 
 
+def installer_loc_keys(path: Path = INSTALLER_LOC) -> dict[str, set[str]]:
+    """설치 프로그램 사전의 언어별 키 이름.
+
+    판이 이 사전을 `147키 중 한국어 92개`라고 적고 있었는데 실측은 189 대
+    161이었다(2026-08-20). 그 자리가 `CITATIONS`에 없어서, 사전이 커지는
+    동안 아무 일도 안 일어났고 거기서 파생된 `55키`까지 같이 죽었다.
+
+    **모양이 바뀌면 조용히 0을 세지 않고 소리를 낸다.** 0은 판의 숫자와
+    안 맞아 빨개지긴 하지만 원인이 "사전이 비었다"로 보여서, 고칠 곳을
+    엉뚱하게 짚게 만든다.
+    """
+    text = path.read_text(encoding="utf-8")
+    heads = [(m.group(1), m.end()) for m in _LOC_LANG.finditer(text)]
+    if len(heads) != 3:
+        raise ValueError(
+            f"언어 블록 셋을 못 찾았다 ({len(heads)}개): {path}. "
+            f"사전 모양이 바뀌었으면 `_LOC_LANG`도 같이 고쳐라"
+        )
+
+    found: dict[str, set[str]] = {}
+    for i, (lang, begin) in enumerate(heads):
+        end = heads[i + 1][1] if i + 1 < len(heads) else len(text)
+        block = text[begin:end]
+        cut = block.find(_LOC_END)
+        if cut != -1:
+            block = block[:cut]
+        keys = set(_LOC_KEY.findall(block))
+        if not keys:
+            raise ValueError(f"{lang} 블록에서 키를 하나도 못 읽었다: {path}")
+        found[lang] = keys
+    return found
+
+
 def guide_facts(repo: Path = REPO) -> dict[str, int]:
     """공식 가이드 코퍼스에서 센 값. `tools/ko-guide`가 원문에서 계산해 대장에 적는다.
 
@@ -141,8 +183,16 @@ def guide_facts(repo: Path = REPO) -> dict[str, int]:
 
 def facts(repo: Path = REPO) -> dict[str, int]:
     golden = _json(repo / "tools" / "strings-golden" / "golden" / "de-en.json")
+    loc = installer_loc_keys(
+        repo / "vendor" / "ff14-accessibility" / "Installer" / "Loc.cs"
+    )
     return {
         **guide_facts(repo),
+        # 독일어가 원본이다. 한국어에만 있는 키는 있을 수 없으므로 전체 수는
+        # 독일어 쪽이 갖는다.
+        "설치 프로그램 키": len(loc["German"]),
+        "설치 프로그램 한국어": len(loc["Korean"]),
+        "설치 프로그램 미번역": len(loc["German"] - loc["Korean"]),
         "골든 쌍": golden["pairs"],
         "골든 미해석": golden["unparsed"],
         "카탈로그 문장": len(_json(repo / "overlay" / "ko" / "ko.json")["strings"]),
@@ -167,6 +217,11 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("docs/status.md", "손으로 옮긴 자리", r"\+ 손 (\d+)곳\)"),
     ("docs/status.md", "손으로 볼 자리", r"복잡해 못 읽은 것 \| (\d+)곳 중"),
     ("docs/status.md", "대장 낱말", r"대장은 (\d+)개가 됐고"),
+    # 설치 프로그램 사전. 2026-08-20까지 등록이 없어서 `147키 중 92개`가
+    # 실측 189 대 161과 갈린 채 남아 있었고, 거기서 나온 `55키`도 같이 죽었다.
+    ("docs/status.md", "설치 프로그램 키", r"\*\*(\d+)키 중 한국어"),
+    ("docs/status.md", "설치 프로그램 한국어", r"키 중 한국어 (\d+)개\*\*"),
+    ("docs/status.md", "설치 프로그램 미번역", r"(\d+)키가 아직 독일어"),
     # 한국어화 스킬. 2026-08-19까지 여기 한 자리도 없어서 숫자 넷이 낡은 채
     # 남았다 - 등록 안 한 인용은 아무도 안 지킨다.
     (LOC_SKILL, "골든 쌍", r"(\d+)문장이고, 결정은"),

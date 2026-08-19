@@ -344,3 +344,86 @@ def test_마일스톤을_본문으로_가리키면_통과한다(tmp_path):
         done="- 1단계를 끝냈다. 남은 것은 §2 W-01\n- 둘도 했다. 남은 것은 §2 W-02",
     )
     assert docs_check.check_board(write(tmp_path, text)) == []
+
+
+# --- 설치 프로그램 사전 --------------------------------------------------
+#
+# 2026-08-20에 판이 `147키 중 한국어 92개`라고 적고 있었는데 실측은 189 대
+# 161이었다. 그 숫자가 인용 검사에 등록돼 있지 않아서, 사전이 커지는 동안
+# 아무 일도 안 일어났다. `55키`가 거기서 파생된 값이라 같이 죽어 있었다.
+
+
+def test_설치_프로그램_사전을_언어별로_센다():
+    keys = docs_check.installer_loc_keys()
+    assert set(keys) == {"German", "English", "Korean"}
+    # 한국어는 아직 다 안 옮겼다. 다 옮기면 이 줄이 아니라 판이 먼저 바뀐다.
+    assert keys["Korean"] < keys["German"]
+    # 한국어에만 있는 키는 없어야 한다 - 원본에 없는 키를 옮길 수는 없다.
+    assert keys["Korean"] - keys["German"] == set()
+
+
+def test_설치_프로그램_숫자_셋의_관계():
+    got = docs_check.facts()
+    assert (
+        got["설치 프로그램 한국어"] + got["설치 프로그램 미번역"]
+        == got["설치 프로그램 키"]
+    )
+
+
+def test_사전_블록을_못_찾으면_소리를_낸다(tmp_path):
+    """조용한 0을 막는다.
+
+    파일은 있는데 모양이 바뀐 경우가 제일 위험하다. 0을 돌려주면 판의
+    숫자와 안 맞아 빨개지긴 하지만, 원인이 `사전이 비었다`로 보여서
+    엉뚱한 데를 고치게 된다.
+    """
+    source = tmp_path / "Loc.cs"
+    source.write_text("class Loc { }", encoding="utf-8")
+    with pytest.raises(ValueError, match="언어 블록"):
+        docs_check.installer_loc_keys(source)
+
+
+def test_사전_블록이_비면_소리를_낸다(tmp_path):
+    source = tmp_path / "Loc.cs"
+    source.write_text(
+        "        [German] = new Dictionary<string, string>\n"
+        "        {\n"
+        "        },\n"
+        "        [English] = new Dictionary<string, string>\n"
+        "        {\n"
+        '            ["A"] = "a",\n'
+        "        },\n"
+        "        [Korean] = new Dictionary<string, string>\n"
+        "        {\n"
+        '            ["A"] = "가",\n'
+        "        },\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="German"):
+        docs_check.installer_loc_keys(source)
+
+
+def test_사전_블록의_경계를_지킨다(tmp_path):
+    """다음 언어의 키를 앞 언어가 삼키지 않는다."""
+    source = tmp_path / "Loc.cs"
+    source.write_text(
+        "        [German] = new Dictionary<string, string>\n"
+        "        {\n"
+        '            ["A"] = "a",\n'
+        '            ["B"] = "b",\n'
+        "        },\n"
+        "        [English] = new Dictionary<string, string>\n"
+        "        {\n"
+        '            ["A"] = "a",\n'
+        '            ["B"] = "b",\n'
+        "        },\n"
+        "        [Korean] = new Dictionary<string, string>\n"
+        "        {\n"
+        '            ["A"] = "가",\n'
+        "        },\n"
+        "    };\n",
+        encoding="utf-8",
+    )
+    keys = docs_check.installer_loc_keys(source)
+    assert keys["German"] == {"A", "B"}
+    assert keys["Korean"] == {"A"}

@@ -671,7 +671,7 @@
     {
       "de": "Diesen Übergang gibt es nur auf den Unteren Decks.",
       "en": "This crossing only exists on the Lower Decks.",
-      "ko": "건너기는 하층 갑판에서만 할 수 있음."
+      "ko": "이 건너기는 하층 갑판에서만 할 수 있다. 지금은 다른 지역이다."
     },
     {
       "de": "Du",
@@ -1646,7 +1646,7 @@
     {
       "de": "Keine offenen Jagdziele in diesem Rang.",
       "en": "No open hunting targets in this rank.",
-      "ko": "이 등급에 남은 토벌 대상 없음."
+      "ko": "이 단계에 남은 토벌 대상 없음."
     },
     {
       "de": "Keine passenden Gegenstände im Beutel gefunden.",

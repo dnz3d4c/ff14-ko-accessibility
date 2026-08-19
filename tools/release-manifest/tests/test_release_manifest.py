@@ -83,6 +83,53 @@ def test_압축_안에_매니페스트가_없으면_만들지_않는다(tmp_path
         rm.read_plugin_manifest(tmp_path / rm.ZIP_NAME)
 
 
+# ── 못 읽은 것과 멀쩡한 것을 가른다 ────────────────────────────────────────
+#
+# **파싱이 실패했는데 아무 말도 안 하면, 릴리스가 멀쩡한 것과 검사가 못 읽은
+# 것이 같은 얼굴이 된다.** 이 도구가 존재하는 이유가 그 부류를 가르는 것이라,
+# 스택트레이스로 죽는 것은 검사를 안 한 것과 같다.
+
+
+def test_압축이_깨졌으면_그렇게_말한다(tmp_path):
+    (tmp_path / rm.ZIP_NAME).write_bytes(b"this is not a zip at all")
+    with pytest.raises(rm.ManifestError, match="압축을 못 읽었다"):
+        rm.read_plugin_manifest(tmp_path / rm.ZIP_NAME)
+
+
+def test_압축_안_매니페스트가_JSON이_아니면_그렇게_말한다(tmp_path):
+    path = tmp_path / rm.ZIP_NAME
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr(f"{rm.INTERNAL_NAME}.json", "{ 이건 JSON이 아니다")
+    with pytest.raises(rm.ManifestError, match="못 읽었다"):
+        rm.read_plugin_manifest(path)
+
+
+def test_dist_매니페스트가_깨졌으면_그렇게_말한다(tmp_path):
+    dist = make_dist(tmp_path)
+    (dist / rm.INSTALLER_MANIFEST_NAME).write_text("{ 깨졌다", encoding="utf-8")
+    with pytest.raises(rm.ManifestError, match="못 읽었다"):
+        rm.manifest_problems(dist, installer_version="1.1.0.0")
+
+
+def test_릴리스_매니페스트가_깨졌으면_그렇게_말한다(tmp_path):
+    path = tmp_path / rm.REPO_MANIFEST_NAME
+    path.write_text("[{ 깨졌다", encoding="utf-8")
+    with pytest.raises(rm.ManifestError, match="못 읽었다"):
+        rm._read_repo_manifest(path)
+
+
+def test_gh가_JSON이_아닌_것을_내면_그렇게_말한다():
+    # gh가 오류를 0으로 내거나 출력이 잘리면 여기로 온다. 스택트레이스 대신
+    # 무엇을 못 읽었는지 말해야 한다.
+    with pytest.raises(rm.ManifestError, match="gh의 릴리스 정보"):
+        rm._parse_object("not json", "gh의 릴리스 정보")
+
+
+def test_JSON이지만_객체가_아니면_그렇게_말한다():
+    with pytest.raises(rm.ManifestError, match="객체가 아니다"):
+        rm._parse_object("[1, 2, 3]", "gh의 저장소 정보")
+
+
 # ── repo.json ──────────────────────────────────────────────────────────────
 
 
@@ -254,3 +301,288 @@ def test_쓴_파일은_둘뿐이다(tmp_path):
     assert sorted(p.name for p in dist.iterdir()) == sorted(
         [rm.ZIP_NAME, rm.INSTALLER_NAME, rm.REPO_MANIFEST_NAME, rm.INSTALLER_MANIFEST_NAME]
     )
+
+
+# ── 릴리스를 다시 재기 ─────────────────────────────────────────────────────
+#
+# `dist`가 완벽해도 업로드에서 하나 빠지면 그대로 나간다. 그 실패는 오류가
+# 아니라 **침묵**이다 - 받는 쪽은 "새 판이 없다"로 읽는다. 그래서 여기서는
+# `dist`를 안 보고 **릴리스에서 받아 다시 계산한다.**
+#
+# 아직 릴리스가 없어 실물로는 못 태운다. 갈래는 전부 픽스처로 돈다.
+
+TAG = "v5.88.0.0"
+
+
+def release_facts(tmp_path, **overrides) -> rm.ReleaseFacts:
+    """아무 문제 없는 릴리스. 테스트마다 한 자리씩 망가뜨린다."""
+    exe = tmp_path / rm.INSTALLER_NAME
+    exe.write_bytes(b"released installer")
+
+    installer = {
+        "InstallerVersion": "1.1.0.0",
+        "AssetName": rm.INSTALLER_NAME,
+        "Sha256": rm.sha256(exe),
+    }
+    base = {
+        "tag": TAG,
+        "asset_names": rm.RELEASE_ASSETS,
+        "repo_manifest": rm.build_repo_manifest(plugin_manifest()),
+        "installer_manifest": installer,
+        "plugin_manifest": plugin_manifest(),
+        "exe": exe,
+        "exe_version": "1.1.0.0",
+        "link_status": {rm.DOWNLOAD_URL: 200, rm.REPO_JSON_URL: 200},
+        "is_draft": False,
+        "is_private": False,
+    }
+    base.update(overrides)
+    return rm.ReleaseFacts(**base)
+
+
+def test_멀쩡한_릴리스는_통과한다(tmp_path):
+    assert rm.release_problems(release_facts(tmp_path)) == []
+
+
+# 1. 자산 다섯이 이름까지 정확히 있나
+
+
+def test_자산이_다섯이_아니면_잡는다(tmp_path):
+    남은것 = tuple(n for n in rm.RELEASE_ASSETS if n != rm.GUIDE_NAME)
+    problems = rm.release_problems(release_facts(tmp_path, asset_names=남은것))
+    assert any(rm.GUIDE_NAME in p for p in problems)
+
+
+def test_대소문자만_다른_자산은_그렇게_말한다(tmp_path):
+    # 설치 프로그램은 `OrdinalIgnoreCase`로 찾아 넘어가는데, 내려받기 주소는
+    # 이름을 그대로 쓴다. 한쪽만 되는 상태라 따로 말해 줘야 한다.
+    바뀐것 = tuple("repo.JSON" if n == rm.REPO_MANIFEST_NAME else n for n in rm.RELEASE_ASSETS)
+    problems = rm.release_problems(release_facts(tmp_path, asset_names=바뀐것))
+    assert any("대소문자" in p for p in problems)
+
+
+# 2. 릴리스 EXE를 내려받아 다시 계산한 해시와 같나
+
+
+def test_해시가_릴리스_EXE와_다르면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.installer_manifest["Sha256"] = "0" * 64
+    problems = rm.release_problems(facts)
+    assert any("Sha256" in p for p in problems)
+
+
+def test_업로드가_끊긴_EXE를_잡는다(tmp_path):
+    """올라간 파일이 `dist`의 그것과 다르면 해시가 안 맞는다."""
+    facts = release_facts(tmp_path)
+    facts.exe.write_bytes(b"released installer (truncated)")
+    assert any("Sha256" in p for p in rm.release_problems(facts))
+
+
+# 3. AssetName이 실재하는 자산을 가리키나
+
+
+def test_AssetName이_없는_자산을_가리키면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.installer_manifest["AssetName"] = "FF14AccessibilityInstaller.exe"
+    problems = rm.release_problems(facts)
+    assert any("AssetName" in p for p in problems)
+
+
+# 4. 다운로드 링크가 릴리스 자산과 맞고 실제로 200을 내나
+
+
+def test_링크가_200이_아니면_잡는다(tmp_path):
+    facts = release_facts(tmp_path, link_status={rm.DOWNLOAD_URL: 404, rm.REPO_JSON_URL: 200})
+    problems = rm.release_problems(facts)
+    assert any("404" in p for p in problems)
+
+
+def test_저장소가_비공개면_repo_json_주소에서_드러난다(tmp_path):
+    # Dalamud가 이 주소를 그대로 박아 쓴다(`InstallerService.cs:73`).
+    facts = release_facts(tmp_path, link_status={rm.DOWNLOAD_URL: 200, rm.REPO_JSON_URL: 404})
+    problems = rm.release_problems(facts)
+    assert any(rm.REPO_JSON_URL in p for p in problems)
+
+
+def test_링크를_못_열었으면_이유를_말한다(tmp_path):
+    facts = release_facts(tmp_path, link_status={rm.DOWNLOAD_URL: "이름을 못 찾았다", rm.REPO_JSON_URL: 200})
+    assert any("이름을 못 찾았다" in p for p in rm.release_problems(facts))
+
+
+def test_링크_셋이_갈리면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.repo_manifest[0]["DownloadLinkTesting"] = "https://example.invalid/x.zip"
+    assert any("DownloadLinkTesting" in p for p in rm.release_problems(facts))
+
+
+def test_링크가_가리키는_파일이_릴리스에_없으면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    바뀐주소 = f"{rm.REPO_URL}/releases/latest/download/latest.zip"
+    for field in ("DownloadLinkInstall", "DownloadLinkUpdate", "DownloadLinkTesting"):
+        facts.repo_manifest[0][field] = 바뀐주소
+    problems = rm.release_problems(
+        facts._replace(link_status={바뀐주소: 200, rm.REPO_JSON_URL: 200})
+    )
+    assert any("latest.zip" in p for p in problems)
+
+
+# 5. InstallerVersion이 네 마디이고 EXE의 PE 버전과 같나
+
+
+def test_버전이_세_마디로_올라갔으면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.installer_manifest["InstallerVersion"] = "1.1.0"
+    problems = rm.release_problems(facts)
+    assert any("네 마디" in p for p in problems)
+
+
+def test_버전이_릴리스_EXE와_다르면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.installer_manifest["InstallerVersion"] = "1.2.0.0"
+    problems = rm.release_problems(facts)
+    assert any("PE 버전" in p for p in problems)
+
+
+# 6. 태그가 플러그인 버전과 맞나
+
+
+def test_태그가_플러그인_버전과_갈리면_잡는다(tmp_path):
+    # `ChoosePluginSourceAsync`가 태그에서 v를 떼어 설치된 버전과 비교한다.
+    # 태그가 낮으면 새 판이 올라가 있어도 "이미 최신"으로 읽는다.
+    problems = rm.release_problems(release_facts(tmp_path, tag="v5.87.0.0"))
+    assert any("태그" in p for p in problems)
+
+
+def test_v가_없는_태그도_같은_것으로_본다(tmp_path):
+    assert rm.release_problems(release_facts(tmp_path, tag="5.88.0.0")) == []
+
+
+# ── 릴리스가 없을 때 ───────────────────────────────────────────────────────
+
+
+# 7. 초안이 아닌가
+#
+# 내는 사람 화면에서는 멀쩡해 보이는데 받는 쪽에서는 아예 안 보인다.
+# 이 도구가 존재하는 이유와 정확히 같은 부류다.
+
+
+def test_초안이면_잡는다(tmp_path):
+    problems = rm.release_problems(release_facts(tmp_path, is_draft=True))
+    assert any("초안" in p for p in problems)
+
+
+# 8. 올라간 repo.json에 한국어가 있나
+#
+# `GERMAN_TO_KOREAN`은 **만드는 쪽**을 막는다. 이건 **올라간 쪽**을 막는다.
+# 손으로 고친 repo.json을 올렸거나 옛 판이 올라갔으면 여기서만 걸린다.
+
+
+def test_올라간_설명이_독일어면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.repo_manifest[0]["Description"] = GERMAN_DESCRIPTION
+    problems = rm.release_problems(facts)
+    assert any("Description" in p and "한국어" in p for p in problems)
+
+
+def test_올라간_한줄소개가_독일어면_잡는다(tmp_path):
+    facts = release_facts(tmp_path)
+    facts.repo_manifest[0]["Punchline"] = GERMAN_PUNCHLINE
+    assert any("Punchline" in p for p in rm.release_problems(facts))
+
+
+# 9. repo.json의 버전과 릴리스 zip 안 매니페스트의 버전이 같나
+#
+# 어긋나면 Dalamud가 받아 놓고 같은 판을 다시 받는다.
+
+
+def test_repo_json과_압축_안_버전이_갈리면_잡는다(tmp_path):
+    facts = release_facts(tmp_path, plugin_manifest=plugin_manifest(AssemblyVersion="5.87.0.0"))
+    problems = rm.release_problems(facts)
+    assert any("압축 안" in p for p in problems)
+
+
+# ── 404를 왜 나는지까지 말하나 ─────────────────────────────────────────────
+#
+# "404"만 말하면 받는 사람은 원인을 모른다. `gh`는 인증을 갖고 있어서
+# 비공개 저장소도 멀쩡히 보고, 그래서 자산 목록만으로는 절대 안 드러난다.
+
+
+def _막힌주소(tmp_path, **overrides):
+    return release_facts(
+        tmp_path, link_status={rm.DOWNLOAD_URL: 404, rm.REPO_JSON_URL: 404}, **overrides
+    )
+
+
+def test_비공개면_비공개라고_말한다(tmp_path):
+    problems = rm.release_problems(_막힌주소(tmp_path, is_private=True))
+    assert any("비공개" in p for p in problems)
+    assert not any("초안" in p for p in problems)
+
+
+def test_초안이면_초안_때문이라고_말한다(tmp_path):
+    problems = rm.release_problems(_막힌주소(tmp_path, is_draft=True))
+    assert any("초안" in p and "404" in p for p in problems)
+
+
+def test_자산이_없어서_난_404는_한_번만_말한다(tmp_path):
+    """한 고장을 세 줄로 말하면 그중 아무것도 안 읽힌다."""
+    남은것 = tuple(n for n in rm.RELEASE_ASSETS if n != rm.ZIP_NAME)
+    problems = rm.release_problems(_막힌주소(tmp_path, asset_names=남은것))
+
+    assert any("릴리스에 자산이 없다" in p and rm.ZIP_NAME in p for p in problems)
+    # 같은 까닭을 주소 줄에서 되풀이하지 않는다. 원인을 못 찾았다고도 안 한다.
+    assert not any(rm.DOWNLOAD_URL in p for p in problems)
+    assert not any("비공개" in p for p in problems)
+
+
+def test_원인을_못_찾으면_모른다고_말한다(tmp_path):
+    # 공개이고 초안도 아니고 자산도 다 있는데 404다. 지어내지 않는다.
+    problems = rm.release_problems(_막힌주소(tmp_path))
+    assert any("원인" in p for p in problems)
+
+
+# ── 상수가 두 번 정의되지 않았나 ───────────────────────────────────────────
+#
+# 편집이 겹치면 같은 상수가 두 번 정의되고, **파이썬은 뒤엣것을 조용히
+# 쓴다.** ruff도 모듈 수준 재할당은 `F811`로 안 잡는다. 실제로 이 파일에서
+# 넷이 그렇게 갈렸다(2026-08-19). 눈으로 보는 대신 여기서 잡는다.
+
+
+def test_모듈_수준_상수가_한_번씩만_정의된다():
+    import ast
+    import collections
+
+    source = Path(rm.__file__).read_text(encoding="utf-8")
+    defined: collections.Counter[str] = collections.Counter()
+    for node in ast.parse(source).body:
+        if isinstance(node, ast.Assign):
+            defined.update(t.id for t in node.targets if isinstance(t, ast.Name))
+        elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            defined.update([node.target.id])
+
+    두번이상 = {name: count for name, count in defined.items() if count > 1}
+    assert not 두번이상, f"같은 이름을 두 번 정의했다(뒤엣것이 조용히 이긴다): {두번이상}"
+
+
+# ── 릴리스가 없을 때 ───────────────────────────────────────────────────────
+
+
+def test_릴리스가_없으면_그렇게_말한다():
+    error = rm.gh_failure(TAG, "release not found", 1)
+    assert "릴리스가 없다" in str(error)
+    assert TAG in str(error)
+    assert "release.bat" in str(error)
+
+
+def test_그밖의_gh_실패는_원문을_붙인다():
+    error = rm.gh_failure(TAG, "HTTP 401: Bad credentials", 1)
+    assert "Bad credentials" in str(error)
+    assert "릴리스가 없다" not in str(error)
+
+
+def test_저장소를_못_찾은_것을_릴리스_탓으로_돌리지_않는다():
+    # 같은 `gh` 실패라도 릴리스를 찾을 때와 저장소를 찾을 때가 다른 말을
+    # 해야 한다. 안 그러면 원인을 엉뚱한 데서 찾는다.
+    error = rm.gh_failure(rm.GH_REPO, "not found", 1, missing=f"저장소를 못 찾았다: {rm.GH_REPO}")
+    assert "저장소를 못 찾았다" in str(error)
+    assert "릴리스가 없다" not in str(error)

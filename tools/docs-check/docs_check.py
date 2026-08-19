@@ -147,7 +147,8 @@ def facts(repo: Path = REPO) -> dict[str, int]:
 #: (문서, 사실 이름, 정규식). 정규식은 숫자 한 자리를 잡는 그룹이 하나여야 하고,
 #: **문서에서 정확히 한 번** 걸려야 한다.
 CITATIONS: tuple[tuple[str, str, str], ...] = (
-    ("README.md", "골든 쌍", r"독일어·영어 (\d+)쌍 스냅샷"),
+    # 루트 README는 프로젝트 소개라 골든 쌍 같은 내부 수치를 안 적는다. 그 값은
+    # 판(status.md)과 ko-localization 스킬, overlay/patches/README.md가 갖는다.
     ("README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
     ("docs/dev/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
     ("docs/status.md", "골든 쌍", r"`AccessibilityStrings` 삼항 \| (\d+)쌍"),

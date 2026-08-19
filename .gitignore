@@ -13,6 +13,11 @@ obj/
 __pycache__/
 .pytest_cache/
 
+# 검사 도구 캐시. mypy와 ruff가 자기 캐시 안에 .gitignore를 넣어 주기는 하지만,
+# 그건 도구가 해 주는 것이라 판본이 바뀌면 사라질 수 있다. 여기서 직접 막는다.
+.mypy_cache/
+.ruff_cache/
+
 # 배포 산출물 (run\pack.bat이 만든다). 162MB EXE라 저장소에 넣지 않는다.
 dist/
 

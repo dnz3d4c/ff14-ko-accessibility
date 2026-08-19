@@ -29,6 +29,22 @@
 브랜치의 손 케이스 커밋)가 더한 줄. 손 케이스도 봐야 한다 - `월드`가 거기
 있었다.
 
+## 두 번째 검사 - 옮기다 만 영어
+
+같은 자리에서 반대쪽 구멍도 막는다. 위 검사는 `[가-힣]{2,}`만 세서 **한국어
+문장에 영어가 그대로 남은 것**을 아예 안 봤다. 그래서 카탈로그의 한국어에서
+보간 자리를 지우고 라틴 문자를 세, 그 목록을 따로 골든으로 고정한다
+(`golden/latin-words.json`).
+
+**남는 것이 전부 잘못은 아니다.** 게임 표기(`HP`·`NPC`), 사용자가 그대로 쳐야
+하는 명령어(`/acc help`), 고유명사(`Dalamud`·`vnavmesh`)는 영어로 있어야 맞다.
+그래서 정규식으로 "명령어처럼 생긴 것"을 맞히지 않고 **허용목록**으로 둔다 -
+그렇게 하면 `of` 같은 진짜도 같이 통과한다.
+
+**이 검사는 `ko.json`만 본다.** 소스에 직접 박힌 영어(`FATEs`,
+`CounterConnector`의 `of`)는 여기 안 걸린다 - 카탈로그를 거치지 않는 자리라
+`tools/strings-golden`과 소스 검수의 몫이다. 이것 하나로 다 막히지 않는다.
+
 사용법:
     uv run --no-project python tools/ko-words/ko_words.py           # 대조
     uv run --no-project python tools/ko-words/ko_words.py --write   # 골든 갱신
@@ -48,6 +64,7 @@ TERMS = REPO / "overlay" / "ko" / "terms.json"
 VENDOR = REPO / "vendor" / "ff14-accessibility"
 DUMP = REPO / "tools" / "ko-terms" / "out" / "addon-Korean.tsv"
 GOLDEN = Path(__file__).resolve().parent / "golden" / "mod-words.json"
+LATIN_GOLDEN = Path(__file__).resolve().parent / "golden" / "latin-words.json"
 
 #: 손 케이스 커밋이 앉아 있는 브랜치.
 WORK_BRANCH = "kr-port"
@@ -59,6 +76,15 @@ HAND_SUBJECT = "lines the generator cannot reach"
 
 #: 한 글자는 조사·의존명사라 신호가 없다.
 TOKEN = re.compile(r"[가-힣]{2,}")
+
+#: 보간 자리. 안에는 슬롯 이름만이 아니라 C# 식이 통째로 들어 있어서
+#: (`{(int)MathF.Round(volume * 100)}`) 지우지 않으면 라틴 문자 검사가 그것들을
+#: 다 센다 - 실측으로 172개와 25개의 차이다. `{{`는 중괄호를 그대로 찍으라는
+#: C# 표기라 슬롯이 아니고, 안쪽이 사용자가 듣는 글자다.
+SLOT = re.compile(r"(?<!\{)\{[^{}]*\}")
+
+#: 한 글자짜리도 센다 - 키 이름 `F1`이 그 자리다.
+LATIN = re.compile(r"[A-Za-z]+")
 
 #: 낱말에 붙은 조사. **떼어 낸 나머지가 게임에 있을 때만** 떼어낸 것으로 친다 -
 #: 그래서 `소지품에`는 `소지품`으로 잡히고 `장판`은 아무것도 못 떼어 그대로 남는다.
@@ -75,6 +101,24 @@ PARTICLES = (
 def tokens(text: str) -> set[str]:
     """한국어 낱말. 보간 자리·영문·숫자는 이 검사 대상이 아니다."""
     return set(TOKEN.findall(text))
+
+
+def latin_tokens(text: str) -> set[str]:
+    """사용자가 듣게 되는 영어 낱말. **보간 자리를 먼저 지운다.**"""
+    return set(LATIN.findall(SLOT.sub(" ", text)))
+
+
+def latin_words(catalog: Path = CATALOG) -> set[str]:
+    """카탈로그의 한국어에 남은 영어.
+
+    손 케이스는 안 본다 - 거기는 소스 줄이라 C# 식별자가 통째로 섞여 들어온다.
+    소스에 박힌 영어는 이 검사의 몫이 아니다(모듈 머리글 참고).
+    """
+    rows = json.loads(catalog.read_text(encoding="utf-8"))["strings"]
+    found: set[str] = set()
+    for row in rows:
+        found |= latin_tokens(row["ko"])
+    return found
 
 
 def load_dump(path: Path = DUMP) -> str:
@@ -161,14 +205,65 @@ def unknown(texts: list[str], dump: str, terms: set[str] | None = None) -> set[s
     return {word for word in found if not in_game(word, dump)} - (terms or set())
 
 
+def check_latin(write: bool) -> int:
+    """한국어에 남은 영어를 허용목록과 대조한다."""
+    now = sorted(latin_words())
+
+    if write:
+        LATIN_GOLDEN.parent.mkdir(parents=True, exist_ok=True)
+        LATIN_GOLDEN.write_text(
+            json.dumps(
+                {
+                    "note": "한국어 문장에 그대로 남은 영어. 여기 있는 것은 "
+                            "영어로 있어야 맞다고 사람이 확인한 것이다 - 게임 "
+                            "표기(HP·NPC), 사용자가 그대로 쳐야 하는 명령어"
+                            "(/acc help), 고유명사(Dalamud·vnavmesh), 키 이름"
+                            "(F1). 늘어날 때 왜인지 커밋 본문에 적는다.",
+                    "source": "overlay/ko/ko.json (보간 자리를 지운 뒤)",
+                    "words": now,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        print(f"영어 골든 갱신: {len(now)}개")
+        return 0
+
+    if not LATIN_GOLDEN.is_file():
+        print(f"영어 골든이 없다 - --write로 만든다: {LATIN_GOLDEN}", file=sys.stderr)
+        return 1
+
+    golden = json.loads(LATIN_GOLDEN.read_text(encoding="utf-8"))["words"]
+    added = [word for word in now if word not in golden]
+    dropped = [word for word in golden if word not in now]
+    if added or dropped:
+        print("영어 골든과 다르다:", file=sys.stderr)
+        for word in added:
+            print(f"  + {word}  (한국어 문장에 영어가 새로 들어왔다)", file=sys.stderr)
+        for word in dropped:
+            print(f"  - {word}  (이제 안 쓴다 - --write로 갱신해라)", file=sys.stderr)
+        return 1
+
+    print(f"통과 - 한국어에 남은 영어 {len(now)}개, 골든 그대로")
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    write = "--write" in argv
+
+    # 영어 검사는 카탈로그만 보면 되므로 게임 덤프가 없어도 돈다.
+    rc = check_latin(write)
+
     if not DUMP.is_file():
         print(f"게임 데이터 덤프가 없다 - 건너뛴다: {DUMP}")
-        return 0
+        return rc
 
     now = sorted(unknown(korean_text(), load_dump(), known_terms()))
 
-    if "--write" in argv:
+    if write:
         GOLDEN.parent.mkdir(parents=True, exist_ok=True)
         GOLDEN.write_text(
             json.dumps(
@@ -188,7 +283,7 @@ def main(argv: list[str]) -> int:
             newline="\n",
         )
         print(f"골든 갱신: {len(now)}개")
-        return 0
+        return rc
 
     if not GOLDEN.is_file():
         print(f"골든이 없다 - --write로 만든다: {GOLDEN}", file=sys.stderr)
@@ -206,7 +301,7 @@ def main(argv: list[str]) -> int:
         return 1
 
     print(f"통과 - 게임에 없는 낱말 {len(now)}개, 골든 그대로")
-    return 0
+    return rc
 
 
 if __name__ == "__main__":

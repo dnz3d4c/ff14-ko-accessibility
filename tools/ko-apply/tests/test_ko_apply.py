@@ -244,6 +244,58 @@ def test_고아가_없으면_빈_목록():
     assert ko_apply.orphans(catalog, result.seen) == []
 
 
+# --- 한국어가 빠진 자리 ----------------------------------------------------
+#
+# `Loc.Pick`이 `Korean => ko ?? en`이다. 한국어 인자가 없으면 **예외도 로그도
+# 없이 영어가 나간다.** 실제로 그렇게 배포됐고(`4 of 29`의 `of`), 현황판에
+# "지금은 영어로 나간다"고 적혀 있었는데도 나갔다. 적어 두는 것으로는 안 막힌다.
+
+
+def test_한국어가_없는_자리를_잡는다():
+    src = 'string A => Pick("Ja", "Yes");'
+    assert ko_apply.gaps(src)
+
+
+def test_한국어가_있으면_안_잡는다():
+    src = 'string A => Pick("Ja", "Yes", "예");'
+    assert ko_apply.gaps(src) == []
+
+
+def test_아직_안_옮긴_삼항도_잡는다():
+    # 삼항은 한국어 자리 자체가 없다. 이것도 영어로 나간다.
+    src = 'string A => IsGerman ? "Ja" : "Yes";'
+    assert ko_apply.gaps(src)
+
+
+def test_몇_행인지_말한다():
+    src = 'class S\n{\n    string A => Pick("Ja", "Yes");\n}\n'
+    assert "3행" in ko_apply.gaps(src)[0]
+
+
+def test_독일어와_영어가_같으면_통과시킨다():
+    # 보간 자리뿐이라 언어가 안 걸린다. 옮길 것이 없으니 빠진 게 아니다.
+    # 판단이 아니라 계산이라 예외 표에 안 적는다.
+    src = 'string A => IsGerman ? $"{name}: {dist}." : $"{name}: {dist}.";'
+    assert ko_apply.gaps(src) == []
+
+
+def test_세는_말은_예외로_통과시킨다():
+    # 번역하면 기능이 조용히 깨진다. 왜인지는 UNTRANSLATABLE에 적혀 있다.
+    src = 'string A => IsGerman ? "von" : "of";'
+    assert ko_apply.gaps(src) == []
+
+
+def test_예외는_적어_둔_쌍에만_적용된다():
+    # 예외가 부류로 번지면 검사가 죽는다. `of`가 들어간 다른 문장은 잡혀야 한다.
+    src = 'string A => IsGerman ? "Teil von {n}" : "Part of {n}";'
+    assert ko_apply.gaps(src)
+
+
+def test_주석_속_예시는_안_잡는다():
+    src = '// Pick("Ja", "Yes") 는 예시다\nstring A => 1;'
+    assert ko_apply.gaps(src) == []
+
+
 # --- 모양 -----------------------------------------------------------------
 
 
@@ -334,6 +386,17 @@ def test_생성_커밋이_정말_생성물이다():
     # 재생성 때 그 줄만 조용히 사라지고, 사라지는 게 한국어라 독일어·영어
     # 스냅샷에는 안 걸린다.
     problems = ko_apply.tip_is_generated()
+    assert problems == [], problems
+
+
+@needs_vendor
+def test_한국어_없이_영어로_나가는_자리가_없다():
+    # 이 검사의 목표는 0이다. 빨개지면 그 자리는 **말없이 영어로 발화된다** -
+    # 사용자는 모드가 고장 난 것인지 아직 안 옮긴 것인지 구분할 수 없다.
+    #
+    # 새 문장이 업스트림에서 오면 여기가 먼저 빨개진다. 옮기거나(카탈로그),
+    # 옮기면 안 되는 것이면 왜인지를 `UNTRANSLATABLE`에 적는다.
+    problems = ko_apply.missing_korean()
     assert problems == [], problems
 
 

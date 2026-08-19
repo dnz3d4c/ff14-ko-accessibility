@@ -26,6 +26,13 @@
 독일어·영어 리터럴은 **읽기만 한다.** 세 번째 인자를 붙일 뿐이라 골든
 스냅샷(`tools/strings-golden`)이 그대로여야 하고, 그게 이 도구의 회귀 검사다.
 
+## 빠진 자리도 여기서 센다
+
+옮기는 동안 소스를 훑는 파서가 이미 답을 갖고 있다 - 어느 자리에 한국어
+인자가 있고 없는지를 `find_sites`가 말해 준다. 그래서 **한국어가 없어 조용히
+영어가 나갈 자리**를 같은 파서로 센다(`missing_korean`). `Loc.Pick`의 폴백이
+그걸 예외도 로그도 없이 덮기 때문에, 안 세면 배포될 때까지 아무도 모른다.
+
 ## 손 케이스는 여기 넣지 않는다
 
 손 케이스는 이 도구가 못 다룬다. 그건 **별도 커밋**으로 간다 - 생성 커밋에
@@ -471,6 +478,69 @@ def check(root: Path = SOURCE_ROOT, catalog_path: Path = CATALOG) -> list[str]:
     return problems
 
 
+# --- 한국어가 빠진 자리 ----------------------------------------------------
+#
+# `Loc.Pick`이 `LanguageMode.Korean => ko ?? en`이다(`Loc.cs:94-99`). 한국어
+# 인자가 없으면 **예외도 로그도 없이 영어가 나간다.** 옮기는 동안에는 그게
+# 맞았다 - 침묵보다 영어가 낫다. 옮기기가 끝난 지금은 그 폴백이 **빠진 자리를
+# 덮는 뚜껑**이다.
+#
+# 실제로 `4 of 29`의 `of`가 그렇게 배포됐다. 현황판에 "지금은 영어로 나간다"고
+# 적혀 있었는데도 나갔다 - **적어 두는 것으로는 안 막힌다.** 그래서 검사한다.
+
+
+#: 한국어를 넣으면 **안 되는** 쌍. 여기 적힌 것만 통과한다.
+#:
+#: `von`/`of`는 세는 말이다. 모드가 자기가 찍은 문장을 다시 읽는다 -
+#: `UIReaderService.TryParseSpokenProgress`가 `"3 von 48"`을 공백으로 셋으로
+#: 쪼개 **가운데를 이 상수와 글자까지 비교해서** 토벌수첩 줄을 알아본다
+#: (`UIReaderService.cs:8963`). 한국어는 수를 앞뒤로 바꿔 놓으므로(`48 중 3`)
+#: 낱말만 갈면 그 비교가 어긋나고, **예외도 로그도 없이 그 기능만 죽는다.**
+#: 낱말과 `Counter()`와 읽는 쪽이 한꺼번에 움직여야 하고, 그건 번역이 아니라
+#: 코드 변경이다 - 현황판 `W-19`.
+#:
+#: **W-19가 끝나면 여기서 지운다.** 그때 이 표는 비고 검사는 예외 없이 0이 된다.
+UNTRANSLATABLE = {
+    ("von", "of"): "세는 말 - 모드가 자기 발화를 되읽어 파싱한다 (W-19)",
+}
+
+
+def gaps(text: str) -> list[str]:
+    """한국어가 없어 영어가 나갈 자리. 소스 한 파일치를 행 번호와 함께.
+
+    두 갈래를 통과시킨다.
+
+    - **독일어와 영어가 글자까지 같은 자리.** 보간 자리뿐이라 언어가 안 걸린다
+      (`AccessibilityStrings.cs`의 `TargetDirection`). 옮길 것이 없으니 빠진
+      게 아니다 - 이건 판단이 아니라 계산이라 예외 표에 안 적는다
+    - **`UNTRANSLATABLE`에 적힌 쌍.** 옮기면 기능이 깨지는 것들이고, 왜인지가
+      그 표 위에 적혀 있다
+    """
+    problems: list[str] = []
+    for site in find_sites(text):
+        if site.ko is not None or site.de == site.en:
+            continue
+        if (site.de, site.en) in UNTRANSLATABLE:
+            continue
+        problems.append(f"{site.line}행: 한국어가 없어 영어로 나간다 - {site.en[:60]}")
+    return problems
+
+
+def missing_korean(root: Path = SOURCE_ROOT) -> list[str]:
+    """트리 전체. 문제 목록을 돌려준다 - 비면 통과.
+
+    **목표는 0이다.** 새 문장이 업스트림에서 오면 여기가 먼저 빨개지고, 옮기든
+    예외로 적든 사람이 한 번은 본다.
+    """
+    problems: list[str] = []
+    for path in source_files(root):
+        name = path.relative_to(root).as_posix()
+        problems += [
+            f"{name}:{problem}" for problem in gaps(path.read_text(encoding="utf-8"))
+        ]
+    return problems
+
+
 def _git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", "-c", "core.hooksPath=", *args],
@@ -554,7 +624,15 @@ def main(argv: list[str]) -> int:
             for problem in problems:
                 print(f"  - {problem}", file=sys.stderr)
             return 1
-        print("통과 - 소스가 카탈로그대로다")
+
+        silent = missing_korean()
+        if silent:
+            print("\n한국어가 없어 영어로 나갈 자리:", file=sys.stderr)
+            for problem in silent:
+                print(f"  - {problem}", file=sys.stderr)
+            return 1
+
+        print("통과 - 소스가 카탈로그대로고, 한국어가 빠진 자리가 없다")
         return 0
 
     problems, changed, seen = _sweep(catalog, SOURCE_ROOT)

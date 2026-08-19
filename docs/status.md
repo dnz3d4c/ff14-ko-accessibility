@@ -158,6 +158,12 @@ dist\FF14AccessibilityInstaller-KR.exe --check
 
 **"표 하나를 지우고 `KeyNames`로 합친다"는 그대로 하면 안 된다.** `KeyNames.NameToVk`에 `NumpadKomma`(0x6E, VK_DECIMAL)가 없어서, Plugin 표를 지우면 스킬 메뉴 뒤로가기(`SkillMenuBack`, `Plugin.cs:900`)가 **조용히 죽는다.** 합치면 `UpdateKeyEdges` 루프도 25개→70개로 넓어지고 게임이 안 쓰는 키마다 새 경고가 뜬다. 쪼개는 쪽이 맞다 — **이름 둘(`F`=0x46, `Pos1`=0x24)만 더하면 버그가 죽고**, 표 통합은 별건이다.
 
+**셋 중 둘은 원인이 하나 더 있다** (2026-08-19, 문서 검토에서 나왔다). 로그 되읽기 키 넷(`KeyChatReadOldest`·`KeyChatReadNewest`·`KeyChatTabPrev`·`KeyChatTabNext`)은 **신규 로그 시스템 전용**이라(`Plugin.cs:1533-1549`), 기본값인 기존 시스템에서는 `이 키는 신규 로그 시스템 것임.`을 말하고 끝난다(`Configuration.cs:253`의 `UseLegacyChatSystem = true`). 결함이 아니라 의도다 — 조용한 키는 고장난 키처럼 들리므로 일부러 말한다고 소스 주석이 적어 뒀다. `LegacyChatHistoryService`에는 그 기능을 할 메서드 자체가 없다.
+
+그래서 **`Shift+End`·`Alt+End`도 기본 설정에서는 안 된다.** 파서는 통과하지만 관문에 걸린다. `Shift+Home`·`Alt+Home`은 원인이 둘 겹쳐 있어서 **로그 시스템을 바꾼 다음에 키까지 바꿔야** 산다. 사용자 문서가 "`Shift+End`와 `Alt+End`는 정상 동작한다"고 적고 있던 자리였고 고쳤다.
+
+**귀로는 아직 확인 안 됐다.** 로그에 `신규 로그 시스템` 발화가 0건이고 시스템 전환 기록도 0건이다. `Shift+End`를 눌러 위 안내가 들리면 확정된다.
+
 덤으로 찾은 것: **`KeyNames` 클래스는 어디서도 안 쓴다.** V5.33에 들어와 한 번도 배선된 적이 없는데, 자기 XML 주석에는 *"`Plugin.ParseKeySpec`이 이 표를 본다"*고 적혀 있다 — 거짓이다.
 
 **업스트림에는 안 보낸다** (판단이지 판정이 아니다, §6).

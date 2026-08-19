@@ -1,0 +1,345 @@
+{
+  "note": "`Pick` 밖에 맨몸으로 있는 외국어 리터럴 중, 계산으로 안 갈리는 잔여분. 통과시킬 것도 아직 못 고친 결함도 여기 모인다 - 어느 쪽인지는 `why`가 말한다.",
+  "rules": {
+    "umlaut": "움라우트를 가진 리터럴이 Pick 밖에 있다",
+    "sibling": "형제 가지가 Pick인데 자기만 맨 리터럴이다"
+  },
+  "sites": [
+    {
+      "file": "KeyNames.cs",
+      "rule": "umlaut",
+      "text": "Rücktaste",
+      "why": "설정 파일에 저장되는 키 이름이라 발화가 아니다. 파일 머리글이 못 박아 뒀다 - 이 이름을 바꾸면 이미 저장된 바인딩이 조용히 무효가 되고, 읽어 주는 이름은 다른 표에 따로 산다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Ausrüstung",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Beste Ausrüstung",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Chat-Registerkarte zurück",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Emote ausführen",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Emote zurück",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Flächenwarnung an/aus",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Himmelssäule",
+      "why": "`#if DEBUG` 안의 딥 던전 조사 명령이 쓰는 콘텐츠 이름표다(`Plugin.cs:589-634`). 배포 빌드에는 안 들어간다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Kategorie zurück",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Kein Tiefes Gewölbe freigeschaltet.",
+      "why": "`#if DEBUG` 안의 딥 던전 조사 명령이 말하는 문장이다. 개발 빌드에서만 들린다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Menü vorlesen",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Nachlese Kategorie zurück",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Nachlese älter",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Nächstes Objekt",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Plugin-Liste zurück",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Skill-Menü",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "Zufälliges Aussehen",
+      "why": "`/acc keys` 충돌 보고서가 쓰는 기능 이름이다. `KeybindService.DumpKeybinds`가 문자열 빌더와 로그에만 넣고 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Plugin.cs",
+      "rule": "umlaut",
+      "text": "löschen",
+      "why": "채팅 명령어 낱말을 `.Equals`로 대조하는 자리다. `del`·`loesch`와 나란한 형제라 발화가 아니라 입력이다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "sibling",
+      "text": "PvP",
+      "why": "게임 한국어판이 그대로 `PvP`라고 쓴다(KR Addon 834행). 세 언어가 같은 낱말이라 `Pick`으로 감싸도 값이 셋 다 같다. **형제 대조가 잡은 것은 맞고 판정만 통과다** - 형제와 모양을 맞출지는 손볼 때 같이 정한다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "Süden",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "Südosten",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "Südwesten",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "nordöstlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "nördlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "südlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "südwestlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "südöstlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AccessibilityStrings.cs",
+      "rule": "umlaut",
+      "text": "östlich",
+      "why": "언어별 나침반 배열이다. `CompassWords`가 `Loc.IsKorean ? CompassKo : IsGerman ? CompassDe : CompassEn`으로 고르고 한국어 짝이 이미 있다. 배열이라 `Pick`으로 묶을 수 있는 모양이 아니다."
+    },
+    {
+      "file": "Services/AutoWalkService.cs",
+      "rule": "umlaut",
+      "text": "Folgen übernimmt",
+      "why": "`Finish(spoken, reason)`의 둘째 인자다. 말하는 것은 첫 인자고 이 값은 `_log.Info`로만 나간다(`AutoWalkService.cs:427-434`)."
+    },
+    {
+      "file": "Services/AutoWalkService.cs",
+      "rule": "umlaut",
+      "text": "Netz endet hier (keine Annäherung)",
+      "why": "`Finish(spoken, reason)`의 둘째 인자다. 말하는 것은 첫 인자고 이 값은 `_log.Info`로만 나간다(`AutoWalkService.cs:427-434`)."
+    },
+    {
+      "file": "Services/AutoWalkService.cs",
+      "rule": "umlaut",
+      "text": "Spur von vnavmesh überschrieben",
+      "why": "`Finish(spoken, reason)`의 둘째 인자다. 말하는 것은 첫 인자고 이 값은 `_log.Info`로만 나간다(`AutoWalkService.cs:427-434`)."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Blaugrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Gelbgrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Graugrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Grün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Limettgrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Seegrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "Türkis",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "dunkles Seegrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "eisblasses Weiß",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "gebräunt",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "gedämpftes",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "gräuliches",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "helles Seegrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "kräftiges",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "porzellanweiß",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "sehr blasses Grün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "sehr dunkles Moosgrün",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/ColorNamer.cs",
+      "rule": "umlaut",
+      "text": "weiß",
+      "why": "**통과시키는 것이 아니라 아직 못 고친 결함이다.** 이 파일은 `De`라는 자기 별칭을 둬서 스냅샷의 표식(`IsGerman`)에 안 잡히고, 104곳 전부 한국어가 없어 영어로 나간다. 현황판 W-44가 그 작업이다."
+    },
+    {
+      "file": "Services/KeybindService.cs",
+      "rule": "umlaut",
+      "text": "Einträge: {numKeybinds}",
+      "why": "`/acc keys`가 파일로 남기는 진단 보고서의 머리글이다. 사람에게는 개수만 말한다."
+    },
+    {
+      "file": "Services/PlacesService.cs",
+      "rule": "umlaut",
+      "text": "Ätheryt",
+      "why": "`PlaceDestination.TypeLabel`은 발화가 아니라 식별자다. `NavigationService.cs:1239`와 `PlacesService.cs:425`가 이 값으로 에테라이트와 전송망을 가르고, 발화형은 `SpokenPlaceType`이 따로 갈랐다(W-42). 리터럴만 바꾸면 그 분류가 예외도 로그도 없이 죽는다."
+    },
+    {
+      "file": "Services/PlacesService.cs",
+      "rule": "umlaut",
+      "text": "Übergang",
+      "why": "`PlaceDestination.TypeLabel`은 발화가 아니라 식별자다. `NavigationService.cs:1239`와 `PlacesService.cs:425`가 이 값으로 에테라이트와 전송망을 가르고, 발화형은 `SpokenPlaceType`이 따로 갈랐다(W-42). 리터럴만 바꾸면 그 분류가 예외도 로그도 없이 죽는다."
+    },
+    {
+      "file": "Services/UIReaderService.cs",
+      "rule": "umlaut",
+      "text": "Bestätigen",
+      "why": "확인 버튼 라벨 목록(`ConfirmButtonLabels`)이다. 한국어 클라의 `확인`이 같은 목록에 이미 들어 있다 - 발화가 아니라 노드 대조다."
+    },
+    {
+      "file": "Services/UIReaderService.cs",
+      "rule": "umlaut",
+      "text": "Schließen",
+      "why": "게임 UI의 닫기 버튼 이름을 대조하는 자리다(`UIReaderService.cs:5988`). 클라이언트 언어로 남아야 눌린다."
+    },
+    {
+      "file": "Services/UIReaderService.cs",
+      "rule": "umlaut",
+      "text": "Vergütung",
+      "why": "퀘스트 패널의 머리글 목록(`QuestPanelHeaders`)이다. 게임이 주는 텍스트와 대조해서 버리는 데 쓴다 - 발화가 아니다."
+    },
+    {
+      "file": "Services/UIReaderService.cs",
+      "rule": "umlaut",
+      "text": "Vergütung bei Erfolg",
+      "why": "퀘스트 패널의 머리글 목록(`QuestPanelHeaders`)이다. 게임이 주는 텍스트와 대조해서 버리는 데 쓴다 - 발화가 아니다."
+    }
+  ]
+}

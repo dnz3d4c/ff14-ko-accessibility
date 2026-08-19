@@ -229,7 +229,7 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 
 - **scoop으로 설치한 .NET SDK 10** — `run\_env.cmd`가 `%SCOOP%\apps\dotnet-sdk\current\dotnet.exe`를 부릅니다. `SCOOP`이 정의되어 있지 않으면 `%USERPROFILE%\scoop`으로 봅니다. PATH의 `dotnet`은 런타임만 있어서 쓰지 않습니다
 - **7z** — `scoop install 7zip`
-- **KR Dalamud의 hook 폴더** — 업데이터에서 [Check Update]를 한 번 돌려야 생깁니다
+- **KR Dalamud의 hook 폴더** — 업데이터에서 [업데이트 확인]를 한 번 돌려야 생깁니다
 
 빌드 환경 구성은 [environment.md](docs/dev/environment.md)를 봅니다. .NET SDK 경로에서 자주 걸립니다.
 

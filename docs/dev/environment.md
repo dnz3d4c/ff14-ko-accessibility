@@ -92,7 +92,7 @@ $USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 
 규칙의 단일 원천은 `tools/kr-setup/kr_profile.py`이고, 설치 프로그램(C#)·배치·로그 판정 셋이 갈라지면 `tools/kr-setup/tests/test_kr_profile.py`가 빨개진다.
 
-업데이터 GUI의 Check Update로 공식 Dalamud stable `15.0.3.2`와 에셋 `437`을 받고 KR 호환 패치까지 자동 적용했다.
+업데이터 GUI의 업데이트 확인로 공식 Dalamud stable `15.0.3.2`와 에셋 `437`을 받고 KR 호환 패치까지 자동 적용했다.
 
 적용 확인:
 
@@ -104,7 +104,7 @@ $USERPROFILE\scoop\apps\dotnet-sdk\current\dotnet.exe build -c Release
 
 ### `Hooks\dev`는 남겨 둔다
 
-Check Update 이전에 공식 stable을 손으로 받아 `Hooks\dev`에 넣고 `--patch-hook`으로 패치한 적이 있다(194MB). 그 구성에는 **에셋이 빠져 있었다** — 빌드 참조로는 충분하지만 실행에는 부족했다.
+업데이트 확인 이전에 공식 stable을 손으로 받아 `Hooks\dev`에 넣고 `--patch-hook`으로 패치한 적이 있다(194MB). 그 구성에는 **에셋이 빠져 있었다** — 빌드 참조로는 충분하지만 실행에는 부족했다.
 
 지우지 않는 이유는 업데이터가 이걸 롤백 대상으로 기록해 뒀기 때문이다.
 
@@ -112,7 +112,7 @@ Check Update 이전에 공식 stable을 손으로 받아 `Hooks\dev`에 넣고 `
 
 ### `DALAMUD_HOME`
 
-사용자 환경변수로 걸어 뒀다. Check Update로 hook 경로가 `dev`에서 버전 폴더로 바뀌었으므로 그에 맞춰 갱신했다.
+사용자 환경변수로 걸어 뒀다. 업데이트 확인로 hook 경로가 `dev`에서 버전 폴더로 바뀌었으므로 그에 맞춰 갱신했다.
 
 DALAMUD_HOME=%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2
 
@@ -126,7 +126,7 @@ Dalamud를 게임에 붙이는 마지막 단계는 GUI 조작이라 남아 있�
 
 절차(README-KR.txt 기준):
 
-1. ~~게임을 종료한 상태에서 `Dalamud.Updater.exe` 실행 → Check Update~~ (2026-08-17 완료)
+1. ~~게임을 종료한 상태에서 `Dalamud.Updater.exe` 실행 → 업데이트 확인~~ (2026-08-17 완료)
 2. 게임 실행
 3. "달라무드 적용" 누름
 
@@ -171,7 +171,7 @@ Services/InventoryService.cs(199,28): error CS1061:
 
 `bin/Release/net10.0-windows/FF14Accessibility/latest.zip`이 나온다. smoke test S1(플러그인 로드)이 이제 가능하다.
 
-Check Update로 정식 설치된 hook(`Hooks\15.0.3.2`)에서도 **같은 오류 1건**이다. 손으로 만든 hook와 정식 hook가 빌드상 동등하다는 뜻이라, 위 결과는 수동 구성의 부작용이 아니다.
+업데이트 확인로 정식 설치된 hook(`Hooks\15.0.3.2`)에서도 **같은 오류 1건**이다. 손으로 만든 hook와 정식 hook가 빌드상 동등하다는 뜻이라, 위 결과는 수동 구성의 부작용이 아니다.
 
 재현 명령(복사용, 저장소 루트에서):
 
@@ -179,7 +179,7 @@ DALAMUD_HOME="$APPDATA\XIVLauncherKR\addon\Hooks\15.0.3.2" $USERPROFILE\scoop\ap
 
 ### 글로벌(7.55) 참조를 다시 구하는 법 — 2026-08-17 23:47 확인
 
-업데이터의 Check Update가 공식 어셈블리를 KR 호환본으로 덮어쓰기 때문에 이 머신에는 7.55가 남지 않는다. 다시 받는다(복사용 한 줄):
+업데이터의 업데이트 확인가 공식 어셈블리를 KR 호환본으로 덮어쓰기 때문에 이 머신에는 7.55가 남지 않는다. 다시 받는다(복사용 한 줄):
 
 curl -sS -o "$LOCALAPPDATA\Temp\dalamud-official.zip" https://goatcorp.github.io/dalamud-distrib/latest.zip && 7z x -y -o"$LOCALAPPDATA\Temp\dalamud-official-15.0.3.2" "$LOCALAPPDATA\Temp\dalamud-official.zip"
 

@@ -62,7 +62,7 @@ setx DALAMUD_RUNTIME "C:\Program Files\dotnet"
 
 ## 5. Dalamud 내려받기와 KR 패치
 
-게임을 끈 상태에서 업데이터를 실행하고 **Check Update**를 누른다. 공식 stable과 에셋을 받아 KR 호환 패치까지 적용한다.
+게임을 끈 상태에서 업데이터를 실행하고 **업데이트 확인**를 누른다. 공식 stable과 에셋을 받아 KR 호환 패치까지 적용한다.
 
 결과: `addon\Hooks\<버전>\`(KR 패치 마커 3종 + FFXIVClientStructs 7.51.0.8667), `dalamudAssets\<번호>\`
 

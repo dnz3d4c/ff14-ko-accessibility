@@ -1,6 +1,36 @@
 # release-manifest — 릴리스 매니페스트를 산출물에서 만든다
 
-`dist`에 이미 있는 산출물을 읽어, 릴리스에 같이 올릴 매니페스트 둘을 같은 자리에 만든다.
+`dist`에 이미 있는 산출물을 읽어, 릴리스에 같이 올릴 매니페스트 둘을 `dist/release/`에 만든다.
+
+**`dist` 루트는 받는 사람에게 그대로 줄 수 있는 폴더다.** 사용 안내가 "같은 폴더에 둡니다"라고 말하는 그 폴더라, 거기에는 사람이 여는 셋만 두고 기계만 읽는 것은 `release/`로 내린다. 자리는 `RELEASE_DIR_NAME` 하나에서 나오고 `release_dir()`만 그것을 쓴다.
+
+```
+dist/
+  FF14AccessibilityInstaller-KR.exe   설치 프로그램
+  FF14Accessibility.zip               모드 본체
+  사용 안내.md                         사용자 문서
+  release/
+    FF14Accessibility-KR-Setup.zip    받는 사람이 받는 것 하나
+    repo.json                         Dalamud 커스텀 저장소
+    installer.json                    설치 프로그램 자기 갱신
+    release-notes.md                  판마다 사람이 쓴다
+```
+
+## 받는 사람이 받는 것은 하나다
+
+`FF14Accessibility-KR-Setup.zip`을 받아 풀면 `FF14Accessibility-KR` 폴더가 나오고 그 안에 루트의 셋이 그대로 들어 있다. **`dist` 루트의 파일을 그대로 담는다** — 따로 만들면 두 벌이 되고 갈린다.
+
+**이름과 압축 안 경로는 ASCII다.** `gh`가 윈도에서 한글 자산 이름을 삼킨 사고가 이미 났고(첫 릴리스에서 `사용 안내.md`가 `default.md`로 올라갔다), 압축 프로그램마다 한글 경로를 다르게 다룬다. 안에 든 `사용 안내.md`는 한글 그대로 둔다 — 그건 사용자가 푼 뒤에 보는 이름이라 무슨 파일인지 알아야 한다.
+
+**릴리스에는 여섯이 개별 자산으로 올라간다.** 첫째가 사람이 받는 것이고 나머지 다섯은 기계가 URL로 받는 것이다. 받는 쪽이 파일 하나씩 URL로 받으므로 폴더 구조는 자산 이름에 영향이 없다.
+
+## KR 표시는 사람이 보는 자리에만
+
+버전만 보면 원본 모드와 구별되지 않는다. **태그에는 못 넣는다** — `ChoosePluginSourceAsync`가 `tag.TrimStart('v','V')`로 버전을 뽑는데 `5.88.0.0-kr`은 `ParseVersionLoose`가 못 읽어서 문자열 비교로 떨어지고, 그러면 최신을 깔고 있어도 실행할 때마다 다시 받는다. `normalize_version`이 같은 이유로 `1.1.0-kr.1`을 이미 거른다.
+
+그래서 사람이 읽는 자리에만 넣는다 — 릴리스 제목, `repo.json`의 `Name`(`PLUGIN_DISPLAY_NAME`), 아카이브 이름, 릴리스 노트 첫 줄이다. **`InternalName`은 건드리지 않는다.** 설치된 폴더 이름이자 갱신 대조 키다.
+
+이름은 지어내지 않았다. 사용자가 실제로 듣는 설치 프로그램 창 제목이 `FF14 접근성 모드 설치 프로그램 (한국 서버)`이고(`Installer/Loc.cs:701`), 사용 안내 제목이 `FF14 접근성 모드 (한국 서버용) 사용 안내`다.
 
 uv run --no-project python tools/release-manifest/release_manifest.py
 
@@ -61,7 +91,7 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 아홉을 잰다.
 
 - **초안이 아닌가.** 초안이면 받는 쪽에서 **아예 안 보이는데** 내는 사람 화면에서는 정상으로 보인다
-- **자산 다섯이 이름까지 정확히 있나.** 대소문자만 다른 것은 따로 말한다 — 설치 프로그램은 `OrdinalIgnoreCase`로 찾아 넘어가는데 내려받기 주소는 이름을 그대로 쓴다
+- **자산 여섯이 이름까지 정확히 있나.** 사용자용 아카이브가 그 첫째다. 대소문자만 다른 것은 따로 말한다 — 설치 프로그램은 `OrdinalIgnoreCase`로 찾아 넘어가는데 내려받기 주소는 이름을 그대로 쓴다
 - **`installer.json`의 `Sha256`이 릴리스 EXE를 내려받아 다시 계산한 값과 같나.** 어긋나면 받는 쪽이 내려받고 나서 버린다
 - **`AssetName`이 릴리스에 실재하는 자산을 가리키나**
 - **`InstallerVersion`이 네 마디이고 릴리스 EXE의 PE 버전과 같나**

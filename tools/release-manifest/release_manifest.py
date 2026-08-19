@@ -1,13 +1,17 @@
-"""릴리스에 같이 올릴 매니페스트 둘을 산출물에서 만든다.
+"""릴리스에 올릴 것을 `dist`의 산출물에서 만든다.
 
-`dist`에 이미 있는 것을 읽어 같은 자리에 두 파일을 낸다.
+`dist` 루트에 이미 있는 것을 읽어 **`dist\\release\\`에 셋을 낸다.** 루트는
+받는 사람에게 그대로 줄 수 있는 폴더로 두고, 사람이 안 여는 것은 거기로 내린다.
 
-1. **`dist\\repo.json`** - Dalamud 커스텀 저장소 매니페스트. 사용자가 저장소
-   주소를 등록해 두면 Dalamud가 이걸 보고 새 판을 알아서 받는다. 형식은
+1. **`dist\\release\\FF14Accessibility-KR-Setup.zip`** - **받는 사람이 받는
+   것 하나.** 풀면 폴더가 나오고 그 안에 설치 프로그램·모드 본체·사용 안내가
+   있다. 루트의 셋을 그대로 담는다
+2. **`dist\\release\\repo.json`** - Dalamud 커스텀 저장소 매니페스트. 사용자가
+   저장소 주소를 등록해 두면 Dalamud가 이걸 보고 새 판을 알아서 받는다. 형식은
    업스트림 `repo.json`을 본뜨고, 값은 **압축 안의
-   `FF14Accessibility.json`에서 읽는다** - 저장소 주소와 내려받기 링크만
-   우리 것으로 갈아 끼운다
-2. **`dist\\installer.json`** - 설치 프로그램 자기 갱신용. 읽는 쪽은
+   `FF14Accessibility.json`에서 읽는다** - 저장소 주소와 내려받기 링크,
+   그리고 목록에 그려지는 이름만 우리 것으로 갈아 끼운다
+3. **`dist\\release\\installer.json`** - 설치 프로그램 자기 갱신용. 읽는 쪽은
    `Installer/InstallerService.cs`의 `TrySelfUpdateAsync`이고, 거기서 쓰는
    필드는 `InstallerVersion`·`AssetName`·`Sha256` 셋이다
 
@@ -58,6 +62,46 @@ INSTALLER_NAME = "FF14AccessibilityInstaller-KR.exe"
 REPO_MANIFEST_NAME = "repo.json"
 INSTALLER_MANIFEST_NAME = "installer.json"
 
+#: 매니페스트 둘이 나가는 자리. `dist` 루트는 **사용자에게 그대로 줄 수 있는
+#: 폴더**로 두고, 기계만 읽는 것은 여기로 내린다 - 사용 안내가 "셋을 같은
+#: 폴더에 두고 실행합니다"라고 말하는 그 폴더라, 거기에 사람이 안 여는 파일이
+#: 섞이면 무엇을 눌러야 하는지 헷갈린다.
+#:
+#: **릴리스에 올라갈 때는 여전히 개별 자산이다.** 받는 쪽이 URL로 직접 받으므로
+#: (`installer.json`은 자기 갱신이, `repo.json`은 Dalamud가) 폴더 구조는 우리
+#: 편의일 뿐이고 자산 이름에는 영향이 없다.
+RELEASE_DIR_NAME = "release"
+
+#: 받는 사람이 실제로 누르는 것. **이 하나만 받아 풀고 안의 exe를 실행하면
+#: 끝난다.** 개별 자산은 기계용으로 그대로 두고 이걸 하나 더 낸다.
+#:
+#: **이름과 압축 안 경로는 ASCII다.** `gh`가 윈도에서 한글 자산 이름을 삼킨
+#: 사고가 이미 났고(`GUIDE_ASSET_NAME` 참고), 압축 프로그램마다 한글 경로를
+#: 다르게 다룬다. 안에 든 `사용 안내.md`는 한글 그대로 둔다 - 그건 사용자가
+#: 푼 뒤에 보는 이름이라 무슨 파일인지 알아야 한다.
+SETUP_ZIP_NAME = "FF14Accessibility-KR-Setup.zip"
+
+#: 압축을 풀면 나오는 폴더. 파일이 푼 자리에 흩어지지 않게 한 겹 감싼다.
+SETUP_DIR_NAME = "FF14Accessibility-KR"
+
+#: 안내 문서가 **폴더에 나갈 때의 이름**. 릴리스에 개별 자산으로 올라갈 때는
+#: `GUIDE_ASSET_NAME`(ASCII)이고, 폴더 안에서는 한글 그대로다 - 받는 사람이
+#: 무슨 파일인지 알아야 한다. 같은 이름을 `tools/pack-check`도 갖고 있다.
+GUIDE_NAME = "사용 안내.md"
+
+#: 받는 사람에게 그대로 주는 셋. `dist` 루트에 있는 것이 이것이고,
+#: 사용자용 아카이브에도 **이 파일들을 그대로 담는다** - 따로 만들면 갈린다.
+USER_FILES = (INSTALLER_NAME, ZIP_NAME, GUIDE_NAME)
+
+#: Dalamud 플러그인 목록에 그려지는 이름. **`InternalName`이 아니다** - 그쪽은
+#: 설치된 폴더 이름이자 갱신 대조 키라 건드리면 안 된다.
+#:
+#: 버전만 보면 원본 모드와 구별되지 않아서 여기에 한국 서버를 드러낸다. 이름을
+#: 지어내지 않았다 - 사용자가 실제로 듣는 설치 프로그램 창 제목이
+#: `FF14 접근성 모드 설치 프로그램 (한국 서버)`이고(`Installer/Loc.cs:701`),
+#: 사용 안내 제목이 `FF14 접근성 모드 (한국 서버용) 사용 안내`다.
+PLUGIN_DISPLAY_NAME = "FF14 접근성 모드 (한국 서버용)"
+
 #: 안내 문서가 **릴리스에 올라갈 때의 이름**이다. 폴더에 나갈 때는
 #: `사용 안내.md`이고 그쪽은 `tools/pack-check`가 본다.
 #:
@@ -84,7 +128,10 @@ REPO_JSON_URL = f"{REPO_URL}/releases/latest/download/{REPO_MANIFEST_NAME}"
 
 #: 한 릴리스에 같이 올라가야 하는 자산. `run\\release.bat`이 올리는 목록이다.
 #: 하나라도 빠지면 받는 쪽은 오류가 아니라 "새 판이 없다"로 읽는다.
+#:
+#: 첫째가 **사람이 받는 것**이고 나머지 다섯은 기계가 URL로 받는 것이다.
 RELEASE_ASSETS = (
+    SETUP_ZIP_NAME,
     INSTALLER_NAME,
     ZIP_NAME,
     GUIDE_ASSET_NAME,
@@ -115,6 +162,7 @@ FIELD_ORDER = (
 
 #: 압축 안 매니페스트가 아니라 우리가 정하는 값.
 OURS = {
+    "Name": PLUGIN_DISPLAY_NAME,
     "RepoUrl": REPO_URL,
     "DownloadLinkInstall": DOWNLOAD_URL,
     "DownloadLinkUpdate": DOWNLOAD_URL,
@@ -347,21 +395,94 @@ def _build(dist: Path, installer_version: str | None) -> Manifests:
     )
 
 
+def release_dir(dist: Path) -> Path:
+    """매니페스트 둘이 있는 자리. **경로는 여기 하나에서만 나온다.**"""
+    return dist / RELEASE_DIR_NAME
+
+
+def write_setup_archive(dist: Path) -> Path:
+    """받는 사람이 받는 것 하나. 풀면 폴더가 나오고 그 안에 셋이 있다.
+
+    **`dist` 루트의 파일을 그대로 담는다.** 따로 만들면 두 벌이 되고 갈린다.
+    """
+    missing = [name for name in USER_FILES if not (dist / name).is_file()]
+    if missing:
+        raise ManifestError(f"아카이브에 담을 것이 없다: {', '.join(missing)}")
+
+    path = release_dir(dist) / SETUP_ZIP_NAME
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as archive:
+        for name in USER_FILES:
+            # 폴더 한 겹으로 감싼다. 없으면 푼 자리에 파일이 흩어진다.
+            archive.write(dist / name, f"{SETUP_DIR_NAME}/{name}")
+    return path
+
+
+def _drop_stale_manifests(dist: Path) -> list[Path]:
+    """옛 자리(`dist` 루트)에 남은 매니페스트를 치운다.
+
+    옛 방식으로 한 번이라도 패킹한 작업 폴더에는 루트에 이 둘이 남아 있고,
+    그러면 `tools/pack-check`이 "받는 사람이 안 쓰는 것"으로 잡아 **패킹이
+    통째로 실패한다.** 새 자리에 쓰는 김에 옛 자리를 치운다.
+    """
+    dropped = []
+    for name in (REPO_MANIFEST_NAME, INSTALLER_MANIFEST_NAME):
+        stale = dist / name
+        if stale.is_file():
+            stale.unlink()
+            dropped.append(stale)
+    return dropped
+
+
 def write_manifests(dist: Path, installer_version: str | None = None) -> Manifests:
-    """두 파일을 `dist`에 쓴다. 다른 산출물은 건드리지 않는다."""
+    """매니페스트 둘과 사용자용 아카이브를 `dist/release`에 쓴다."""
     made = _build(dist, installer_version)
+    target = release_dir(dist)
+    target.mkdir(parents=True, exist_ok=True)
     for name, content in _files(made):
-        (dist / name).write_text(
+        (target / name).write_text(
             json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
+    write_setup_archive(dist)
+    _drop_stale_manifests(dist)
     return made
+
+
+def setup_archive_problems(dist: Path) -> list[str]:
+    """사용자용 아카이브가 풀었을 때 쓸 수 있는 모양인가.
+
+    **여기가 어긋나면 받는 사람이 푼 자리에서 막힌다.** 파일이 흩어지거나
+    실행할 exe가 없는 것이라, 릴리스가 멀쩡해 보여도 소용이 없다.
+    """
+    path = release_dir(dist) / SETUP_ZIP_NAME
+    if not path.is_file():
+        return [f"사용자용 아카이브가 없다: {path}"]
+
+    try:
+        with zipfile.ZipFile(path) as archive:
+            names = archive.namelist()
+    except (zipfile.BadZipFile, OSError) as error:
+        return [f"사용자용 아카이브를 못 읽었다: {path} ({error})"]
+
+    problems = []
+    for name in USER_FILES:
+        wanted = f"{SETUP_DIR_NAME}/{name}"
+        if wanted not in names:
+            problems.append(f"{SETUP_ZIP_NAME} 안에 {name}이 없다")
+
+    stray = sorted(n for n in names if not n.startswith(f"{SETUP_DIR_NAME}/"))
+    if stray:
+        problems.append(
+            f"{SETUP_ZIP_NAME}이 {SETUP_DIR_NAME} 폴더로 안 감싸여 있다: {', '.join(stray)}. "
+            f"푼 자리에 파일이 흩어진다"
+        )
+    return problems
 
 
 def manifest_problems(dist: Path, installer_version: str | None = None) -> list[str]:
     """이미 있는 매니페스트가 지금 산출물과 맞나. 만들지 않고 재기만 한다."""
-    problems = []
+    problems = setup_archive_problems(dist)
     for name, content in _files(_build(dist, installer_version)):
-        path = dist / name
+        path = release_dir(dist) / name
         if not path.is_file():
             problems.append(f"매니페스트가 없다: {path}")
             continue
@@ -732,9 +853,9 @@ def main(argv: list[str]) -> int:
 
     plugin, installer = made.repo[0], made.installer
     print("== 릴리스 매니페스트 ==")
-    print(f"  {dist / REPO_MANIFEST_NAME}")
+    print(f"  {release_dir(dist) / REPO_MANIFEST_NAME}")
     print(f"    {plugin['InternalName']} {plugin['AssemblyVersion']} (Dalamud API {plugin['DalamudApiLevel']})")
-    print(f"  {dist / INSTALLER_MANIFEST_NAME}")
+    print(f"  {release_dir(dist) / INSTALLER_MANIFEST_NAME}")
     print(f"    {installer['AssetName']} {installer['InstallerVersion']}")
     print(f"    SHA-256 {installer['Sha256']}")
     return 0

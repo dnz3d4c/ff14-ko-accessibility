@@ -12,6 +12,7 @@
 """
 
 import json
+import shutil
 from pathlib import Path
 
 import pack_check
@@ -268,14 +269,21 @@ def test_항목이_둘이면_잡는다():
 # (2026-08-19). exe와 zip만 나가고 안내는 저장소에만 있었다.
 
 
-def make_dist(tmp_path, *, doc=True, manifests=True):
+def make_dist(tmp_path, *, doc=True, manifests=True, notes=True):
+    """받는 사람에게 그대로 주는 루트 셋 + 기계가 읽는 `release/` 셋."""
     (tmp_path / "FF14Accessibility.zip").write_bytes(b"")
     (tmp_path / "FF14AccessibilityInstaller-KR.exe").write_bytes(b"")
     if doc:
         (tmp_path / pack_check.GUIDE_NAME).write_text("안내", encoding="utf-8")
+
+    release = tmp_path / pack_check.RELEASE_DIR_NAME
+    release.mkdir(exist_ok=True)
     if manifests:
         for name in pack_check.RELEASE_MANIFESTS:
-            (tmp_path / name).write_text("{}", encoding="utf-8")
+            (release / name).write_text("{}", encoding="utf-8")
+        (release / pack_check.SETUP_ZIP_NAME).write_bytes(b"")
+    if notes:
+        (release / pack_check.RELEASE_NOTES_NAME).write_text("판", encoding="utf-8")
     return tmp_path
 
 
@@ -312,3 +320,54 @@ def test_릴리스_매니페스트가_빠지면_잡는다(tmp_path):
 def test_릴리스_매니페스트는_배포물로_센다(tmp_path):
     """있다고 "배포물이 아닌 것"으로 잡히면 패킹이 매번 걸린다."""
     assert pack_check.dist_layout_problems(make_dist(tmp_path)) == []
+
+
+# ── 루트는 사용자 것, release는 기계 것 ────────────────────────────────────
+#
+# 사용 안내가 "셋을 같은 폴더에 두고 실행합니다"라고 말하는 그 폴더가 dist
+# 루트다. 거기에 사람이 안 여는 파일이 섞이면 무엇을 눌러야 하는지 헷갈린다.
+
+
+def test_루트에_기계용_파일이_섞이면_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    (dist / "repo.json").write_text("{}", encoding="utf-8")
+    problems = pack_check.dist_layout_problems(dist)
+    assert any("repo.json" in p for p in problems)
+
+
+def test_release_폴더가_있다고_잡지_않는다(tmp_path):
+    """하위 폴더를 "배포물이 아닌 것"으로 세면 패킹이 매번 걸린다."""
+    assert pack_check.dist_layout_problems(make_dist(tmp_path)) == []
+
+
+def test_release_폴더가_통째로_없으면_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    shutil.rmtree(dist / pack_check.RELEASE_DIR_NAME)
+    problems = pack_check.dist_layout_problems(dist)
+    assert any(pack_check.RELEASE_DIR_NAME in p for p in problems)
+
+
+def test_릴리스_노트는_있어도_되고_없어도_된다(tmp_path):
+    """판마다 사람이 쓰는 것이라 여기서 요구하지 않는다.
+
+    `run\\pack.bat`은 노트를 쓰기 전에 도니까, 여기서 요구하면 그냥 빌드만
+    하려던 사람이 매번 걸린다. 없으면 낼 수 없다는 것은 `run\\release.bat`이
+    못박는다 - 거기가 맞는 자리다.
+    """
+    assert pack_check.dist_layout_problems(make_dist(tmp_path, notes=False)) == []
+    assert pack_check.dist_layout_problems(make_dist(tmp_path, notes=True)) == []
+
+
+def test_사용자용_아카이브가_빠지면_잡는다(tmp_path):
+    """받는 사람이 실제로 받는 것이다. 이게 없으면 릴리스에 올릴 것이 없다."""
+    dist = make_dist(tmp_path)
+    (dist / pack_check.RELEASE_DIR_NAME / pack_check.SETUP_ZIP_NAME).unlink()
+    problems = pack_check.dist_layout_problems(dist)
+    assert any(pack_check.SETUP_ZIP_NAME in p for p in problems)
+
+
+def test_release_폴더에_모르는_것이_있으면_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    (dist / pack_check.RELEASE_DIR_NAME / "메모.txt").write_text("x", encoding="utf-8")
+    problems = pack_check.dist_layout_problems(dist)
+    assert any("메모.txt" in p for p in problems)

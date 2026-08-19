@@ -47,6 +47,21 @@ GUIDE_NAME = "사용 안내.md"
 #: 그 도구의 `--check`가, 릴리스에 올라갔나는 `--release`가 잰다.
 RELEASE_MANIFESTS = ("repo.json", "installer.json")
 
+#: 사람이 안 여는 것이 들어가는 자리. `dist` 루트는 **받는 사람에게 그대로 줄
+#: 수 있는 폴더**로 두고 여기에 기계용을 내린다 - 사용 안내가 "셋을 같은 폴더에
+#: 두고 실행합니다"라고 말하는 그 폴더라, 거기 파일이 많으면 무엇을 눌러야
+#: 하는지 헷갈린다. 이름의 원천은 `tools/release-manifest`의 `RELEASE_DIR_NAME`이다.
+RELEASE_DIR_NAME = "release"
+
+#: 릴리스 노트. 사람이 쓰고, 받는 사람이 "이번에 뭐가 바뀌었나"를 읽는
+#: 유일한 자리다. `run\\release.bat`이 `--notes-file`로 넘긴다.
+RELEASE_NOTES_NAME = "release-notes.md"
+
+#: 받는 사람이 실제로 받는 것. `tools/release-manifest`가 `dist` 루트의 셋을
+#: 그대로 담아 만든다. 여기서는 나갈 자리에 있나만 본다 - 안에 무엇이 들었나는
+#: 그 도구의 `--check`가 잰다.
+SETUP_ZIP_NAME = "FF14Accessibility-KR-Setup.zip"
+
 #: Dalamud가 "공식 저장소에서 왔다"에 쓰는 값(`SpecialPluginSource.MainRepo`).
 #: 설치 프로그램이 **처음에 쓰는** 값이고, 설정에 저장소를 등록한 뒤 아래
 #: `KR_REPO_URL`로 옮긴다. 끝나고도 이 값이면 그 단계가 안 돈 것이다.
@@ -273,22 +288,45 @@ def dist_layout_problems(dist: Path) -> list[str]:
     자기 갱신과 커스텀 저장소가 통째로 죽는데, **받는 쪽은 그것을 오류가
     아니라 "새 판이 없다"로 읽는다.** 만드는 것은 `tools/release-manifest`고
     여기서는 나갈 자리에 있나만 본다.
+
+    **자리가 둘로 갈린다.** 루트는 받는 사람에게 그대로 주는 셋이고,
+    `release/`는 사람이 안 여는 것이다. 사용 안내가 "셋을 같은 폴더에 두고
+    실행합니다"라고 말하는 그 폴더가 루트라, 거기 파일이 많으면 무엇을
+    눌러야 하는지 헷갈린다.
     """
     problems = []
-    expected = {
+    root_expected = {
         f"{INTERNAL_NAME}.zip",
         "FF14AccessibilityInstaller-KR.exe",
         GUIDE_NAME,
-        *RELEASE_MANIFESTS,
     }
+    # 노트는 **있어도 되지만 여기서 요구하지는 않는다.** 판마다 사람이 쓰는
+    # 것이고 `run\\pack.bat`은 그 전에 돈다 - 여기서 요구하면 그냥 빌드만
+    # 하려던 사람이 매번 걸린다. 없으면 낼 수 없다는 것은 `run\\release.bat`이
+    # 못박는다.
+    release_required = {*RELEASE_MANIFESTS, SETUP_ZIP_NAME}
+    release_allowed = release_required | {RELEASE_NOTES_NAME}
+    release = dist / RELEASE_DIR_NAME
 
-    for name in sorted(expected):
+    for name in sorted(root_expected):
         if not (dist / name).is_file():
             problems.append(f"산출물이 없다: {dist / name}")
 
-    extra = sorted(p.name for p in dist.iterdir() if p.name not in expected)
+    # 하위 폴더는 "배포물이 아닌 것"이 아니다. 이름만 빼고 따로 본다.
+    extra = sorted(p.name for p in dist.iterdir() if p.name not in root_expected | {RELEASE_DIR_NAME})
     if extra:
-        problems.append(f"dist에 배포물이 아닌 것이 있다: {', '.join(extra)}")
+        problems.append(f"dist 루트에 받는 사람이 안 쓰는 것이 있다: {', '.join(extra)}")
+
+    if not release.is_dir():
+        return problems + [f"릴리스용 폴더가 없다: {release}"]
+
+    for name in sorted(release_required):
+        if not (release / name).is_file():
+            problems.append(f"산출물이 없다: {release / name}")
+
+    extra = sorted(p.name for p in release.iterdir() if p.name not in release_allowed)
+    if extra:
+        problems.append(f"{RELEASE_DIR_NAME}에 배포물이 아닌 것이 있다: {', '.join(extra)}")
 
     return problems
 

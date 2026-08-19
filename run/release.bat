@@ -14,6 +14,7 @@ rem 태그는 플러그인 버전이다. 설치 프로그램이 태그에서 v�
 rem 버전과 비교하기 때문이다(InstallerService.ChoosePluginSourceAsync).
 
 set "OUT=%REPO%\dist"
+set "RELOUT=%OUT%\release"
 set "GHREPO=dnz3d4c/ff14-ko-accessibility"
 
 echo == 릴리스 ==
@@ -23,8 +24,6 @@ for %%F in (
   "FF14AccessibilityInstaller-KR.exe"
   "FF14Accessibility.zip"
   "사용 안내.md"
-  "repo.json"
-  "installer.json"
 ) do (
   if not exist "%OUT%\%%~F" (
     echo [실패] 자산이 없다: %OUT%\%%~F
@@ -33,10 +32,24 @@ for %%F in (
   )
 )
 
+rem 기계만 읽는 것은 dist\release 에 있다. dist 루트는 받는 사람에게 그대로
+rem 주는 폴더라, 사람이 안 여는 파일을 거기 두지 않는다.
+for %%F in (
+  "FF14Accessibility-KR-Setup.zip"
+  "repo.json"
+  "installer.json"
+) do (
+  if not exist "%RELOUT%\%%~F" (
+    echo [실패] 자산이 없다: %RELOUT%\%%~F
+    echo   run\pack.bat 을 먼저 돌린다.
+    goto :fail
+  )
+)
+
 rem 릴리스 노트는 사람이 쓴다. 판마다 내용이 달라서 만들어 낼 수 없고,
 rem 받는 사람이 "이번에 뭐가 바뀌었나"를 읽는 유일한 자리다.
-if not exist "%OUT%\release-notes.md" (
-  echo [실패] 릴리스 노트가 없다: %OUT%\release-notes.md
+if not exist "%RELOUT%\release-notes.md" (
+  echo [실패] 릴리스 노트가 없다: %RELOUT%\release-notes.md
   echo   이번 판에서 바뀐 것을 한국어로 적고 다시 돌린다.
   goto :fail
 )
@@ -66,20 +79,23 @@ if errorlevel 1 (
 gh release view "%TAG%" --repo "%GHREPO%" > NUL 2>&1
 if errorlevel 1 (
   echo 새 릴리스를 만든다.
-  gh release create "%TAG%" --repo "%GHREPO%" --title "%TAG%" --notes-file "%OUT%\release-notes.md" ^
+  gh release create "%TAG%" --repo "%GHREPO%" --title "FF14 접근성 모드 (한국 서버용) %TAG%" --notes-file "%RELOUT%\release-notes.md" ^
+    "%RELOUT%\FF14Accessibility-KR-Setup.zip" ^
     "%OUT%\FF14AccessibilityInstaller-KR.exe" ^
     "%OUT%\FF14Accessibility.zip" ^
-    "%OUT%\repo.json" ^
-    "%OUT%\installer.json" ^
+    "%RELOUT%\repo.json" ^
+    "%RELOUT%\installer.json" ^
     "%TMPGUIDE%"
   if errorlevel 1 goto :fail
 ) else (
   echo 같은 태그가 이미 있다. 자산만 덮어쓴다.
+  gh release edit "%TAG%" --repo "%GHREPO%" --title "FF14 접근성 모드 (한국 서버용) %TAG%" > NUL
   gh release upload "%TAG%" --repo "%GHREPO%" --clobber ^
+    "%RELOUT%\FF14Accessibility-KR-Setup.zip" ^
     "%OUT%\FF14AccessibilityInstaller-KR.exe" ^
     "%OUT%\FF14Accessibility.zip" ^
-    "%OUT%\repo.json" ^
-    "%OUT%\installer.json" ^
+    "%RELOUT%\repo.json" ^
+    "%RELOUT%\installer.json" ^
     "%TMPGUIDE%"
   if errorlevel 1 goto :fail
 )

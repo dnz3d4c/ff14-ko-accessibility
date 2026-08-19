@@ -64,6 +64,21 @@ def make_exe(dist: Path) -> Path:
     return path
 
 
+def make_guide(dist: Path) -> Path:
+    """받는 폴더에 같이 나가는 안내 문서. 아카이브에도 이게 들어간다."""
+    path = dist / rm.GUIDE_NAME
+    path.write_text("사용 안내", encoding="utf-8")
+    return path
+
+
+def make_user_files(dist: Path) -> Path:
+    """`dist` 루트에 받는 사람이 쓰는 셋을 만든다."""
+    make_zip(dist)
+    make_exe(dist)
+    make_guide(dist)
+    return dist
+
+
 # ── 압축에서 읽기 ──────────────────────────────────────────────────────────
 
 
@@ -106,7 +121,7 @@ def test_압축_안_매니페스트가_JSON이_아니면_그렇게_말한다(tmp
 
 def test_dist_매니페스트가_깨졌으면_그렇게_말한다(tmp_path):
     dist = make_dist(tmp_path)
-    (dist / rm.INSTALLER_MANIFEST_NAME).write_text("{ 깨졌다", encoding="utf-8")
+    (rm.release_dir(dist) / rm.INSTALLER_MANIFEST_NAME).write_text("{ 깨졌다", encoding="utf-8")
     with pytest.raises(rm.ManifestError, match="못 읽었다"):
         rm.manifest_problems(dist, installer_version="1.1.0.0")
 
@@ -257,8 +272,7 @@ def test_진짜_PE에서는_버전을_읽는다():
 
 
 def make_dist(tmp_path) -> Path:
-    make_zip(tmp_path)
-    make_exe(tmp_path)
+    make_user_files(tmp_path)
     rm.write_manifests(tmp_path, installer_version="1.1.0.0")
     return tmp_path
 
@@ -270,7 +284,7 @@ def test_갓_만든_것은_통과한다(tmp_path):
 
 def test_해시가_실제_파일과_다르면_잡는다(tmp_path):
     dist = make_dist(tmp_path)
-    path = dist / rm.INSTALLER_MANIFEST_NAME
+    path = rm.release_dir(dist) / rm.INSTALLER_MANIFEST_NAME
     manifest = json.loads(path.read_text(encoding="utf-8"))
     manifest["Sha256"] = "0" * 64
     path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -295,12 +309,163 @@ def test_매니페스트가_아예_없으면_잡는다(tmp_path):
     assert any(rm.INSTALLER_MANIFEST_NAME in p for p in problems)
 
 
-def test_쓴_파일은_둘뿐이다(tmp_path):
-    """`dist`의 기존 산출물을 건드리지 않는다."""
+def test_루트에는_사용자가_쓸_것만_남는다(tmp_path):
+    """`dist` 루트는 **사용자에게 그대로 줄 수 있는 폴더**다.
+
+    사용 안내가 "셋을 같은 폴더에 두고 실행합니다"라고 말하는 그 폴더라,
+    기계만 읽는 파일이 섞이면 사용자가 무엇을 눌러야 하는지 헷갈린다.
+    """
     dist = make_dist(tmp_path)
     assert sorted(p.name for p in dist.iterdir()) == sorted(
-        [rm.ZIP_NAME, rm.INSTALLER_NAME, rm.REPO_MANIFEST_NAME, rm.INSTALLER_MANIFEST_NAME]
+        [*rm.USER_FILES, rm.RELEASE_DIR_NAME]
     )
+
+
+def test_매니페스트는_release_폴더에_만든다(tmp_path):
+    dist = make_dist(tmp_path)
+    assert sorted(p.name for p in rm.release_dir(dist).iterdir()) == sorted(
+        [rm.REPO_MANIFEST_NAME, rm.INSTALLER_MANIFEST_NAME, rm.SETUP_ZIP_NAME]
+    )
+
+
+def test_release_폴더가_없으면_만든다(tmp_path):
+    make_user_files(tmp_path)
+    assert not rm.release_dir(tmp_path).exists()
+    rm.write_manifests(tmp_path, installer_version="1.1.0.0")
+    assert (rm.release_dir(tmp_path) / rm.REPO_MANIFEST_NAME).is_file()
+
+
+# ── 사용자용 아카이브 ──────────────────────────────────────────────────────
+#
+# 사용자는 이 zip 하나만 받아 풀고 그 안의 exe를 실행하면 끝난다. 개별 자산은
+# 기계용으로 그대로 두고 이걸 하나 더 낸다.
+
+
+def test_사용자용_아카이브를_만든다(tmp_path):
+    dist = make_dist(tmp_path)
+    assert (rm.release_dir(dist) / rm.SETUP_ZIP_NAME).is_file()
+
+
+def test_아카이브를_풀면_폴더_하나에_셋이_있다(tmp_path):
+    dist = make_dist(tmp_path)
+    with zipfile.ZipFile(rm.release_dir(dist) / rm.SETUP_ZIP_NAME) as archive:
+        names = archive.namelist()
+
+    assert sorted(names) == sorted(f"{rm.SETUP_DIR_NAME}/{n}" for n in rm.USER_FILES)
+    # 푼 자리에 파일이 흩어지지 않고 폴더 하나로 들어간다.
+    assert {n.split("/")[0] for n in names} == {rm.SETUP_DIR_NAME}
+
+
+def test_아카이브_안_내용이_dist_루트의_그것이다(tmp_path):
+    """따로 만들지 않는다. 두 벌이 되면 갈린다."""
+    dist = make_dist(tmp_path)
+    with zipfile.ZipFile(rm.release_dir(dist) / rm.SETUP_ZIP_NAME) as archive:
+        packed = archive.read(f"{rm.SETUP_DIR_NAME}/{rm.ZIP_NAME}")
+    assert packed == (dist / rm.ZIP_NAME).read_bytes()
+
+
+def test_아카이브_이름과_안쪽_경로가_ASCII다(tmp_path):
+    """`gh`가 윈도에서 한글 이름을 삼킨 사고가 이미 났다."""
+    dist = make_dist(tmp_path)
+    with zipfile.ZipFile(rm.release_dir(dist) / rm.SETUP_ZIP_NAME) as archive:
+        names = archive.namelist()
+
+    rm.SETUP_ZIP_NAME.encode("ascii")
+    rm.SETUP_DIR_NAME.encode("ascii")
+    # 안에 든 `사용 안내.md`는 한글 그대로다 - 사용자가 푼 뒤에 보는 이름이다.
+    assert any(rm.GUIDE_NAME in n for n in names)
+
+
+def test_아카이브가_자산_목록에_있다():
+    assert rm.SETUP_ZIP_NAME in rm.RELEASE_ASSETS
+    assert len(rm.RELEASE_ASSETS) == 6
+
+
+def test_아카이브가_없으면_check가_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    (rm.release_dir(dist) / rm.SETUP_ZIP_NAME).unlink()
+    problems = rm.manifest_problems(dist, installer_version="1.1.0.0")
+    assert any(rm.SETUP_ZIP_NAME in p for p in problems)
+
+
+def test_아카이브에_파일이_빠지면_check가_잡는다(tmp_path):
+    dist = make_dist(tmp_path)
+    path = rm.release_dir(dist) / rm.SETUP_ZIP_NAME
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr(f"{rm.SETUP_DIR_NAME}/{rm.INSTALLER_NAME}", b"exe")
+
+    problems = rm.manifest_problems(dist, installer_version="1.1.0.0")
+    assert any(rm.ZIP_NAME in p for p in problems)
+
+
+def test_아카이브_폴더_구조가_틀리면_check가_잡는다(tmp_path):
+    """폴더 없이 담으면 푼 자리에 파일이 흩어진다."""
+    dist = make_dist(tmp_path)
+    path = rm.release_dir(dist) / rm.SETUP_ZIP_NAME
+    with zipfile.ZipFile(path, "w") as archive:
+        for name in rm.USER_FILES:
+            archive.writestr(name, b"x")
+
+    problems = rm.manifest_problems(dist, installer_version="1.1.0.0")
+    assert any(rm.SETUP_DIR_NAME in p for p in problems)
+
+
+# ── 옛 자리에 남은 매니페스트 ──────────────────────────────────────────────
+#
+# 옛 방식으로 한 번이라도 패킹한 작업 폴더에는 루트에 매니페스트가 남아 있고,
+# 그러면 `pack-check`이 "받는 사람이 안 쓰는 것"으로 잡아 패킹이 통째로 실패한다.
+# 새 자리에 쓰는 김에 옛 자리를 치운다.
+
+
+def test_루트에_남은_옛_매니페스트를_치운다(tmp_path):
+    make_user_files(tmp_path)
+    (tmp_path / rm.REPO_MANIFEST_NAME).write_text("옛것", encoding="utf-8")
+    (tmp_path / rm.INSTALLER_MANIFEST_NAME).write_text("옛것", encoding="utf-8")
+
+    rm.write_manifests(tmp_path, installer_version="1.1.0.0")
+
+    assert not (tmp_path / rm.REPO_MANIFEST_NAME).exists()
+    assert not (tmp_path / rm.INSTALLER_MANIFEST_NAME).exists()
+    assert (rm.release_dir(tmp_path) / rm.REPO_MANIFEST_NAME).is_file()
+
+
+def test_치울_것이_없어도_조용하다(tmp_path):
+    make_user_files(tmp_path)
+    rm.write_manifests(tmp_path, installer_version="1.1.0.0")
+    assert (rm.release_dir(tmp_path) / rm.INSTALLER_MANIFEST_NAME).is_file()
+
+
+# ── KR 표시 ────────────────────────────────────────────────────────────────
+#
+# 버전만 보면 원본 모드와 헷갈린다. 태그에는 못 넣는다 - `ChoosePluginSourceAsync`가
+# 태그에서 버전을 뽑아 비교하는데 `5.88.0.0-kr`은 `ParseVersionLoose`가 못 읽어서
+# 문자열 비교로 떨어지고, 그러면 최신을 깔고 있어도 실행할 때마다 다시 받는다.
+# 그래서 **사람이 읽는 자리에만** 넣는다.
+
+
+def test_플러그인_목록_이름에_한국_서버가_드러난다():
+    made = entry()
+    assert made["Name"] == rm.PLUGIN_DISPLAY_NAME
+    assert "한국" in made["Name"]
+
+
+def test_내부_이름은_안_건드린다():
+    """설치된 폴더 이름이자 갱신 대조 키다."""
+    assert entry()["InternalName"] == "FF14Accessibility"
+
+
+def test_표시_이름이_설치_프로그램_창_제목과_같은_말을_쓴다():
+    # 사용자가 실제로 듣는 이름이 `Loc.cs`의 `FF14 접근성 모드 ... 한국 서버`다.
+    assert "FF14 접근성 모드" in rm.PLUGIN_DISPLAY_NAME
+
+
+def test_경로를_두_곳에_안_박는다(tmp_path):
+    """만드는 자리와 다시 재는 자리가 같은 상수에서 나온다."""
+    dist = make_dist(tmp_path)
+    # `release_dir`이 가리키는 곳을 비우면 `--check`가 없다고 말해야 한다.
+    (rm.release_dir(dist) / rm.REPO_MANIFEST_NAME).unlink()
+    problems = rm.manifest_problems(dist, installer_version="1.1.0.0")
+    assert any(rm.REPO_MANIFEST_NAME in p for p in problems)
 
 
 # ── 릴리스를 다시 재기 ─────────────────────────────────────────────────────

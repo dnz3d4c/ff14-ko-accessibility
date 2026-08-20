@@ -13,9 +13,11 @@
 
 import json
 import shutil
+import subprocess
 from pathlib import Path
 
 import pack_check
+import pytest
 
 VERSION = "5.87.0.0"
 REPO = Path(__file__).resolve().parents[3]
@@ -194,6 +196,79 @@ def test_안_붙는_멤버만_뽑아_말한다():
 def test_고를_줄이_없으면_원문이라도_보여_준다():
     assert "터졌다" in pack_check.binding_detail("", "도구가 터졌다")
     assert pack_check.binding_detail("", "") == "(출력 없음)"
+
+
+# ── Dalamud 준비 완료 판정 ─────────────────────────────────────────────────
+#
+# **넷 중 셋은 정상 실행에서 안 생긴다.** 마커 없이 폴더만 있는 상태는 업데이터가
+# 아직 쓰는 중일 때이고, 2026-08-20에 설치 프로그램이 정확히 그 틈에 끼어들어
+# 플러그인을 먼저 깔았다(07:57:41 배치, 에셋은 07:57:46 도착). 조건을 인위로
+# 만들지 않으면 한 번도 안 태워지는 휴면 경로다.
+#
+# 판정을 파이썬으로 옮겨 적지 않고 **실물 EXE에 물어본다.** 옮겨 적으면 그게
+# 두 번째 사본이 되고, 사본은 조용히 갈라진다(`installer_seed_containers`가
+# 소스에서 씨앗을 읽는 것과 같은 이유다).
+
+INSTALLER_CSPROJ = (
+    REPO / "vendor" / "ff14-accessibility" / "Installer" / "FF14AccessibilityInstaller.csproj"
+)
+
+
+@pytest.fixture(scope="module")
+def installer_exe() -> Path:
+    """지금 소스에서 빌드한 설치 프로그램.
+
+    `dist/`의 것을 안 쓴다 - 그건 **마지막 패킹 시점의 것**이라, 판정을 고친
+    직후에 재면 낡은 바이너리를 재고 초록이 거짓말이 된다.
+    """
+    dotnet = pack_check.dotnet_path()
+    if not dotnet.is_file() or not INSTALLER_CSPROJ.is_file():
+        pytest.skip("dotnet SDK나 설치 프로그램 소스가 없다")
+
+    built = subprocess.run(
+        [str(dotnet), "build", "-c", "Release", str(INSTALLER_CSPROJ), "-v", "quiet", "--nologo"],
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    if built.returncode != 0:
+        pytest.fail(f"설치 프로그램 빌드 실패:\n{built.stdout}{built.stderr}")
+
+    # `publish\`는 제외한다. `run\pack.bat`이 거기에 배포용 EXE를 남기는데,
+    # 그건 방금 빌드한 것이 아니라 **마지막 패킹 시점의 것**이다. 실제로 그걸
+    # 집어서 옛 판정을 재고 있었다.
+    exes = [
+        exe
+        for exe in (INSTALLER_CSPROJ.parent / "bin" / "Release").rglob("*-KR.exe")
+        if "publish" not in exe.parts
+    ]
+    if not exes:
+        pytest.fail("빌드는 됐는데 EXE를 못 찾았다")
+    return max(exes, key=lambda exe: exe.stat().st_mtime)
+
+
+@pytest.mark.parametrize(
+    ("marker", "assets", "ready", "label"),
+    [
+        (False, False, False, "빈 Hooks 폴더만 - 옛 설치 잔재도 이 모양이다"),
+        (False, True, False, "마커 없이 에셋만"),
+        (True, False, False, "마커는 왔고 에셋이 아직 없다 - 실제로 겪은 상태"),
+        (True, True, True, "둘 다 있다"),
+    ],
+)
+def test_준비_완료_판정(installer_exe, tmp_path, marker, assets, ready, label):
+    root = tmp_path / "profile"
+    root.mkdir()
+    pack_check._seed_dalamud(root, marker=marker, assets=assets)
+
+    done = pack_check.run_check(installer_exe, root)
+    assert pack_check.dalamud_ready(done.stdout) is ready, f"{label}\n{done.stdout}"
+
+
+def test_판정_줄이_없으면_조용히_통과하지_않는다():
+    # 라벨이 바뀌면 위 넷이 전부 무의미해진다. 그때 예외로 죽어야 한다.
+    with pytest.raises(ValueError):
+        pack_check.dalamud_ready("[OK ] profile root  C:\\x")
 
 
 # ── dalamudConfig ──────────────────────────────────────────────────────────

@@ -386,6 +386,28 @@ def installer_seed_containers(repo: Path) -> set[str]:
     return {key for key, value in seed.items() if isinstance(value, dict)}
 
 
+def _seed_dalamud(root: Path, *, marker: bool = True, assets: bool = True) -> None:
+    """업데이터가 일을 마쳤을 때 남는 자취.
+
+    **폴더 하나로는 모자란다.** 설치 프로그램이 준비 완료로 보는 조건이
+    `addon\\Hooks` 존재였던 동안, 이 검사는 빈 폴더 하나로 통과하면서 실물에서
+    업데이터가 **아직 쓰는 중인** 상태를 한 번도 안 태웠다(2026-08-20 실측:
+    설치 프로그램이 07:57:41에 플러그인을 깔았는데 에셋은 07:57:46에 왔다).
+
+    `marker`·`assets`를 끄면 그 중간 상태를 만들 수 있다. 정상 실행에서는 안
+    생기는 조합이라 인위로만 만들어진다.
+    """
+    hooks = root / "addon" / "Hooks" / "15.0.0.0"
+    hooks.mkdir(parents=True, exist_ok=True)
+    if marker:
+        # 이름 셋이 아니라 `Dalamud.KR.*.Patch.json` 패턴이 기준이다. 하나만
+        # 만드는 것은 그 패턴이 개수에 안 기대는지도 같이 보기 때문이다.
+        (hooks / "Dalamud.KR.Compatibility.Patch.json").write_text("{}", encoding="utf-8")
+    if assets:
+        (root / "dalamudAssets").mkdir(parents=True, exist_ok=True)
+        (root / "dalamudAssets" / "asset.ver").write_text("437", encoding="utf-8")
+
+
 def _seed_profile(root: Path) -> None:
     """설치기가 "Dalamud가 있다"고 볼 만큼만 갖춘 가짜 프로필.
 
@@ -393,7 +415,7 @@ def _seed_profile(root: Path) -> None:
     한다.** 여기가 더 갖춰져 있으면 첫 설치가 겪는 상태를 한 번도 안 태운다 -
     `installer_seed_containers`가 그걸 지킨다.
     """
-    (root / "addon" / "Hooks" / "15.0.0.0").mkdir(parents=True)
+    _seed_dalamud(root)
     (root / "dalamudConfig.json").write_text(
         json.dumps(
             {
@@ -423,6 +445,38 @@ def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
         env=env,
         timeout=300,
     )
+
+
+#: `KrCheck.Run`이 준비 완료 판정을 내는 줄. `[OK ]`면 참, `[-- ]`면 거짓이다.
+READY_LABEL = "dalamud ready"
+
+
+def run_check(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
+    """`--check`를 가짜 프로필에 대고 돌린다.
+
+    `--bootstrap`이 아니라 `--check`인 것이 중요하다 - 이쪽은 읽기만 하고,
+    `--bootstrap`은 **사용자 환경변수 DALAMUD_RUNTIME을 실제로 쓴다**
+    (`KrCheck.cs`의 `EnsureRuntimeVariable`). 검사가 기계 설정을 건드리면 안 된다.
+    """
+    env = dict(os.environ)
+    env["FF14ACC_KR_PROFILE"] = str(root)
+    return subprocess.run(
+        [str(exe), "--check"],
+        capture_output=True,
+        text=True,
+        encoding=locale.getpreferredencoding(False),
+        errors="replace",
+        env=env,
+        timeout=120,
+    )
+
+
+def dalamud_ready(stdout: str) -> bool:
+    """`--check` 출력에서 준비 완료 판정만 골라낸다."""
+    for line in stdout.splitlines():
+        if READY_LABEL in line:
+            return line.lstrip().startswith("[OK ]")
+    raise ValueError(f"`--check` 출력에 `{READY_LABEL}` 줄이 없다:\n{stdout}")
 
 
 def binding_detail(stdout: str, stderr: str = "") -> str:

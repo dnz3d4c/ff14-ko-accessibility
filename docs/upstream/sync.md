@@ -103,11 +103,12 @@ run\sync.bat v5.87
 
 **여기까지가 도구의 몫이다.** 남는 것은 이 순서로 한다.
 
-1. 새 자리를 저장소에 기록한다 — git add vendor/ff14-accessibility
-2. 변경 이력을 한국어로 (§6)
-3. 골든 대조 (§7)
-4. `run\check.bat` — 테스트·vendor 기록·양쪽 빌드
-5. **인게임 확인 — 사용자 몫이다.** 기계는 여기까지 못 온다
+1. **csproj 둘의 KR 마디를 `0`으로 되돌린다.** 앞 마디가 올라갔으니 한국어판 개정 번호는 다시 시작이다. vendor에 커밋하고 미러에 민 다음에 2번을 한다 — 형식과 이유는 [release.md](../dev/release.md) §5
+2. 새 자리를 저장소에 기록한다 — git add vendor/ff14-accessibility
+3. 변경 이력을 한국어로 (§6)
+4. 골든 대조 (§7)
+5. `run\check.bat` — 테스트·vendor 기록·양쪽 빌드
+6. **인게임 확인 — 사용자 몫이다.** 기계는 여기까지 못 온다
 
 ### 5.3 안 얹힐 때
 
@@ -121,7 +122,7 @@ cd vendor/ff14-accessibility && git rebase --onto <새태그> <핀커밋> kr-por
 - 아니면 새 코드에 맞춰 고치고 `git rebase --continue`
 - **생성 커밋에서 멈췄으면 §5.4다.** 충돌을 풀지 않는다
 - 끝나면 `main`도 새 태그로 옮겨 둔다(`git branch -f main <새태그>`) — 도구가 만드는 것과 같은 배치다
-- 미러로 밀고(§5.2의 5와 같은 push), 핀을 옮긴 뒤 `git add vendor/ff14-accessibility`로 기록한다
+- 미러로 밀고(§5.2의 5와 같은 push), 핀을 옮긴 뒤 `git add vendor/ff14-accessibility`로 기록한다. 그 뒤 순서는 §5.2의 남은 것과 같고 **KR 마디를 `0`으로 되돌리는 것이 그 첫 단계다**
 
 **핀을 옮길 진입점이 이 갈래에는 없다.** 핀을 쓰는 것은 `upstream_sync.py`의 `write_pin` 하나인데, 그 함수를 부르는 곳은 `cmd_to`뿐이고 `--to`는 얹기가 실패하면 핀에 손대기 전에 끝난다. 그래서 **손으로 푼 뒤에 쓸 명령이 없다.** 손으로 rebase를 끝냈으면 `run\sync.bat <태그>`를 다시 돌려 본다 — 이미 얹혀 있으면 통과해서 핀까지 옮긴다. 그것도 안 되면 판의 W-59다. `upstream.json`을 편집기로 고치지 않는다(§2의 핀 조상 검사가 막는다).
 

@@ -79,13 +79,45 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 
 플러그인 매니페스트의 `AssemblyVersion`과 태그가 같아야 한다.
 
-## 5. 되살리면서 잡은 것 둘
+## 5. 버전은 네 마디 숫자다 — 네 번째가 한국어판 몫이다
+
+**마디를 다섯으로 만들거나 SemVer 접미사를 붙이면 갱신이 무한히 반복된다.** `ParseVersionLoose`(`Installer/InstallerService.cs:1740`)가 마디 다섯을 넘으면 `null`을 돌려주고, 그러면 `IsNewer`(1726행)가 문자열 비교로 떨어져 **같은 판을 새 판으로 보고 갱신을 계속 다시 권한다.** `tools/pack-check`의 `parse_version`(171행)과 `tools/release-manifest`의 `normalize_version`, 그리고 Dalamud도 같은 제약이다.
+
+그래서 `<Version>1.1.1-kr.1</Version>` 같은 표기는 **아무 효과가 없다.** PE에 실리는 것은 `AssemblyVersion`과 `FileVersion`이고, 자기 갱신이 대조하는 것도 그쪽이다(`release_manifest.file_version`).
+
+**업스트림은 세 번째·네 번째 마디를 안 쓴다.** 그 자리가 비어 있어서 네 번째를 한국어판 개정 번호로 쓴다.
+
+| 대상 | 형식 |
+|------|------|
+| 플러그인 | `<업스트림 major>.<minor>.0.<KR 개정>` |
+| 설치 프로그램 | `<업스트림 세 마디>.<KR 개정>` |
+
+- 업스트림 핀이 그대로면 KR 마디만 올린다
+- **핀을 옮기면 KR 마디를 `0`으로 되돌린다.** 앞 마디가 올라가므로 단조 증가가 안 깨진다
+- 업스트림 값이 우리 것보다 크면 그쪽을 따른다
+- **버전을 내리지 않는다.** 내리면 이미 깔린 쪽에서 갱신이 영영 안 뜬다
+
+고칠 자리는 csproj 둘이고 각각 `Version`·`AssemblyVersion`·`FileVersion` 셋이다. 압축 안의 `FF14Accessibility.json`과 vendor의 `repo.json`은 **빌드가 덮는 템플릿이라 손대지 않는다** — 값이 맞는지는 빌드한 뒤 `dist\release\repo.json`에서 확인한다.
+
+`Plugin.cs`의 `PluginVersion` 상수는 별개다. TTS로 발화되는 값이고 업스트림 major.minor를 따라간다 — 네 번째 마디는 거기 안 들어간다.
+
+### 5-1. 안 올리고 내면 침묵한다
+
+**산출물이 바뀌었는데 버전이 그대로면 받는 쪽은 갱신을 아예 안 본다.** 설치 프로그램의 `IsNewer`도 Dalamud도 버전만 보므로 오류가 아니고, 내는 사람 화면에도 안 남는다. 그래서 `run\release.bat`이 자산을 올리기 직전에 막는다.
+
+uv run --no-project python tools/release-manifest/release_manifest.py --check-bump
+
+제일 최근 릴리스의 매니페스트 둘을 받아 `dist\release`의 것과 대조한다. **둘 다 같으면 실패**고, 하나라도 내려가면 실패, 하나라도 오르면 통과, 릴리스가 하나도 없으면 통과다.
+
+**노트만 고치는 갈래는 안 막는다** — `gh release edit`이 검사보다 앞에서 끝난다. 같은 판을 그대로 다시 올려야 하면 `FF14_RELEASE_SAME_VERSION=1`을 걸고 부른다.
+
+## 6. 되살리면서 잡은 것 둘
 
 **저장소 주소가 업스트림을 가리키고 있었다.** `AccessibilityRepoOwner`가 `derbruedi` 그대로였다. 그냥 켰으면 사용자에게 **글로벌 빌드**를 내려보냈을 것이고, 그건 적재는 되고 첫 장비세트 호출에서 죽는다([kr-runtime.md](kr-runtime.md) §7의 그 사고와 같다).
 
 **무인 설치가 자기를 갈아치울 뻔했다.** `--install`은 모든 물음에 예로 답하므로, 검사 때마다 160MB를 받아 **검사 대상 바이너리를 릴리스 것으로 바꿔** 놓는다. `SkipSelfUpdate`로 갈랐다. 같은 이유로 `SkipReleaseCheck`도 있다 — `tools/pack-check`는 **방금 빌드한 산출물**을 재는 것이라, 설치 프로그램이 릴리스를 대신 받으면 두 단계가 같은 파일을 안 보게 된다.
 
-## 6. 플러그인 zip은 두 곳에서 온다
+## 7. 플러그인 zip은 두 곳에서 온다
 
 옆에 있는 빌드와 릴리스 중 **버전이 높은 쪽**을 쓴다.
 
@@ -93,6 +125,6 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 
 네트워크가 없으면 옆엣것으로 그냥 간다 — **오류가 아니다.**
 
-## 7. 아직 없는 것
+## 8. 아직 없는 것
 
 **받는 것에 무결성 검사가 없다** (현황판 W-50). 설치 프로그램 EXE에는 SHA-256이 있는데 플러그인 zip·KR 달라무드 업데이터·vnavmesh에는 없다. `repo.json`에 해시를 실을 자리는 이미 있다.

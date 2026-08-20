@@ -215,9 +215,11 @@ def facts(repo: Path = REPO) -> dict[str, int]:
 #: (문서, 사실 이름, 정규식). 정규식은 숫자 한 자리를 잡는 그룹이 하나여야 하고,
 #: **문서에서 정확히 한 번** 걸려야 한다.
 CITATIONS: tuple[tuple[str, str, str], ...] = (
-    # 루트 README는 프로젝트 소개라 골든 쌍 같은 내부 수치를 안 적는다. 그 값은
-    # 판(status.md)과 ko-localization 스킬, overlay/patches/README.md가 갖는다.
-    ("README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
+    # 개발 안내는 저장소 설비를 적는 자리라 골든 쌍 같은 번역 수치는 안 적는다.
+    # 그 값은 판(status.md)과 ko-localization 스킬, overlay/patches/README.md가
+    # 갖는다. 이 문장은 2026-08-20까지 루트 `README.md` 7장에 있었고, 그 장이
+    # 통째로 여기로 옮겨 왔다 - 경로를 같이 안 고쳤으면 검사가 그 자리에서 죽는다.
+    ("docs/dev/README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
     ("docs/dev/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
     ("docs/status.md", "골든 쌍", r"`AccessibilityStrings` 삼항 \| (\d+)쌍"),
     ("docs/status.md", "골든 고유 쌍", r"삼항 \| \d+쌍\(고유 (\d+)\)"),

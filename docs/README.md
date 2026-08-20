@@ -8,6 +8,7 @@
 
 ## dev/ — 세우고 만드는 것
 
+- [README.md](dev/README.md) — **개발 안내.** 저장소가 무엇을 담고, 클론 직후 무엇을 하고, 어떤 검사가 도는지. 아래 넷으로 들어가는 입구다
 - [environment.md](dev/environment.md) — 경로·버전·빌드 함정. KR 클라이언트와 글로벌이 갈리는 자리
 - [kr-runtime.md](dev/kr-runtime.md) — KR 실행 환경을 손으로 세우는 절차. 설치 프로그램이 이 절차를 대신한다
 - [release.md](dev/release.md) — **내는 절차.** 릴리스 자산, 태그 규약, 그리고 **공개 전환과 첫 릴리스의 순서.** 순서를 틀리면 오류가 안 나고 받는 사람 화면에서만 이상해진다

@@ -26,12 +26,12 @@
     {
       "de": " Enter blättert weiter.",
       "en": " Press Enter to continue.",
-      "ko": " 엔터를 누르면 다음 쪽으로 넘어간다."
+      "ko": " 엔터는 페이지 넘기기."
     },
     {
       "de": " Enter schließt.",
       "en": " Press Enter to close.",
-      "ko": " 엔터로 닫는다."
+      "ko": " 엔터는 닫기."
     },
     {
       "de": " Erholungsbonus für {percent} Prozent einer Stufe.",
@@ -61,7 +61,7 @@
     {
       "de": " Nummernblock 3 läuft zum Übergang.",
       "en": " Numpad 3 walks to the transition.",
-      "ko": " 숫자패드 3을 누르면 통로로 간다."
+      "ko": " 숫자패드 3은 통로로 이동."
     },
     {
       "de": " Seite {current} von {total}.",
@@ -176,7 +176,7 @@
     {
       "de": ". Enter beginnt.",
       "en": ". Press Enter to begin.",
-      "ko": ". 엔터로 시작한다."
+      "ko": ". 엔터는 시작."
     },
     {
       "de": ". Übung: {exercise}",
@@ -221,7 +221,7 @@
     {
       "de": "Aktives Fenster: {name}. {visibleCount} Fenster sichtbar, Liste im Log.",
       "en": "Active window: {name}. {visibleCount} windows visible, list written to log.",
-      "ko": "초점 창: {name}. 보이는 창 {visibleCount}개, 전체 목록은 로그에 적힘."
+      "ko": "초점 받은 창: {name}. 보이는 창 {visibleCount}개, 전체 목록은 로그에 적힘."
     },
     {
       "de": "Aktiviere: {text}",
@@ -261,7 +261,7 @@
     {
       "de": "Allgemeine Aktionen, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
       "en": "General actions, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back.",
-      "ko": "일반 기술, 항목 {count}개. 숫자패드 8과 2로 넘기고, 4 또는 6으로 목록을 바꾸고, 숫자패드 0으로 고르고, 숫자패드 마침표로 돌아간다."
+      "ko": "일반 기술, 항목 {count}개. 숫자패드 8과 2는 항목 이동, 4와 6은 목록 전환, 0은 선택, 마침표는 뒤로."
     },
     {
       "de": "Allianz",
@@ -306,7 +306,7 @@
     {
       "de": "Angelplätze: {count} im Gebiet.",
       "en": "Fishing spots: {count} in this area.",
-      "ko": "이 지역에 낚시터 {count}곳."
+      "ko": "낚시터, 이 지역 {count}곳"
     },
     {
       "de": "Angezielt.",
@@ -476,7 +476,7 @@
     {
       "de": "Benachrichtigung. Mit {key} annehmen.",
       "en": "Notification. Press {key} to accept.",
-      "ko": "알림. {key} 눌러 수락한다."
+      "ko": "알림. {key}는 수락."
     },
     {
       "de": "Berechne Weg zu {name}.",
@@ -821,7 +821,7 @@
     {
       "de": "Enter öffnet das Hauptmenü. Strg+F1 sagt diese Hilfe erneut an.",
       "en": "Press Enter to open the main menu. Press Ctrl+F1 to hear this help again.",
-      "ko": "엔터를 누르면 주 메뉴가 열린다. 컨트롤 F1로 이 도움말을 다시 듣는다."
+      "ko": "엔터는 주 메뉴 열기, 컨트롤 F1은 도움말 다시 듣기."
     },
     {
       "de": "Entnehmen",
@@ -846,12 +846,12 @@
     {
       "de": "FATEs: {active} aktiv, {preparing} starten gleich.",
       "en": "FATEs: {active} active, {preparing} starting soon.",
-      "ko": "돌발 임무: 이 지역에 진행 중 {active}개, 곧 시작 {preparing}개."
+      "ko": "돌발 임무, 이 지역 진행 중 {active}개, 곧 시작 {preparing}개"
     },
     {
       "de": "FATEs: {active} aktiv.",
       "en": "FATEs: {active} active.",
-      "ko": "돌발 임무: 이 지역에 진행 중 {active}개."
+      "ko": "돌발 임무, 이 지역 진행 중 {active}개"
     },
     {
       "de": "FC",
@@ -976,7 +976,7 @@
     {
       "de": "Freibriefe: {givers} Geber, {goals} Ziele.",
       "en": "Levequests: {givers} givers, {goals} goals.",
-      "ko": "길드 의뢰: 의뢰인 {givers}명, 목표 지점 {goals}곳."
+      "ko": "길드 의뢰, 의뢰인 {givers}명, 목표 지점 {goals}곳"
     },
     {
       "de": "Freie Gesellschaft",
@@ -1021,7 +1021,7 @@
     {
       "de": "Gamepad-Kalibrierung. Escape zum Schließen.",
       "en": "Gamepad calibration. Press Escape to close.",
-      "ko": "게임패드 보정. 이스케이프로 닫는다."
+      "ko": "게임패드 보정. 이스케이프는 닫기."
     },
     {
       "de": "Ganze Gruppe vorlesen",
@@ -1041,7 +1041,7 @@
     {
       "de": "Gegenstand abliefern. Drücke Strg F3 für die passenden Gegenstände, dann auswählen und Übergeben.",
       "en": "Hand over item. Press Ctrl F3 for the matching items, then select and Hand Over.",
-      "ko": "아이템 건네주기. 컨트롤 F3을 누르면 맞는 아이템이 나온다. 고른 다음 건네주기를 누른다."
+      "ko": "아이템 건네주기. 컨트롤 F3은 맞는 아이템 찾기, 고른 다음 건네주기 누르기."
     },
     {
       "de": "Gegenstand {id}",
@@ -1056,7 +1056,7 @@
     {
       "de": "Gegenstände, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
       "en": "Items, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back.",
-      "ko": "아이템, 항목 {count}개. 숫자패드 8과 2로 넘기고, 4 또는 6으로 목록을 바꾸고, 숫자패드 0으로 고르고, 숫자패드 마침표로 돌아간다."
+      "ko": "아이템, 항목 {count}개. 숫자패드 8과 2는 항목 이동, 4와 6은 목록 전환, 0은 선택, 마침표는 뒤로."
     },
     {
       "de": "Gegner",
@@ -1296,12 +1296,12 @@
     {
       "de": "Jagdziele: {total} offen, keines in diesem Gebiet.",
       "en": "Hunting targets: {total} open, none in this area.",
-      "ko": "토벌 대상: 남은 것 {total}종. 이 지역에는 없음."
+      "ko": "토벌 대상, 남은 것 {total}종, 이 지역 없음"
     },
     {
       "de": "Jagdziele: {total} offen, {here} in diesem Gebiet.",
       "en": "Hunting targets: {total} open, {here} in this area.",
-      "ko": "토벌 대상: 남은 것 {total}종, 그중 이 지역에 {here}종."
+      "ko": "토벌 대상, 남은 것 {total}종, 그중 이 지역 {here}종"
     },
     {
       "de": "Job: ",
@@ -1376,7 +1376,7 @@
     {
       "de": "Kein Angelplatz nah genug. Nächster: {name}, {distance:F0} Meter. Stell dich an die Angelstelle und drück erneut.",
       "en": "No fishing spot close enough. Nearest: {name}, {distance:F0} meters. Stand at the fishing spot and press again.",
-      "ko": "충분히 가까운 낚시터 없음. 가장 가까운 곳: {name}, {distance:F0}미터. 낚시 자리에 서서 다시 누른다."
+      "ko": "충분히 가까운 낚시터 없음. 가장 가까운 곳: {name}, {distance:F0}미터. 낚시 자리에 서서 다시 시도 필요."
     },
     {
       "de": "Kein Aussehen-Fenster offen. Nur im Schritt Aussehen der Charaktererschaffung.",
@@ -1386,12 +1386,12 @@
     {
       "de": "Kein Emote gewählt. Erst durchblättern.",
       "en": "No emote selected. Browse first.",
-      "ko": "고른 감정 표현 없음. 먼저 넘겨서 고른다."
+      "ko": "고른 감정 표현 없음. 먼저 항목 이동으로 선택 필요."
     },
     {
       "de": "Kein Fenster fokussiert. {visibleCount} Fenster sichtbar, Liste im Log.",
       "en": "No window focused. {visibleCount} windows visible, list written to log.",
-      "ko": "초점이 놓인 창 없음. 보이는 창 {visibleCount}개, 전체 목록은 로그에 적힘."
+      "ko": "초점 받은 창 없음. 보이는 창 {visibleCount}개, 전체 목록은 로그에 적힘."
     },
     {
       "de": "Kein Flüster-Partner zum Antworten.",
@@ -1406,7 +1406,7 @@
     {
       "de": "Kein Plugin gewählt. Erst durchblättern.",
       "en": "No plugin selected. Browse first.",
-      "ko": "고른 플러그인 없음. 먼저 넘겨서 고른다."
+      "ko": "고른 플러그인 없음. 먼저 항목 이동으로 선택 필요."
     },
     {
       "de": "Kein Rezept ausgewählt.",
@@ -1416,7 +1416,7 @@
     {
       "de": "Kein Skill gewählt. Erst mit dem Skill-Browser blättern.",
       "en": "No skill selected. Browse with the skill browser first.",
-      "ko": "고른 기술 없음. 먼저 기술 목록에서 고른다."
+      "ko": "고른 기술 없음. 먼저 기술 목록에서 선택 필요."
     },
     {
       "de": "Kein Tiefes Gewölbe.",
@@ -1431,7 +1431,7 @@
     {
       "de": "Kein Weg aktiv. Erst ein Ziel wählen.",
       "en": "No route active. Pick a destination first.",
-      "ko": "진행 중인 경로 없음. 먼저 목적지를 고른다."
+      "ko": "진행 중인 경로 없음. 먼저 목적지 설정 필요."
     },
     {
       "de": "Kein Weg gefunden, führe in Luftlinie.{hint}",
@@ -1461,22 +1461,22 @@
     {
       "de": "Kein Ziel gesetzt. Erst mit Bild ab ein Objekt wählen.",
       "en": "No target set. Select an object with Page Down first.",
-      "ko": "대상이 정해지지 않음. 먼저 페이지 다운으로 사물을 고른다."
+      "ko": "대상이 정해지지 않음. 먼저 페이지 다운으로 사물 선택 필요."
     },
     {
       "de": "Kein Ziel gewählt. Erst ein Ziel anvisieren oder im Objekt-Browser auswählen.",
       "en": "No destination selected. Target something first, or pick it in the object browser.",
-      "ko": "고른 목적지 없음. 먼저 대상을 지정하거나 사물 목록에서 고른다."
+      "ko": "고른 목적지 없음. 먼저 대상 지정이나 사물 목록에서 선택 필요."
     },
     {
       "de": "Kein Ziel zum Folgen. Erst ein Ziel anwählen.",
       "en": "No target to follow. Select a target first.",
-      "ko": "따라갈 대상 없음. 먼저 대상을 지정한다."
+      "ko": "따라갈 대상 없음. 먼저 대상 지정 필요."
     },
     {
       "de": "Kein Ziel. Erst mit Bild ab ein Objekt wählen.",
       "en": "No target. Select an object with Page Down first.",
-      "ko": "대상 없음. 먼저 페이지 다운으로 사물을 고른다."
+      "ko": "대상 없음. 먼저 페이지 다운으로 사물 선택 필요."
     },
     {
       "de": "Kein aktives Addon für Dump gefunden.",
@@ -1546,7 +1546,7 @@
     {
       "de": "Keine Freibriefe. Erst bei einem Freibrief-Geber annehmen.",
       "en": "No levequests. Accept one from a levemete first.",
-      "ko": "길드 의뢰 없음. 먼저 의뢰인에게서 받는다."
+      "ko": "길드 의뢰 없음. 먼저 의뢰인에게서 수령 필요."
     },
     {
       "de": "Keine Handkarten mehr.",
@@ -1561,7 +1561,7 @@
     {
       "de": "Keine Koordinaten in der Zwischenablage gefunden. Erst die Zahlen kopieren, dann die Taste drücken.",
       "en": "No coordinates found on the clipboard. Copy the numbers first, then press the key.",
-      "ko": "클립보드에 좌표가 없음. 먼저 숫자를 복사한 다음 키를 누른다."
+      "ko": "클립보드에 좌표가 없음. 먼저 숫자 복사 필요."
     },
     {
       "de": "Keine Monster in dieser Liste.",
@@ -1581,7 +1581,7 @@
     {
       "de": "Keine Quest-Ziele. Erst eine Quest annehmen.",
       "en": "No quest goals. Accept a quest first.",
-      "ko": "퀘스트 목표 없음. 먼저 퀘스트를 받는다."
+      "ko": "퀘스트 목표 없음. 먼저 퀘스트 수령 필요."
     },
     {
       "de": "Keine Raumdaten.",
@@ -1616,7 +1616,7 @@
     {
       "de": "Keine Ziel-Taste gewählt. Erst die Ziel-Taste wählen.",
       "en": "No target slot selected. Select the target slot first.",
-      "ko": "배정할 키를 안 골랐음. 먼저 배정할 키를 고른다."
+      "ko": "배정할 키를 안 골랐음. 먼저 배정할 키 선택 필요."
     },
     {
       "de": "Keine andere Liste verfügbar.",
@@ -1921,12 +1921,12 @@
     {
       "de": "Pfeil hoch und runter zum Wechseln, Enter zum Bestätigen, Escape zurück, Strg+F1 für Hilfe.",
       "en": "Use up and down arrow keys to move, Enter to confirm, Escape to go back, Ctrl+F1 for help.",
-      "ko": "위아래 화살표로 항목 사이를 옮겨 다니고, 엔터로 확인하고, 이스케이프로 돌아간다. 컨트롤 F1은 도움말."
+      "ko": "위아래 화살표는 항목 이동, 엔터는 확인, 이스케이프는 뒤로, 컨트롤 F1은 도움말."
     },
     {
       "de": "Pfeile hoch und runter wechseln Option. Links und rechts ändern Wert oder Tab. Enter speichert, Escape verwirft, Strg+F1 für Hilfe.",
       "en": "Up and down arrows move between options. Left and right change value or tab. Enter saves, Escape discards, Ctrl+F1 for help.",
-      "ko": "위아래 화살표로 다른 항목으로 옮겨 간다. 좌우 화살표로 값이나 탭을 바꾼다. 엔터는 저장, 이스케이프는 취소, 컨트롤 F1은 도움말."
+      "ko": "위아래 화살표는 항목 이동, 좌우 화살표는 값이나 탭 변경, 엔터는 저장, 이스케이프는 취소, 컨트롤 F1은 도움말."
     },
     {
       "de": "Plugin-Liste nicht verfügbar.",
@@ -1976,12 +1976,12 @@
     {
       "de": "Quest-Gegenstand zum Benutzen: {joined}. Mit Strg und Nummernblock 0 auf die Leiste legen.",
       "en": "Usable quest item: {joined}. Put it on a bar with Ctrl and Numpad 0.",
-      "ko": "쓸 수 있는 퀘스트 아이템: {joined}. 컨트롤과 숫자패드 0으로 단축바에 올린다."
+      "ko": "쓸 수 있는 퀘스트 아이템: {joined}. 컨트롤과 숫자패드 0은 단축바에 올리기."
     },
     {
       "de": "Quest-Gegenstände, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
       "en": "Quest items, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back.",
-      "ko": "퀘스트 아이템, 항목 {count}개. 숫자패드 8과 2로 넘기고, 4 또는 6으로 목록을 바꾸고, 숫자패드 0으로 고르고, 숫자패드 마침표로 돌아간다."
+      "ko": "퀘스트 아이템, 항목 {count}개. 숫자패드 8과 2는 항목 이동, 4와 6은 목록 전환, 0은 선택, 마침표는 뒤로."
     },
     {
       "de": "Quest-Gegner",
@@ -2056,7 +2056,7 @@
     {
       "de": "Reittiere, {count} Einträge. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
       "en": "Mounts, {count} entries. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back.",
-      "ko": "탈것, 항목 {count}개. 숫자패드 8과 2로 넘기고, 4 또는 6으로 목록을 바꾸고, 숫자패드 0으로 고르고, 숫자패드 마침표로 돌아간다."
+      "ko": "탈것, 항목 {count}개. 숫자패드 8과 2는 항목 이동, 4와 6은 목록 전환, 0은 선택, 마침표는 뒤로."
     },
     {
       "de": "Ring",
@@ -2186,7 +2186,7 @@
     {
       "de": "Skill-Zuweisung, {count} Skills. Nummernblock 8 und 2 blättern, 4 oder 6 wechselt die Liste, Nummernblock 0 wählt, Nummernblock Komma zurück.",
       "en": "Skill assignment, {count} skills. Numpad 8 and 2 to browse, 4 or 6 switches the list, Numpad 0 selects, Numpad decimal to go back.",
-      "ko": "기술 배정, 기술 {count}개. 숫자패드 8과 2로 넘기고, 4 또는 6으로 목록을 바꾸고, 숫자패드 0으로 고르고, 숫자패드 마침표로 돌아간다."
+      "ko": "기술 배정, 기술 {count}개. 숫자패드 8과 2는 항목 이동, 4와 6은 목록 전환, 0은 선택, 마침표는 뒤로."
     },
     {
       "de": "Slot {slot}",
@@ -2451,7 +2451,7 @@
     {
       "de": "Verlosungs-Fenster im Fokus. Mit dem Nummernblock auswählen.",
       "en": "Loot roll window focused. Use the numpad to choose.",
-      "ko": "전리품 입찰 창에 초점. 숫자패드로 고른다."
+      "ko": "전리품 입찰 창이 초점 받음. 숫자패드는 선택."
     },
     {
       "de": "Version {version}",
@@ -2511,12 +2511,12 @@
     {
       "de": "Wegenetz ist noch nicht bereit. Gleich nochmal versuchen.",
       "en": "Navmesh is not ready yet. Try again shortly.",
-      "ko": "길 정보가 아직 준비 안 됨. 잠시 뒤 다시 해라."
+      "ko": "길 정보가 아직 준비 안 됨. 잠시 뒤 다시 시도 필요."
     },
     {
       "de": "Wegenetz lädt noch, {percent:F0} Prozent. Gleich nochmal versuchen.",
       "en": "Navmesh still loading, {percent:F0} percent. Try again shortly.",
-      "ko": "길 정보 불러오는 중, {percent:F0} 퍼센트. 잠시 뒤 다시 해라."
+      "ko": "길 정보 불러오는 중, {percent:F0} 퍼센트. 잠시 뒤 다시 시도 필요."
     },
     {
       "de": "Wegenetz wird geladen.",
@@ -2536,7 +2536,7 @@
     {
       "de": "Wegfindung läuft schon. Gleich nochmal versuchen.",
       "en": "Pathfinding is already running. Try again shortly.",
-      "ko": "경로 찾기가 이미 진행 중. 잠시 뒤 다시 해라."
+      "ko": "경로 찾기가 이미 진행 중. 잠시 뒤 다시 시도 필요."
     },
     {
       "de": "Wegpunkt- und Ankunftston",
@@ -2551,12 +2551,12 @@
     {
       "de": "Wegpunkte: {count} im Gebiet, davon {exits} Übergänge.",
       "en": "Waypoints: {count} in this area, {exits} of them exits.",
-      "ko": "이 지역에 경유지 {count}곳, 그중 다른 지역으로 넘어가는 통로 {exits}곳."
+      "ko": "경유지, 이 지역 {count}곳, 그중 다른 지역으로 넘어가는 통로 {exits}곳"
     },
     {
       "de": "Wegpunkte: {count} im Gebiet.",
       "en": "Waypoints: {count} in this area.",
-      "ko": "이 지역에 경유지 {count}곳."
+      "ko": "경유지, 이 지역 {count}곳"
     },
     {
       "de": "Weiter komme ich nicht, hier endet der begehbare Weg. Noch {MetersRemaining(distance)} nach {direction}.",
@@ -2996,7 +2996,7 @@
     {
       "de": "{confirm} oder {cancel}? Links und rechts wechseln, Enter wählt aus.",
       "en": "{confirm} or {cancel}? Left and right to switch, Enter to select.",
-      "ko": "{confirm} 또는 {cancel}? 좌우 방향키로 고르고 엔터로 확정한다."
+      "ko": "{confirm} 또는 {cancel}? 좌우 방향키는 선택, 엔터는 확정."
     },
     {
       "de": "{count} Angelplätze: {joined}.",
@@ -3121,17 +3121,17 @@
     {
       "de": "{label}: {count} in der Nähe.",
       "en": "{label}: {count} nearby.",
-      "ko": "근처에 {label} {count}."
+      "ko": "{label}, 근처 {count}"
     },
     {
       "de": "{label}: {here} im Gebiet, {away} in anderen Gebieten.",
       "en": "{label}: {here} in this area, {away} in other areas.",
-      "ko": "이 지역에 {label} {here}, 다른 지역에 {away}."
+      "ko": "{label}, 이 지역 {here}, 다른 지역 {away}"
     },
     {
       "de": "{label}: {here} im Gebiet.",
       "en": "{label}: {here} in this area.",
-      "ko": "이 지역에 {label} {here}."
+      "ko": "{label}, 이 지역 {here}"
     },
     {
       "de": "{level}, nicht tragbar, {reason}",
@@ -3286,7 +3286,7 @@
     {
       "de": "{skillName} gewählt. Ziel-Taste wählen, {count} verfügbar. Nummernblock 8 und 2 blättern, Nummernblock 0 belegt, Nummernblock Komma zurück.",
       "en": "{skillName} selected. Choose a target key, {count} available. Numpad 8 and 2 to browse, Numpad 0 assigns, Numpad decimal to go back.",
-      "ko": "{skillName} 선택됨. 대상 키를 고른다. 고를 수 있는 키 {count}개. 숫자패드 8과 2로 넘기고, 숫자패드 0으로 배정하고, 숫자패드 마침표로 돌아간다."
+      "ko": "{skillName} 선택됨. 배정할 키 선택. 고를 수 있는 키 {count}개. 숫자패드 8과 2는 항목 이동, 0은 배정, 마침표는 뒤로."
     },
     {
       "de": "{slotLabel}, aktuell {current}, {index} von {count}",
@@ -3331,7 +3331,7 @@
     {
       "de": "Ätheryten: {count} im Gebiet.",
       "en": "Aetherytes: {count} in this area.",
-      "ko": "이 지역에 에테라이트 {count}곳."
+      "ko": "에테라이트, 이 지역 {count}곳"
     },
     {
       "de": "Übergang abgebrochen - die Übergangsstelle wurde nicht erreicht.",

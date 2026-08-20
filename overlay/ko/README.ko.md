@@ -82,7 +82,7 @@ https://github.com/dnz3d4c/ff14-ko-accessibility/releases/latest 에서 최신 �
 - `vnavmesh 플러그인을 설치하지 않아도 자동 이동을 제외한 나머지 기능은 동작합니다.`
 - `vnavmesh를 설치하시겠습니까?`
 
-[예]를 실행하면 플러그인을 설치합니다. [아니오]를 고르면 `vnavmesh 설치하지 않습니다. 건너뛰었습니다.`가 남습니다.
+[예]를 실행하면 플러그인을 설치합니다. [아니오]를 고르면 `vnavmesh를 건너뛰었습니다.`가 남습니다.
 
 #### ⑥ 업데이터에서 [업데이트 확인] 누르기
 
@@ -139,7 +139,7 @@ vnavmesh도 설치했다면 아래를 붙여넣어 열리는 폴더에서 `vnavm
 
 #### ② Dalamud까지 삭제하기
 
-아래 폴더를 삭제하면 KR Dalamud와 설치된 플러그인이 함께 지워집니다.
+**다른 Dalamud 플러그인을 사용하고 있으면 이 단계는 진행하지 않습니다.** 아래 폴더를 삭제하면 KR Dalamud와 함께 설치된 플러그인이 모두 지워집니다.
 
 %APPDATA%\XIVLauncherKR
 
@@ -422,9 +422,13 @@ KR Dalamud 업데이터까지 삭제하려면 아래 폴더도 삭제합니다.
 
 진행 상황 영역에 아래 같은 줄이 남았다면 설치 프로그램이 인터넷에서 업데이터를 가져오지 못한 것입니다.
 
-- `GitHub에 연결하지 못했습니다: ...`
-- `GitHub 응답이 없습니다.`
-- `최신 버전에 "Portable" 압축이 없습니다.`
+- `GitHub에 연결하지 못했습니다: ... 업데이터는 직접 받아야 합니다.`
+- `GitHub 응답이 없습니다. 업데이터는 직접 받아야 합니다.`
+- `최신 버전에 "Portable" 압축이 없습니다. 업데이터는 직접 받아야 합니다.`
+
+앞의 둘은 잠시 뒤에 설치 프로그램을 다시 실행하면 대개 해결됩니다. 세 번째까지 나오면 [github.com/MiqoKR/kr-dalamud-updater](https://github.com/MiqoKR/kr-dalamud-updater)의 최신 릴리스에서 이름에 `Portable`이 들어간 압축 파일을 받아 아래 폴더에 풉니다.
+
+%LOCALAPPDATA%\KR-Dalamud-Updater\app
 
 ### 3) 모드가 활성화되지 않을 때
 

@@ -196,6 +196,11 @@ def facts(repo: Path = REPO) -> dict[str, int]:
         "설치 프로그램 한국어": len(loc["Korean"]),
         "설치 프로그램 미번역": len(loc["German"] - loc["Korean"]),
         "골든 쌍": golden["pairs"],
+        # 같은 문장이 소스 여러 자리에 나오면 쌍은 여러 번 세지만 옮길 자리는
+        # 하나다. 판이 "몇 자리를 옮겼나"를 적는 곳은 이쪽과 대조해야 한다 -
+        # `689자리 중 687`이 2026-08-20까지 실측 어디와도 안 맞은 채 남아
+        # 있었고, 원인은 그 자리가 `CITATIONS`에 없던 것이다.
+        "골든 고유 쌍": len({tuple(p) for f in golden["by_file"].values() for p in f}),
         "골든 미해석": golden["unparsed"],
         "카탈로그 문장": len(_json(repo / "overlay" / "ko" / "ko.json")["strings"]),
         "대장 낱말": len(_json(repo / "overlay" / "ko" / "terms.json")["terms"]),
@@ -215,6 +220,8 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
     ("docs/dev/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
     ("docs/status.md", "골든 쌍", r"`AccessibilityStrings` 삼항 \| (\d+)쌍"),
+    ("docs/status.md", "골든 고유 쌍", r"삼항 \| \d+쌍\(고유 (\d+)\)"),
+    ("docs/status.md", "카탈로그 문장", r"→ \*\*(\d+)자리 옮김"),
     ("docs/status.md", "골든 쌍", r"문장을 한국어로 옮기기 \((\d+)쌍"),
     ("docs/status.md", "손으로 옮긴 자리", r"\+ 손 (\d+)곳\)"),
     ("docs/status.md", "손으로 볼 자리", r"복잡해 못 읽은 것 \| (\d+)곳 중"),
@@ -485,7 +492,7 @@ _MD_LINK = re.compile(r"\[([^\]]+)\]\(([^)#]+?)(?:#[^)]*)?\)")
 #: `CITATIONS`는 **등록한 자리 하나**만 본다. 같은 숫자가 산문 여기저기에
 #: 흩어져 있으면 거기까지는 안 간다 - `688`이 실제로 그렇게 세 자리에 남아
 #: 지금 값 691과 갈렸다. 값이 움직이면 여기 옛 값을 적는다.
-RETIRED_VALUES = (("골든 쌍", "688"),)
+RETIRED_VALUES = (("골든 쌍", "688"), ("골든 쌍", "691"))
 
 #: 폐기값을 안 보는 자리. 날짜가 박힌 기록과 동결 문서는 **그때 그대로가
 #: 맞다**(`CLAUDE.md`의 현황판 규약). `docs/status.md`는 §7(끝난 것)만 뺀다.

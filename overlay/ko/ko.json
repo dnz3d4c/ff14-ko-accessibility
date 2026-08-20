@@ -2174,11 +2174,6 @@
       "ko": "화면 요소가 보이는지를 모드가 대신 판정함."
     },
     {
-      "de": "Sichtbarkeit: {visibility}. Ausrüstungsset-Markierung: {gearset}.",
-      "en": "Visibility: {visibility}. Gearset marks: {gearset}.",
-      "ko": "화면 요소 표시 판정: {visibility}. 장비세트 표시 판정: {gearset}."
-    },
-    {
       "de": "Skill-Menü geschlossen.",
       "en": "Skill menu closed.",
       "ko": "기술 메뉴 닫힘."
@@ -2222,16 +2217,6 @@
       "de": "Spielerdaten noch nicht bereit.",
       "en": "Player data not ready yet.",
       "ko": "플레이어 정보가 아직 준비 안 됨."
-    },
-    {
-      "de": "Spielfunktion",
-      "en": "the game's own function",
-      "ko": "게임 기능"
-    },
-    {
-      "de": "Spielfunktion über koreanische Signatur",
-      "en": "the game's own function via the Korean signature",
-      "ko": "게임 기능(한국어판 시그니처로 찾음)"
     },
     {
       "de": "Sprache auf {language} umgestellt.",
@@ -2804,11 +2789,6 @@
       "ko": "{zone} 지역."
     },
     {
-      "de": "im Mod nachgebildet",
-      "en": "emulated inside the mod",
-      "ko": "모드가 대신 처리"
-    },
-    {
       "de": "in der Nähe",
       "en": "nearby",
       "ko": "근처"
@@ -2862,11 +2842,6 @@
       "de": "männlich",
       "en": "male",
       "ko": "남성"
-    },
-    {
-      "de": "nach Gegenstands-ID",
-      "en": "by item ID",
-      "ko": "아이템 ID 기준"
     },
     {
       "de": "neu, Register des Spiels",

@@ -90,6 +90,8 @@ if errorlevel 1 (
 gh release view "%TAG%" --repo "%GHREPO%" > NUL 2>&1
 if errorlevel 1 (
   echo 새 릴리스를 만든다.
+  call :checkbump
+  if errorlevel 1 goto :bumpfail
   gh release create "%TAG%" --repo "%GHREPO%" --title "FF14 접근성 모드 (한국 서버용) %TAG%" --notes-file "%RELOUT%\release-notes.md" ^
     "%RELOUT%\FF14Accessibility-KR-Setup.zip" ^
     "%OUT%\FF14AccessibilityInstaller-KR.exe" ^
@@ -108,6 +110,8 @@ if errorlevel 1 (
     echo [실패] 릴리스 노트를 못 올렸다.
     goto :fail
   )
+  call :checkbump
+  if errorlevel 1 goto :bumpfail
   gh release upload "%TAG%" --repo "%GHREPO%" --clobber ^
     "%RELOUT%\FF14Accessibility-KR-Setup.zip" ^
     "%OUT%\FF14AccessibilityInstaller-KR.exe" ^
@@ -132,3 +136,24 @@ echo.
 if not defined FF14_NOPAUSE pause
 endlocal
 exit /b 1
+
+:checkbump
+rem 자산을 올리기 직전에 부른다. **산출물이 바뀌었는데 버전이 그대로면 받는
+rem 쪽은 갱신을 아예 안 본다** - 설치 프로그램의 IsNewer 도 Dalamud 도 버전만
+rem 보기 때문이다. 오류가 아니라 침묵이라, 올리고 나면 어디서도 안 드러난다.
+rem
+rem 노트만 고치는 갈래는 안 막는다 - 위에서 gh release edit 이 먼저 끝난다.
+rem 같은 판을 그대로 다시 올려야 하면 FF14_RELEASE_SAME_VERSION=1 을 걸고 부른다.
+if defined FF14_RELEASE_SAME_VERSION (
+  echo 버전 검사를 건너뛴다 ^(FF14_RELEASE_SAME_VERSION^).
+  exit /b 0
+)
+uv run --no-project python "%REPO%\tools\release-manifest\release_manifest.py" --check-bump
+if errorlevel 1 exit /b 1
+exit /b 0
+
+:bumpfail
+echo.
+echo [실패] 버전이 안 올라갔다. 자산을 안 올린다.
+echo   vendor 의 csproj 둘에서 네 번째 마디를 올리고 run\pack.bat 부터 다시 돌린다.
+goto :fail

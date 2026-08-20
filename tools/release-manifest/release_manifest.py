@@ -641,13 +641,17 @@ def gather_release(tag: str, workdir: Path, repo: str = GH_REPO) -> ReleaseFacts
     )
 
 
-def _load(path: Path) -> object:
-    """릴리스에서 받은 JSON. 깨졌으면 그렇게 말한다 - 그것도 배포 사고다."""
+def _load(path: Path, where: str = "릴리스의") -> object:
+    """JSON 하나를 읽는다. 깨졌으면 그렇게 말한다 - 그것도 배포 사고다.
+
+    `where`는 **어디서 온 파일인지**다. 릴리스에서 받은 것과 `dist`에 만든
+    것이 파일 이름이 같아서, 그 말이 없으면 어느 쪽이 깨졌는지 모른다.
+    """
     try:
         raw = path.read_text(encoding="utf-8-sig")
     except (OSError, UnicodeDecodeError) as error:
-        raise ManifestError(f"릴리스의 {path.name}을 못 읽었다: {error}") from error
-    return _parse_json(raw, f"릴리스의 {path.name}")
+        raise ManifestError(f"{where} {path.name}을 못 읽었다: {error}") from error
+    return _parse_json(raw, f"{where} {path.name}")
 
 
 def _read_repo_manifest(path: Path | None) -> list[dict]:
@@ -813,6 +817,153 @@ def check_release(tag: str, repo: str = GH_REPO) -> list[str]:
         shutil.rmtree(workdir, ignore_errors=True)
 
 
+# ── 버전이 올라갔나 ────────────────────────────────────────────────────────
+#
+# **산출물이 바뀌었는데 버전이 그대로면 갱신이 침묵한다.** 설치 프로그램의
+# `IsNewer`도 Dalamud도 버전만 보므로, 같은 번호로 다시 올리면 받는 쪽은
+# "새 판이 없다"로 읽는다. 오류가 아니라서 내는 사람 화면에도 안 남는다.
+#
+# 이 저장소가 이미 그 상태였다 - `v5.88.0.0`을 낸 뒤 vendor에 17커밋이
+# 쌓이는 동안 버전 둘이 그대로였다.
+
+
+def manifest_versions(directory: Path, where: str = "릴리스의") -> dict[str, str]:
+    """매니페스트 둘에서 버전만 뽑는다. 없거나 비면 그 자리를 안 만든다.
+
+    **릴리스에서 받은 폴더와 `dist/release`를 같은 함수로 읽는다.** 두 벌이
+    되면 갈리고, 갈리면 비교가 거짓말을 한다.
+    """
+    found: dict[str, str] = {}
+
+    repo_path = directory / REPO_MANIFEST_NAME
+    if repo_path.is_file():
+        loaded = _load(repo_path, where)
+        entry = loaded[0] if isinstance(loaded, list) and loaded else loaded
+        version = entry.get("AssemblyVersion") if isinstance(entry, dict) else None
+        if isinstance(version, str) and version:
+            found[REPO_MANIFEST_NAME] = version
+
+    installer_path = directory / INSTALLER_MANIFEST_NAME
+    if installer_path.is_file():
+        loaded = _load(installer_path, where)
+        version = loaded.get("InstallerVersion") if isinstance(loaded, dict) else None
+        if isinstance(version, str) and version:
+            found[INSTALLER_MANIFEST_NAME] = version
+
+    return found
+
+
+def latest_release_tag(repo: str = GH_REPO) -> str | None:
+    """제일 최근 릴리스의 태그. 하나도 없으면 `None`이다.
+
+    **`release view`가 아니라 `release list`다.** 릴리스가 없는 것을 예외가
+    아니라 빈 배열로 받아야 "첫 릴리스"와 "gh가 실패했다"가 안 섞인다.
+    섞이면 첫 릴리스를 영영 못 내거나, gh 고장을 첫 릴리스로 읽는다.
+    """
+    listing = _parse_json(
+        _gh(
+            ["release", "list", "--repo", repo, "--limit", "1", "--json", "tagName"],
+            repo,
+            missing=f"저장소를 못 찾았다: {repo}",
+        ),
+        "gh의 릴리스 목록",
+    )
+    if not isinstance(listing, list):
+        raise ManifestError(f"gh의 릴리스 목록이 배열이 아니다: {type(listing).__name__}")
+    if not listing:
+        return None
+
+    tag = listing[0].get("tagName") if isinstance(listing[0], dict) else None
+    if not isinstance(tag, str) or not tag:
+        raise ManifestError("gh의 릴리스 목록에 태그 이름이 없다")
+    return tag
+
+
+class BumpFacts(NamedTuple):
+    """이미 나간 것과 지금 낼 것의 버전. I/O는 여기까지고 판정은 순수 함수다."""
+
+    #: 제일 최근 릴리스의 태그. 릴리스가 하나도 없으면 `None`이다.
+    latest_tag: str | None
+    #: 매니페스트 이름 -> 릴리스에 나가 있는 버전.
+    released: dict[str, str]
+    #: 매니페스트 이름 -> 지금 `dist/release`에 있는 버전.
+    local: dict[str, str]
+
+
+def gather_bump_facts(dist: Path, workdir: Path, repo: str = GH_REPO) -> BumpFacts:
+    """비교할 두 벌을 모은다. 매니페스트 둘만 받으므로 몇 초면 끝난다."""
+    tag = latest_release_tag(repo)
+    if tag is not None:
+        for name in (REPO_MANIFEST_NAME, INSTALLER_MANIFEST_NAME):
+            _gh(
+                ["release", "download", tag, "--repo", repo, "--pattern", name,
+                 "--dir", str(workdir), "--clobber"],
+                tag,
+                missing=f"릴리스 {tag}에 {name}이 없다. 나가 있는 버전을 알 수 없다",
+            )
+
+    return BumpFacts(
+        latest_tag=tag,
+        released=manifest_versions(workdir),
+        local=manifest_versions(release_dir(dist), where="dist의"),
+    )
+
+
+def _version_key(text: str) -> tuple[int, ...]:
+    """크기를 잴 수 있는 꼴. `normalize_version`이 거르는 것은 여기서도 못 잰다."""
+    return tuple(int(part) for part in normalize_version(text).split("."))
+
+
+def bump_problems(facts: BumpFacts) -> list[str]:
+    """지금 낼 것이 이미 나간 것보다 새 판인가. 받아 오지 않고 재기만 한다."""
+    if facts.latest_tag is None:
+        return []  # 첫 릴리스다. 비교할 상대가 없는 것과 안 올린 것은 다르다
+
+    problems = []
+    risen = 0
+    for name in (REPO_MANIFEST_NAME, INSTALLER_MANIFEST_NAME):
+        now, before = facts.local.get(name), facts.released.get(name)
+        if not now:
+            problems.append(f"dist의 {name}에서 버전을 못 읽었다. `run\\pack.bat`을 먼저 돌린다")
+            continue
+        if not before:
+            problems.append(f"릴리스 {facts.latest_tag}의 {name}에서 버전을 못 읽었다")
+            continue
+
+        try:
+            # 못 읽는 버전끼리 크기를 재면 통과든 실패든 근거가 없다.
+            higher, lower = _version_key(now), _version_key(before)
+        except ManifestError as error:
+            problems.append(f"{name}의 버전을 비교할 수 없다: {now} vs {before} ({error})")
+            continue
+
+        if higher < lower:
+            problems.append(
+                f"{name}의 버전이 릴리스보다 낮다: {now} < {before}. "
+                f"내리면 이미 깐 쪽에서 갱신이 영영 안 뜬다"
+            )
+        elif higher > lower:
+            risen += 1
+
+    if not problems and not risen:
+        problems.append(
+            f"릴리스 {facts.latest_tag}와 버전이 똑같다. 산출물이 바뀌었으면 갱신이 "
+            f"침묵한다 - csproj의 네 번째 마디를 올려라. 같은 판을 그대로 다시 "
+            f"올리는 것이면 FF14_RELEASE_SAME_VERSION=1을 걸고 부른다"
+        )
+    return problems
+
+
+def check_bump(dist: Path, repo: str = GH_REPO) -> tuple[BumpFacts, list[str]]:
+    """버전을 재고 잰 것과 문제를 함께 돌려준다. 받은 것은 지운다."""
+    workdir = Path(tempfile.mkdtemp(prefix="ff14acc-bump-"))
+    try:
+        facts = gather_bump_facts(dist, workdir, repo)
+        return facts, bump_problems(facts)
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+
 def main(argv: list[str]) -> int:
     repo = Path(__file__).resolve().parents[2]
     parser = argparse.ArgumentParser(description="릴리스 매니페스트를 산출물에서 만든다")
@@ -827,6 +978,11 @@ def main(argv: list[str]) -> int:
         "--release",
         metavar="태그",
         help="릴리스에 실제로 올라간 것을 받아 다시 잰다. 자산을 내려받아 몇 분 걸린다",
+    )
+    parser.add_argument(
+        "--check-bump",
+        action="store_true",
+        help="이미 나간 릴리스보다 버전이 올랐나. `run\\release.bat`이 자산을 올리기 전에 부른다",
     )
     args = parser.parse_args(argv[1:])
 
@@ -844,6 +1000,25 @@ def main(argv: list[str]) -> int:
                 return 1
             print(f"== 릴리스 {args.release}: 받는 쪽이 읽을 수 있다 ==")
             print(f"  자산 {len(RELEASE_ASSETS)}개, 해시·버전·주소 대조 통과")
+            return 0
+
+        # **자산을 올리기 전에** 돌린다. 산출물이 바뀌었는데 버전이 그대로면
+        # 받는 쪽은 갱신을 아예 안 본다 - 오류가 아니라 침묵이라, 올리고 나면
+        # 아무 데서도 안 드러난다.
+        if args.check_bump:
+            facts, problems = check_bump(dist)
+            if problems:
+                print("== 릴리스 버전: 안 올랐다 ==\n")
+                for problem in problems:
+                    print(f"  - {problem}")
+                return 1
+            if facts.latest_tag is None:
+                print("== 릴리스 버전: 첫 릴리스다 ==")
+                print("  비교할 릴리스가 없다")
+                return 0
+            print(f"== 릴리스 버전: {facts.latest_tag}보다 새 판이다 ==")
+            for name in sorted(facts.local):
+                print(f"  {name} {facts.released.get(name)} -> {facts.local[name]}")
             return 0
 
         # 태그가 곧 플러그인 버전이다 - 설치 프로그램이 태그에서 v를 떼어

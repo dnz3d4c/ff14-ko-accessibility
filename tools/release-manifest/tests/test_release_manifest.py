@@ -787,3 +787,79 @@ def test_저장소를_못_찾은_것을_릴리스_탓으로_돌리지_않는다(
     error = rm.gh_failure(rm.GH_REPO, "not found", 1, missing=f"저장소를 못 찾았다: {rm.GH_REPO}")
     assert "저장소를 못 찾았다" in str(error)
     assert "릴리스가 없다" not in str(error)
+
+
+# ── 버전이 올라갔나 ────────────────────────────────────────────────────────
+#
+# **산출물이 바뀌었는데 버전이 그대로면 갱신이 침묵한다.** `IsNewer`가 거짓을
+# 돌려주므로 오류도 안 나고, 받는 쪽은 "새 판이 없다"로 읽는다. 이 저장소에서
+# 이미 그 상태였다 - `v5.88.0.0`을 낸 뒤 vendor에 17커밋이 쌓이는 동안 버전
+# 둘이 그대로였다. 그래서 **올리기 전에** 이 검사를 세웠다.
+
+
+def dist_versions(plugin: str = "5.88.0.0", installer: str = "1.1.1.0") -> dict[str, str]:
+    """매니페스트 이름을 키로 하는 버전 둘. 이름은 상수에서 나온다."""
+    return {rm.REPO_MANIFEST_NAME: plugin, rm.INSTALLER_MANIFEST_NAME: installer}
+
+
+def bump_facts(**overrides) -> rm.BumpFacts:
+    """이미 나간 것과 지금 낼 것이 같은 상태. 여기서 한 자리씩 옮긴다."""
+    base = {"latest_tag": TAG, "released": dist_versions(), "local": dist_versions()}
+    base.update(overrides)
+    return rm.BumpFacts(**base)
+
+
+def test_둘_다_같으면_막는다():
+    assert any("똑같다" in p for p in rm.bump_problems(bump_facts()))
+
+
+def test_플러그인만_올라도_통과한다():
+    assert rm.bump_problems(bump_facts(local=dist_versions(plugin="5.88.0.1"))) == []
+
+
+def test_설치_프로그램만_올라도_통과한다():
+    assert rm.bump_problems(bump_facts(local=dist_versions(installer="1.1.1.1"))) == []
+
+
+def test_버전이_내려가면_막는다():
+    problems = rm.bump_problems(bump_facts(local=dist_versions(plugin="5.87.0.0")))
+    assert any("낮다" in p for p in problems)
+
+
+def test_하나가_올라도_다른_하나가_내려가면_막는다():
+    """올린 것이 내린 것을 덮지 않는다. 내려간 쪽은 그 자체로 사고다."""
+    facts = bump_facts(local=dist_versions(plugin="5.89.0.0", installer="1.1.0.0"))
+    assert any("낮다" in p for p in rm.bump_problems(facts))
+
+
+def test_릴리스가_하나도_없으면_통과한다():
+    # 첫 릴리스다. **비교할 상대가 없는 것과 안 올린 것은 다르다.**
+    assert rm.bump_problems(bump_facts(latest_tag=None, released={})) == []
+
+
+def test_릴리스에서_버전을_못_읽으면_막는다():
+    # 못 읽은 것을 통과로 세면 검사가 조용히 죽는다. 이 도구가 존재하는
+    # 이유와 정확히 반대되는 자리다.
+    assert any("못 읽었다" in p for p in rm.bump_problems(bump_facts(released={})))
+
+
+def test_dist에서_버전을_못_읽으면_막는다():
+    assert any("못 읽었다" in p for p in rm.bump_problems(bump_facts(local={})))
+
+
+def test_읽는_쪽이_못_읽는_버전은_비교하지_않고_말한다():
+    # 마디가 다섯이면 `ParseVersionLoose`가 null을 준다. 그런 값끼리 크기를
+    # 재면 통과든 실패든 근거가 없다.
+    facts = bump_facts(local=dist_versions(plugin="5.88.0.0.1"))
+    assert any("비교할 수 없다" in p for p in rm.bump_problems(facts))
+
+
+def test_매니페스트_둘에서_버전만_뽑는다(tmp_path):
+    """받은 것과 만든 것을 **같은 함수로** 읽는다. 두 벌이 되면 갈린다."""
+    dist = make_dist(tmp_path)
+    found = rm.manifest_versions(rm.release_dir(dist))
+    assert found == {rm.REPO_MANIFEST_NAME: VERSION, rm.INSTALLER_MANIFEST_NAME: "1.1.0.0"}
+
+
+def test_매니페스트가_없으면_그_자리를_안_만든다(tmp_path):
+    assert rm.manifest_versions(tmp_path) == {}

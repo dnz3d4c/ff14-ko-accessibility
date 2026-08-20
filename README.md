@@ -27,6 +27,10 @@
 
 **한국 서버는 한국 전용 계정을 사용합니다.** 글로벌 서버 계정으로는 접속할 수 없습니다. 계정을 만드는 방법은 [사용 안내](overlay/ko/README.ko.md) 1장 2절에 있습니다.
 
+**Microsoft .NET 10 Desktop Runtime x64가 필요합니다.** 없으면 모드가 동작하지 않습니다. 아래 주소를 클릭하면 설치 파일 내려받기가 바로 시작됩니다. 이미 설치되어 있는지 확인하는 방법은 [사용 안내](overlay/ko/README.ko.md) 1장 3절에 있습니다.
+
+https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe
+
 **KR Dalamud 업데이터와 vnavmesh는 설치 프로그램이 해당 프로그램의 저장소에서 직접 내려받으며**, 내려받을지 묻는 대화상자가 표시됩니다. 이 저장소에서 재배포하지 않습니다.
 
 - **[KR Dalamud 업데이터](https://github.com/MiqoKR/kr-dalamud-updater)** — 게임에 Dalamud를 사용할 수 있게 해주는 프로그램입니다. 프로그램이 없으면 모드가 실행되지 않습니다

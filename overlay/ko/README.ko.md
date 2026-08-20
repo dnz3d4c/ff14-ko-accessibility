@@ -32,7 +32,9 @@ dotnet --list-runtimes
 
 Microsoft.WindowsDesktop.App 10.0.11 [C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App]
 
-해당 줄이 출력되지 않는다면 [dotnet.microsoft.com/download/dotnet/10.0](https://dotnet.microsoft.com/download/dotnet/10.0)에 접속해 **.NET Desktop Runtime**의 **x64** 설치 파일을 다운로드해 설치합니다. SDK나 ASP.NET Core Runtime이 아닙니다.
+해당 줄이 출력되지 않는다면 아래 주소에서 **.NET Desktop Runtime**을 설치합니다. 링크를 클릭하면 x64 설치 파일 내려받기가 바로 시작됩니다.
+
+https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe
 
 ### 4) 설치 프로그램이 내려받는 것
 

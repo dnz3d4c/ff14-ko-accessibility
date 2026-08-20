@@ -652,6 +652,6 @@ KR Dalamud 업데이터까지 지우려면 아래 폴더도 지웁니다.
 
 이 모드는 **GNU Affero General Public License, Version 3**을 따릅니다. 쓰고, 고치고, 남에게 줄 수 있습니다. 다만 **고친 판을 배포하거나 네트워크로 제공하는 경우에는 그 소스 코드도 함께 공개해야 합니다.** 라이선스 전문은 `FF14Accessibility.zip` 안의 `LICENSE` 파일에 있고, 소스 코드는 위 원본 저장소에서 얻을 수 있습니다.
 
-함께 배포되는 다른 사람의 소프트웨어는 **Tolk**(LGPL-3.0), **NVDA Controller Client**(LGPL-2.1), **NAudio**(MIT)이고, 각각의 라이선스는 같은 압축 파일 안의 `THIRD-PARTY-NOTICES.md`에 있습니다. **남에게 전할 때 이 파일이 함께 있어야 합니다.**
+함께 배포되는 제3자 소프트웨어는 **Tolk**(LGPL-3.0), **NVDA Controller Client**(LGPL-2.1), **NAudio**(MIT)이고, 각각의 라이선스는 같은 압축 파일 안의 `THIRD-PARTY-NOTICES.md`에 있습니다. **재배포할 때 이 파일이 함께 있어야 합니다.**
 
 이 모드는 **Dalamud** 위에서 동작합니다. Dalamud는 스퀘어 에닉스의 공식 이용약관 밖에 있고, 사용에 따르는 책임은 사용하는 사람에게 있습니다.

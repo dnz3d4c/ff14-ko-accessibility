@@ -5,7 +5,7 @@
 # 이미 막히는 걸 또 막으면 사람이 --no-verify를 쓰게 되고, 그러면 아무것도
 # 안 막는다.
 #
-# 검사하는 것 둘.
+# 검사하는 것 셋.
 #
 # 1) 저장소가 기록한 vendor 자리(gitlink)가 실물과 맞는가.
 #
@@ -18,6 +18,13 @@
 #
 # commit-msg의 C8은 현황판을 *건드렸나*만 본다. 그래서 절끼리 어긋난 것도,
 # README가 낡는 것도 안 걸렸다(2026-08-18에 실제로 23곳). 0.1초라 여기 둔다.
+#
+# 3) 문서 말투가 한 문서 안에서 갈리는가.
+#
+# 숫자와 단축키와 발화 문장은 전부 기계가 막는데 문장 품질만 맨몸이었고,
+# 그래서 같은 지적이 반복해서 왔다(2026-08-20에 사용자가 README 14자리를
+# 직접 고쳤다). pytest에도 있지만 그건 check.bat에서만 돌아서, 문서를 고치는
+# 커밋에서 바로 걸리도록 여기 둔다. 0.2초 아래다.
 #
 # 여기 없는 것과 이유:
 #   - 배치 인코딩 -> git이 이미 막는다. .gitattributes의 working-tree-encoding=CP949가
@@ -45,5 +52,12 @@ if ! uv run --no-project python tools/docs-check/docs_check.py >/dev/null 2>&1; 
 	uv run --no-project python tools/docs-check/docs_check.py >&2
 	echo "" >&2
 	echo "문서를 실제와 맞추고 다시 커밋한다. 정말 넘겨야 하면 --no-verify." >&2
+	exit 1
+fi
+
+if ! uv run --no-project python tools/ko-style/ko_style.py >/dev/null 2>&1; then
+	uv run --no-project python tools/ko-style/ko_style.py >&2
+	echo "" >&2
+	echo "말투를 한 갈래로 맞추고 다시 커밋한다. 정말 넘겨야 하면 --no-verify." >&2
 	exit 1
 fi

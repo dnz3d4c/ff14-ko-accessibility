@@ -100,8 +100,14 @@ if errorlevel 1 (
     "%TMPKEYS%"
   if errorlevel 1 goto :fail
 ) else (
-  echo 같은 태그가 이미 있다. 자산만 덮어쓴다.
-  gh release edit "%TAG%" --repo "%GHREPO%" --title "FF14 접근성 모드 (한국 서버용) %TAG%" > NUL
+  echo 같은 태그가 이미 있다. 노트와 자산을 덮어쓴다.
+  rem 노트도 같이 올린다. 제목만 고치면 판이 바뀌어도 받는 사람이 읽는
+  rem 본문은 첫 릴리스 때 그대로 남는다 - 오류가 아니라 침묵이다.
+  gh release edit "%TAG%" --repo "%GHREPO%" --title "FF14 접근성 모드 (한국 서버용) %TAG%" --notes-file "%RELOUT%\release-notes.md" > NUL
+  if errorlevel 1 (
+    echo [실패] 릴리스 노트를 못 올렸다.
+    goto :fail
+  )
   gh release upload "%TAG%" --repo "%GHREPO%" --clobber ^
     "%RELOUT%\FF14Accessibility-KR-Setup.zip" ^
     "%OUT%\FF14AccessibilityInstaller-KR.exe" ^

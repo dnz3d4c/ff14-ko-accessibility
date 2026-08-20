@@ -78,6 +78,9 @@ UMLAUTS = re.compile(r"[äöüßÄÖÜ]")
 #: `", "`(잇는 조각)가 걸리면 골든이 잡음으로 찬다.
 _LETTER = re.compile(r"[^\W\d_]")
 
+#: `string.Format`이 값을 박는 자리. `{{`는 리터럴 중괄호라 자리가 아니다.
+_PLACEHOLDER = re.compile(r"\{(\d+)\}")
+
 _ENTRY = re.compile(r'\[\s*"([A-Za-z0-9_]+)"\s*\]\s*=')
 _CALL = re.compile(r'Loc\.Get\(\s*"([A-Za-z0-9_]+)"')
 _STRING = re.compile(r'"(?:[^"\\\n]|\\.)*"')
@@ -155,6 +158,11 @@ def dictionaries(path: Path = LOC_FILE) -> dict[str, dict[str, str]]:
             )
         found[language] = entries
     return found
+
+
+def placeholders(value: str) -> frozenset[str]:
+    """이 값이 요구하는 서식 자리 번호. `{{`는 리터럴 중괄호라 뺀다."""
+    return frozenset(_PLACEHOLDER.findall(value.replace("{{", "").replace("}}", "")))
 
 
 def called(root: Path = SOURCE_ROOT) -> dict[str, list[str]]:
@@ -308,6 +316,27 @@ def check(root: Path = SOURCE_ROOT, golden_path: Path = GOLDEN) -> list[str]:
         bad.append(
             f"골든에만 남은 키가 있다: {', '.join(dropped)}. --write로 갱신해라"
         )
+
+    # 6) 언어마다 서식 자리가 다르다 -> 넘긴 값이 조용히 버려진다.
+    #    `KrWaitingForDalamud`가 그랬다 - 한국어에만 `{0}`이 빠져서
+    #    `InstallerService`가 넘긴 `15`가 안 박혔고, 사전 셋을 나란히 놓고
+    #    보기 전까지 아무도 못 봤다.
+    for key in sorted(set().union(*(entries[language] for language in LANGUAGES))):
+        spread = {
+            language: placeholders(entries[language][key])
+            for language in LANGUAGES
+            if key in entries[language]
+        }
+        if len(spread) > 1 and len(set(spread.values())) > 1:
+            shown = " / ".join(
+                f"[{language}] "
+                + (", ".join(f"{{{mark}}}" for mark in sorted(marks)) or "없음")
+                for language, marks in spread.items()
+            )
+            bad.append(
+                f"{key}: 언어마다 서식 자리가 다르다 ({shown}). "
+                f"빠진 쪽은 넘긴 값이 버려진다"
+            )
 
     return bad
 

@@ -232,6 +232,59 @@ def test_죽은_키를_센다(world):
     assert loc_check.dead_keys(entries, loc_check.called(root)) == ["Dead"]
 
 
+# --- 검사 6: 서식 자리 -----------------------------------------------------
+#
+# `KrWaitingForDalamud`가 실제로 이 모양이었다 - 독일어·영어에는 `{0}`이
+# 있는데 한국어에만 통째로 빠져서, `InstallerService`가 넘긴 `15`가 버려진
+# 채로 배포됐다. 세 사전을 나란히 놓고 보지 않으면 사람 눈에 안 잡힌다.
+
+
+def test_서식_자리를_센다():
+    assert loc_check.placeholders("{0}분 뒤 {1}") == frozenset({"0", "1"})
+    assert loc_check.placeholders("자리 없음") == frozenset()
+
+
+def test_리터럴_중괄호는_자리가_아니다():
+    # C#에서 `{{`는 여는 중괄호 하나다. 서식 자리로 세면 없는 인자를 요구한다.
+    assert loc_check.placeholders("{{0}}") == frozenset()
+
+
+def test_한국어에만_자리가_빠지면_잡는다(world, golden):
+    root = world(
+        german='["A"] = "bis zu {0} Minuten",',
+        english='["A"] = "up to {0} minutes",',
+        korean='["A"] = "잠시 기다립니다",',
+        caller='Info(Loc.Get("A", 15));',
+    )
+    bad = loc_check.check(root, golden([]))
+    assert any("서식 자리가 다르다" in line and "A" in line for line in bad), bad
+
+
+def test_자리_번호가_다르면_잡는다(world, golden):
+    # 개수가 같아도 번호가 다르면 다른 인자가 박힌다.
+    root = world(
+        english='["A"] = "{0}",', korean='["A"] = "{1}",', caller='Info(Loc.Get("A", 1));'
+    )
+    bad = loc_check.check(root, golden([]))
+    assert any("서식 자리가 다르다" in line for line in bad), bad
+
+
+def test_자리가_같으면_통과한다(world, golden):
+    root = world(
+        german='["A"] = "{0} von {1}",',
+        english='["A"] = "{0} of {1}",',
+        korean='["A"] = "{1} 중 {0}",',
+        caller='Info(Loc.Get("A", 1, 2));',
+    )
+    assert loc_check.check(root, golden([])) == []
+
+
+def test_한_사전에만_있는_키는_대조하지_않는다(world, golden):
+    # 죽은 키다. 나란히 놓을 상대가 없으니 이 갈래가 볼 것이 없다.
+    root = world(english='["Dead"] = "{0}",', korean="", caller="")
+    assert loc_check.check(root, golden(["Dead"])) == []
+
+
 # --- 지금 저장소 - 늘 돈다 -------------------------------------------------
 
 needs_source = pytest.mark.skipif(

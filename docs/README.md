@@ -15,7 +15,7 @@
 
 ## korean/ — 한국어로 옮기는 것
 
-- [keys.md](korean/keys.md) — 키를 두고 **실측하거나 판정한 것.** KR에서 겹치는 키, 지금 안 되는 키와 원인, 게임 자체 메뉴가 받는 입력이다. **키 목록 자체는 여기 없다** — [사용 안내](../overlay/ko/README.ko.md) 4장과 [루트 README](../README.md) 2장이 갖고 `tools/docs-check`가 소스와 대조한다
+- [keys.md](korean/keys.md) — 키를 두고 **실측하거나 판정한 것.** KR에서 겹치는 키, 지금 안 되는 키와 원인, 게임 자체 메뉴가 받는 입력이다. **키 목록 자체는 여기 없다** — [사용 안내](../overlay/ko/README.ko.md) 4장이 갖고 `tools/docs-check`가 소스와 대조한다
 - [hand-cases.md](korean/hand-cases.md) — 생성기가 못 읽는 문장 모양과 옮길 때 조심할 것
 - [guide-corpus.md](korean/guide-corpus.md) — 파판14 공식 가이드 코퍼스. 무엇을 받아 뒀고 어떻게 찾나
 

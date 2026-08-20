@@ -63,11 +63,13 @@ _LOC_LANG = re.compile(
 _LOC_KEY = re.compile(r'^\s+\["(\w+)"\]\s*=', re.M)
 _LOC_END = "\n        },"
 
-#: 단축키 목록을 갖는 문서 둘. **양쪽에 다 있어야 한다** - 배포물에는 사용
-#: 안내만 나가고(빼면 모드를 못 쓴다), 저장소를 여는 사람은 루트 README를
-#: 먼저 본다. 그래서 두 벌이고, 그래서 갈라진다. W-04가 그 사고였다: 키 이름
-#: 표가 저장소 안에 둘이었고 서로 갈라져서 기본 바인딩 셋이 조용히 죽었다.
-KEY_DOCS = ("README.md", "overlay/ko/README.ko.md")
+#: 단축키 목록을 갖는 **하나뿐인** 문서. 배포물에 나가는 것이 이것이라 뺄 수
+#: 없고, 다른 문서는 여기로 링크만 한다.
+#:
+#: 전에는 루트 README도 같은 목록을 갖고 있어서 이 상수가 둘이었고, `check_keys`가
+#: 문서끼리 먼저 대조했다. W-65에서 README가 한국 서버 고유 내용만 갖게 되면서
+#: 그 사본이 없어졌다 - 목록을 한 자리에 두는 것이 대조보다 먼저다.
+KEY_DOC = "overlay/ko/README.ko.md"
 
 _KEY_IN_SOURCE = re.compile(r"^\s*public string (Key\w+)\s*=", re.M)
 _KEY_IN_DOC = re.compile(r"`(Key\w+)`")
@@ -447,28 +449,24 @@ def doc_keys(rel: str) -> set[str]:
 
 
 def check_keys() -> list[str]:
-    """키 목록이 문서끼리, 그리고 소스와 어긋나는 자리.
+    """키 목록이 소스와 어긋나는 자리.
 
-    **먼저 문서끼리 본다.** vendor가 없어도(권한 없이 클론한 경우) 이 대조는
-    돌아야 한다 - 두 문서가 갈라지는 것이 제일 흔한 사고다.
+    전에는 소스보다 **문서끼리** 먼저 봤다. 목록이 두 벌이었고 갈라지는 것이 제일
+    흔한 사고였기 때문이다(W-04). 사본이 없어진 지금 그 대조는 **약해진 것이 아니라
+    상대가 없어 성립하지 않는다** - 목록이 한 벌이면 갈라질 두 벌이 없다. 다시
+    두 벌이 되면 그때 이 함수가 아니라 `KEY_DOC`이 먼저 늘어난다.
+
+    소스를 못 보면(권한 없이 클론해 vendor가 없는 경우) 볼 것이 남지 않는다.
     """
-    bad = []
-    docs = {rel: doc_keys(rel) for rel in KEY_DOCS}
-    left, right = KEY_DOCS
-    for name in sorted(docs[left] - docs[right]):
-        bad.append(f"{name}: `{left}`에만 있다")
-    for name in sorted(docs[right] - docs[left]):
-        bad.append(f"{name}: `{right}`에만 있다")
-
     src = source_keys()
     if src is None:
-        return bad  # vendor를 못 받은 상태. 다른 검사와 같은 규약으로 건너뛴다
+        return []  # vendor를 못 받은 상태. 다른 검사와 같은 규약으로 건너뛴다
 
-    for rel, names in docs.items():
-        for name in sorted(names - src):
-            bad.append(f"{name}: `{rel}`에 있는데 `Configuration.cs`에 없다")
-        for name in sorted(src - names):
-            bad.append(f"{name}: `Configuration.cs`에 있는데 `{rel}`에 없다")
+    names = doc_keys(KEY_DOC)
+    bad = [f"{name}: `{KEY_DOC}`에 있는데 `Configuration.cs`에 없다"
+           for name in sorted(names - src)]
+    bad += [f"{name}: `Configuration.cs`에 있는데 `{KEY_DOC}`에 없다"
+            for name in sorted(src - names)]
     return bad
 
 
@@ -578,7 +576,7 @@ def main(argv: list[str]) -> int:
             print(f"  {item}", file=sys.stderr)
         return 1
 
-    keys = doc_keys(KEY_DOCS[0])
+    keys = doc_keys(KEY_DOC)
     print(f"통과 - 인용 {len(CITATIONS)}자리, 현황판 정합, 단축키 {len(keys)}개")
     return 0
 

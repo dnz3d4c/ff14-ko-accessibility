@@ -159,27 +159,24 @@ def test_유형별_절이_없으면_소리를_낸다(tmp_path):
         docs_check.hand_type_sum(path)
 
 
-# --- 단축키 대장 (W-39) ----------------------------------------------------
+# --- 단축키 대장 (W-39·W-65) ------------------------------------------------
 #
-# 키 목록이 저장소 안에 두 벌이다. 루트 README는 저장소를 여는 사람이 보고,
-# 사용 안내는 배포물에 그것만 나가서 뺄 수가 없다. W-04에서 키 이름 표가
-# 둘로 갈려 기본 바인딩 셋이 조용히 죽은 적이 있어서, 여기서 못박는다.
+# 키 목록은 사용 안내 한 벌이다. 배포물에 그것만 나가서 뺄 수가 없고, 다른
+# 문서는 거기로 링크만 한다. 루트 README가 두 번째 벌을 갖고 있던 동안에는
+# 문서끼리 먼저 대조했다 - W-04에서 키 이름 표가 둘로 갈려 기본 바인딩 셋이
+# 조용히 죽은 적이 있어서다. 사본이 없어진 지금 남은 대조 상대는 소스뿐이다.
 
 
-def test_단축키가_문서끼리_그리고_소스와_맞는다():
+def test_단축키가_소스와_맞는다():
     bad = docs_check.check_keys()
     assert bad == [], "\n".join(bad)
 
 
-def test_문서_한쪽에서_키가_빠지면_걸린다(monkeypatch):
+def test_문서에서_키가_빠지면_걸린다(monkeypatch):
+    if docs_check.source_keys() is None:
+        pytest.skip("vendor를 못 받은 상태")
     real = docs_check.doc_keys
-    빠뜨릴_문서 = docs_check.KEY_DOCS[1]
-
-    def 한쪽만_모자라게(rel):
-        names = real(rel)
-        return names - {"KeyHelp"} if rel == 빠뜨릴_문서 else names
-
-    monkeypatch.setattr(docs_check, "doc_keys", 한쪽만_모자라게)
+    monkeypatch.setattr(docs_check, "doc_keys", lambda rel: real(rel) - {"KeyHelp"})
     bad = docs_check.check_keys()
     assert any("KeyHelp" in line for line in bad), bad
 
@@ -187,7 +184,7 @@ def test_문서_한쪽에서_키가_빠지면_걸린다(monkeypatch):
 def test_소스에만_있는_키가_잡힌다(monkeypatch):
     if docs_check.source_keys() is None:
         pytest.skip("vendor를 못 받은 상태")
-    문서에_있는_것 = docs_check.doc_keys(docs_check.KEY_DOCS[0])
+    문서에_있는_것 = docs_check.doc_keys(docs_check.KEY_DOC)
     monkeypatch.setattr(
         docs_check, "source_keys", lambda: 문서에_있는_것 | {"KeyNieDokumentiert"}
     )
@@ -195,9 +192,9 @@ def test_소스에만_있는_키가_잡힌다(monkeypatch):
     assert any("KeyNieDokumentiert" in line for line in bad), bad
 
 
-def test_vendor가_없으면_문서끼리만_본다(monkeypatch):
-    # 권한 없이 클론하면 vendor가 안 받아진다. 그때도 두 문서 대조는 돌아야
-    # 한다 - 소스를 못 봐도 문서끼리 갈라진 것은 잡을 수 있다.
+def test_vendor가_없으면_건너뛴다(monkeypatch):
+    # 권한 없이 클론하면 vendor가 안 받아진다. 대조할 상대가 소스뿐이라 그때는
+    # 볼 것이 남지 않는다 - 다른 검사와 같은 규약으로 조용히 건너뛴다.
     monkeypatch.setattr(docs_check, "source_keys", lambda: None)
     assert docs_check.check_keys() == []
 

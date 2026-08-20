@@ -71,11 +71,19 @@ def make_guide(dist: Path) -> Path:
     return path
 
 
+def make_keys(dist: Path) -> Path:
+    """사용 안내 4장의 키만 모은 목록. 이것도 아카이브에 들어간다."""
+    path = dist / rm.KEYS_NAME
+    path.write_text("단축키 목록", encoding="utf-8")
+    return path
+
+
 def make_user_files(dist: Path) -> Path:
-    """`dist` 루트에 받는 사람이 쓰는 셋을 만든다."""
+    """`dist` 루트에 받는 사람이 쓰는 넷을 만든다."""
     make_zip(dist)
     make_exe(dist)
     make_guide(dist)
+    make_keys(dist)
     return dist
 
 
@@ -312,8 +320,8 @@ def test_매니페스트가_아예_없으면_잡는다(tmp_path):
 def test_루트에는_사용자가_쓸_것만_남는다(tmp_path):
     """`dist` 루트는 **사용자에게 그대로 줄 수 있는 폴더**다.
 
-    사용 안내가 "셋을 같은 폴더에 두고 실행합니다"라고 말하는 그 폴더라,
-    기계만 읽는 파일이 섞이면 사용자가 무엇을 눌러야 하는지 헷갈린다.
+    사용 안내가 "압축을 풀면 그 안에 넷이 들어 있습니다"라고 세어 주는 그
+    폴더라, 기계만 읽는 파일이 섞이면 사용자가 무엇을 눌러야 하는지 헷갈린다.
     """
     dist = make_dist(tmp_path)
     assert sorted(p.name for p in dist.iterdir()) == sorted(
@@ -346,7 +354,7 @@ def test_사용자용_아카이브를_만든다(tmp_path):
     assert (rm.release_dir(dist) / rm.SETUP_ZIP_NAME).is_file()
 
 
-def test_아카이브를_풀면_폴더_하나에_셋이_있다(tmp_path):
+def test_아카이브를_풀면_폴더_하나에_넷이_있다(tmp_path):
     dist = make_dist(tmp_path)
     with zipfile.ZipFile(rm.release_dir(dist) / rm.SETUP_ZIP_NAME) as archive:
         names = archive.namelist()
@@ -376,9 +384,37 @@ def test_아카이브_이름과_안쪽_경로가_ASCII다(tmp_path):
     assert any(rm.GUIDE_NAME in n for n in names)
 
 
+def test_단축키_목록이_아카이브에_들어간다(tmp_path):
+    """**`dist` 루트에 내놓는 것만으로는 사용자에게 안 닿는다.**
+
+    받는 사람이 받는 것은 이 아카이브 하나다. `USER_FILES`에 없으면 파일이
+    `dist`에만 남고, 그 빠짐은 오류가 아니라 침묵이다 - 받는 쪽 화면에는
+    아무 일도 안 일어난다. `run\\pack.bat`의 복사 줄만 늘리면 그 상태가 된다.
+    """
+    dist = make_dist(tmp_path)
+    with zipfile.ZipFile(rm.release_dir(dist) / rm.SETUP_ZIP_NAME) as archive:
+        names = archive.namelist()
+    assert f"{rm.SETUP_DIR_NAME}/{rm.KEYS_NAME}" in names, names
+
+
+def test_문서_둘이_개별_자산으로도_올라간다():
+    """아카이브를 안 풀고 문서만 훑는 길이 있다.
+
+    사용 안내가 단축키 목록을 가리키므로, 사용 안내만 받아 간 사람이 그 링크를
+    따라갈 수 있어야 한다. 올릴 때 이름이 ASCII인 것은 `gh`가 윈도에서 한글
+    자산 이름을 삼키기 때문이다.
+    """
+    assert rm.GUIDE_ASSET_NAME in rm.RELEASE_ASSETS
+    assert rm.KEYS_ASSET_NAME in rm.RELEASE_ASSETS
+    rm.KEYS_ASSET_NAME.encode("ascii")
+
+
 def test_아카이브가_자산_목록에_있다():
+    # 개수를 세는 것은 **자산이 조용히 사라지는 것**을 막으려는 것이다. 늘릴
+    # 때는 `run\\release.bat`이 실제로 그것을 올리는지 같이 본다 - 목록에만
+    # 넣고 안 올리면 `--release`가 매번 빨개진다.
     assert rm.SETUP_ZIP_NAME in rm.RELEASE_ASSETS
-    assert len(rm.RELEASE_ASSETS) == 6
+    assert len(rm.RELEASE_ASSETS) == 7
 
 
 def test_아카이브가_없으면_check가_잡는다(tmp_path):

@@ -159,12 +159,15 @@ def test_유형별_절이_없으면_소리를_낸다(tmp_path):
         docs_check.hand_type_sum(path)
 
 
-# --- 단축키 대장 (W-39·W-65) ------------------------------------------------
+# --- 단축키 대장 (W-39·W-65·W-73) -------------------------------------------
 #
-# 키 목록은 사용 안내 한 벌이다. 배포물에 그것만 나가서 뺄 수가 없고, 다른
-# 문서는 거기로 링크만 한다. 루트 README가 두 번째 벌을 갖고 있던 동안에는
-# 문서끼리 먼저 대조했다 - W-04에서 키 이름 표가 둘로 갈려 기본 바인딩 셋이
-# 조용히 죽은 적이 있어서다. 사본이 없어진 지금 남은 대조 상대는 소스뿐이다.
+# 대조가 둘이고 보는 것이 다르다. `check_keys`는 **설정 이름을 소스와** 보고,
+# `check_key_docs`는 **키 목록을 문서끼리** 본다.
+#
+# 문서끼리 보는 쪽은 한 번 없어졌다 돌아왔다. W-04에서 키 이름 표가 둘로 갈려
+# 기본 바인딩 셋이 조용히 죽었고, W-65에서 루트 README의 사본이 없어지면서
+# 대조할 상대가 사라졌다. W-73이 단축키만 모은 문서를 떼면서 다시 두 벌이 됐고
+# 둘 다 배포물에 나간다 - 갈라지면 사용자가 문서마다 다른 답을 듣는다.
 
 
 def test_단축키가_소스와_맞는다():
@@ -197,6 +200,105 @@ def test_vendor가_없으면_건너뛴다(monkeypatch):
     # 볼 것이 남지 않는다 - 다른 검사와 같은 규약으로 조용히 건너뛴다.
     monkeypatch.setattr(docs_check, "source_keys", lambda: None)
     assert docs_check.check_keys() == []
+
+
+def test_두_단축키_문서가_안_갈린다():
+    bad = docs_check.check_key_docs()
+    assert bad == [], "\n".join(bad)
+
+
+#: 합성 문서. 정본은 4장에 키를 굵게 적고 3장에 설정 메뉴 조작을 두고,
+#: 사본은 굵게 안 쓰고 절 이름 하나가 다르다. **두 문서의 실제 모양이 다르므로
+#: 그 차이까지 여기서 태운다** - 굵기나 절 이름을 맞춰 놓고 재면 실물에서
+#: 안 도는 검사를 통과시킨다.
+GUIDE = """# 안내
+
+## 3. 게임 실행
+
+### 3) 설정 메뉴
+
+- `소리` — 항목이 넷입니다
+- 숫자패드 8 또는 위쪽 화살표 — 위로
+{설정}
+
+## 4. 키
+
+### 1) 대상 찾기
+
+- **Page Down** — 다음 대상 알려 주고 지정하기
+{키}
+
+### 2) 게임 키와 겹치는 것
+
+- **Page Up과 Page Down**은 카메라 확대·축소를 겸합니다
+
+## 5. 명령어
+
+- `/acc help` — 도움말 알려 주기
+"""
+
+MIRROR = """# 목록
+
+## 1. 대상 찾기
+
+- Page Down — 다음 대상 알려 주고 지정하기
+{키}
+
+## 2. 설정 메뉴 조작
+
+- 숫자패드 8 또는 위쪽 화살표 — 위로
+{설정}
+"""
+
+
+def key_docs(tmp_path, guide_keys="", mirror_keys="", guide_opts="", mirror_opts=""):
+    guide = tmp_path / "README.ko.md"
+    mirror = tmp_path / "KEYS.ko.md"
+    guide.write_text(GUIDE.format(키=guide_keys, 설정=guide_opts), encoding="utf-8")
+    mirror.write_text(MIRROR.format(키=mirror_keys, 설정=mirror_opts), encoding="utf-8")
+    return guide, mirror
+
+
+def test_같은_키를_적은_두_문서는_통과한다(tmp_path):
+    assert docs_check.check_key_docs(*key_docs(tmp_path)) == []
+
+
+def test_사본에서_키가_빠지면_걸린다(tmp_path):
+    # 배포물에 두 벌이 나가는데 사본이 낡는 것이 이 검사가 막는 바로 그 사고다.
+    paths = key_docs(tmp_path, guide_keys="- **Ctrl+F1** — 도움말 말하기")
+    bad = docs_check.check_key_docs(*paths)
+    assert any("Ctrl+F1" in item and "정본에만" in item for item in bad), bad
+
+
+def test_사본에만_있는_키가_잡힌다(tmp_path):
+    paths = key_docs(tmp_path, mirror_keys="- Ctrl+F9 — 첫 단축바 읽기")
+    bad = docs_check.check_key_docs(*paths)
+    assert any("Ctrl+F9" in item and "사본에만" in item for item in bad), bad
+
+
+def test_절_이름이_다른_자리도_짝지어_본다(tmp_path):
+    # 설정 메뉴 조작 키는 정본에서 3장에 있어서 절 이름이 다르다. 별칭으로
+    # 잇지 않으면 이 절만 통째로 대조 밖에 남는다.
+    paths = key_docs(tmp_path, guide_opts="- Home, End — 목록의 처음, 끝으로 이동")
+    bad = docs_check.check_key_docs(*paths)
+    assert any("설정 메뉴 조작" in item and "Home, End" in item for item in bad), bad
+
+
+def test_정본에_생긴_절을_사본이_안_받으면_걸린다(tmp_path):
+    # 절을 **4장 안에** 넣는다. 뒤에 붙이면 5장(명령어)에 들어가서, 이 검사가
+    # 안 보는 자리를 태우고 초록으로 끝난다.
+    paths = key_docs(tmp_path, guide_keys="\n### 3) 새 갈래\n\n- **Ctrl+F7** — 장비 입기")
+    bad = docs_check.check_key_docs(*paths)
+    assert any("새 갈래" in item for item in bad), bad
+
+
+def test_장을_재편하면_소리를_낸다(tmp_path):
+    # 장 제목으로 잘라 내므로 제목이 바뀌면 **키를 하나도 못 찾고 조용히
+    # 통과한다.** 이 도구가 막으려던 실패와 같은 모양이라 소리를 내야 한다.
+    guide, mirror = key_docs(tmp_path)
+    guide.write_text("# 안내\n\n## 1. 아무것도 없다\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="장을 못 찾았다"):
+        docs_check.check_key_docs(guide, mirror)
 
 
 # --- 상태값 화이트리스트 ----------------------------------------------------

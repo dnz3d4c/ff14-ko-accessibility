@@ -57,9 +57,15 @@ if errorlevel 1 goto :fail
 copy /y "%PLUGINZIP%" "%OUT%\FF14Accessibility.zip" >nul
 if errorlevel 1 goto :fail
 
-rem 안내 문서도 같이 나간다. 설치의 첫 단계가 이걸 읽는 것인데, 저장소에만
+rem 안내 문서 둘도 같이 나간다. 설치의 첫 단계가 이걸 읽는 것인데, 저장소에만
 rem 두면 받는 사람은 무엇부터 눌러야 하는지 알 길이 없다.
+rem
+rem **여기에 줄을 더하는 것만으로는 사용자에게 안 닿는다.** 받는 사람이 푸는
+rem 아카이브는 tools\release-manifest 의 USER_FILES 가 담고, 거기 없으면
+rem 파일이 dist 에만 남는다. 그 빠짐은 오류가 아니라 침묵이다.
 copy /y "%REPO%\overlay\ko\README.ko.md" "%OUT%\사용 안내.md" >nul
+if errorlevel 1 goto :fail
+copy /y "%REPO%\overlay\ko\KEYS.ko.md" "%OUT%\단축키 목록.md" >nul
 if errorlevel 1 goto :fail
 
 echo.

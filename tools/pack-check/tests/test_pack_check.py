@@ -344,12 +344,14 @@ def test_항목이_둘이면_잡는다():
 # (2026-08-19). exe와 zip만 나가고 안내는 저장소에만 있었다.
 
 
-def make_dist(tmp_path, *, doc=True, manifests=True, notes=True):
-    """받는 사람에게 그대로 주는 루트 셋 + 기계가 읽는 `release/` 셋."""
+def make_dist(tmp_path, *, doc=True, keys=True, manifests=True, notes=True):
+    """받는 사람에게 그대로 주는 루트 넷 + 기계가 읽는 `release/` 셋."""
     (tmp_path / "FF14Accessibility.zip").write_bytes(b"")
     (tmp_path / "FF14AccessibilityInstaller-KR.exe").write_bytes(b"")
     if doc:
         (tmp_path / pack_check.GUIDE_NAME).write_text("안내", encoding="utf-8")
+    if keys:
+        (tmp_path / pack_check.KEYS_NAME).write_text("목록", encoding="utf-8")
 
     release = tmp_path / pack_check.RELEASE_DIR_NAME
     release.mkdir(exist_ok=True)
@@ -371,6 +373,17 @@ def test_안내_문서가_배포물로_센다(tmp_path):
 def test_안내_문서가_빠지면_잡는다(tmp_path):
     problems = pack_check.dist_layout_problems(make_dist(tmp_path, doc=False))
     assert any(pack_check.GUIDE_NAME in p for p in problems)
+
+
+def test_단축키_목록이_빠지면_잡는다(tmp_path):
+    """`run\\pack.bat`의 복사 줄이 빠진 상태다.
+
+    사용 안내 4장에 키가 전량 있으니 없어도 되는 것처럼 보이는데, 그 4장은
+    키마다 설명이 붙어 빠르게 훑을 수가 없다. 목록만 필요한 사람이 받는 것이
+    이 파일이라 빠지면 그 길이 통째로 없어진다.
+    """
+    problems = pack_check.dist_layout_problems(make_dist(tmp_path, keys=False))
+    assert any(pack_check.KEYS_NAME in p for p in problems), problems
 
 
 def test_모르는_파일은_여전히_잡는다(tmp_path):
@@ -399,8 +412,8 @@ def test_릴리스_매니페스트는_배포물로_센다(tmp_path):
 
 # ── 루트는 사용자 것, release는 기계 것 ────────────────────────────────────
 #
-# 사용 안내가 "셋을 같은 폴더에 두고 실행합니다"라고 말하는 그 폴더가 dist
-# 루트다. 거기에 사람이 안 여는 파일이 섞이면 무엇을 눌러야 하는지 헷갈린다.
+# 사용 안내가 "압축을 풀면 그 안에 넷이 들어 있습니다"라고 세어 주는 그 폴더가
+# dist 루트다. 거기에 사람이 안 여는 파일이 섞이면 무엇을 눌러야 하는지 헷갈린다.
 
 
 def test_루트에_기계용_파일이_섞이면_잡는다(tmp_path):

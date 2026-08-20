@@ -4,8 +4,8 @@
 받는 사람에게 그대로 줄 수 있는 폴더로 두고, 사람이 안 여는 것은 거기로 내린다.
 
 1. **`dist\\release\\FF14Accessibility-KR-Setup.zip`** - **받는 사람이 받는
-   것 하나.** 풀면 폴더가 나오고 그 안에 설치 프로그램·모드 본체·사용 안내가
-   있다. 루트의 셋을 그대로 담는다
+   것 하나.** 풀면 폴더가 나오고 그 안에 설치 프로그램·모드 본체·사용 안내·
+   단축키 목록이 있다. 루트의 넷을 그대로 담는다
 2. **`dist\\release\\repo.json`** - Dalamud 커스텀 저장소 매니페스트. 사용자가
    저장소 주소를 등록해 두면 Dalamud가 이걸 보고 새 판을 알아서 받는다. 형식은
    업스트림 `repo.json`을 본뜨고, 값은 **압축 안의
@@ -63,9 +63,9 @@ REPO_MANIFEST_NAME = "repo.json"
 INSTALLER_MANIFEST_NAME = "installer.json"
 
 #: 매니페스트 둘이 나가는 자리. `dist` 루트는 **사용자에게 그대로 줄 수 있는
-#: 폴더**로 두고, 기계만 읽는 것은 여기로 내린다 - 사용 안내가 "셋을 같은
-#: 폴더에 두고 실행합니다"라고 말하는 그 폴더라, 거기에 사람이 안 여는 파일이
-#: 섞이면 무엇을 눌러야 하는지 헷갈린다.
+#: 폴더**로 두고, 기계만 읽는 것은 여기로 내린다 - 사용 안내가 "압축을 풀면 그
+#: 안에 넷이 들어 있습니다"라고 세어 주는 그 폴더라, 거기에 사람이 안 여는
+#: 파일이 섞이면 무엇을 눌러야 하는지 헷갈린다.
 #:
 #: **릴리스에 올라갈 때는 여전히 개별 자산이다.** 받는 쪽이 URL로 직접 받으므로
 #: (`installer.json`은 자기 갱신이, `repo.json`은 Dalamud가) 폴더 구조는 우리
@@ -89,9 +89,18 @@ SETUP_DIR_NAME = "FF14Accessibility-KR"
 #: 무슨 파일인지 알아야 한다. 같은 이름을 `tools/pack-check`도 갖고 있다.
 GUIDE_NAME = "사용 안내.md"
 
-#: 받는 사람에게 그대로 주는 셋. `dist` 루트에 있는 것이 이것이고,
+#: 안내 문서 4장의 키만 모은 목록. 폴더에 나갈 때의 이름이고, 릴리스에 개별
+#: 자산으로 올라갈 때는 `KEYS_ASSET_NAME`(ASCII)이다. 원본은
+#: `overlay/ko/KEYS.ko.md`이고 같은 이름을 `tools/pack-check`도 갖고 있다.
+KEYS_NAME = "단축키 목록.md"
+
+#: 받는 사람에게 그대로 주는 넷. `dist` 루트에 있는 것이 이것이고,
 #: 사용자용 아카이브에도 **이 파일들을 그대로 담는다** - 따로 만들면 갈린다.
-USER_FILES = (INSTALLER_NAME, ZIP_NAME, GUIDE_NAME)
+#:
+#: **여기가 사용자용 ZIP의 정본이다.** `dist` 루트에 파일을 하나 더 내놓아도
+#: 이 튜플에 없으면 아카이브에 안 들어가고, 받는 사람은 그것을 영영 못 본다 -
+#: 오류가 아니라 침묵이다. `run\\pack.bat`의 복사 줄만 늘리면 그렇게 된다.
+USER_FILES = (INSTALLER_NAME, ZIP_NAME, GUIDE_NAME, KEYS_NAME)
 
 #: Dalamud 플러그인 목록에 그려지는 이름. **`InternalName`이 아니다** - 그쪽은
 #: 설치된 폴더 이름이자 갱신 대조 키라 건드리면 안 된다.
@@ -114,6 +123,12 @@ PLUGIN_DISPLAY_NAME = "FF14 접근성 모드 (한국 서버용)"
 #: 사람이 무슨 파일인지 아는 쪽이 낫다.
 GUIDE_ASSET_NAME = "README.ko.md"
 
+#: 단축키 목록이 **릴리스에 올라갈 때의 이름**이다. 같은 이유로 ASCII다.
+#:
+#: 사용 안내만 받아 간 사람도 그 문서가 가리키는 목록을 따라갈 수 있어야 해서
+#: 개별 자산으로도 올린다 - 아카이브를 안 풀고 문서만 훑는 길이 실제로 있다.
+KEYS_ASSET_NAME = "KEYS.ko.md"
+
 #: 우리 저장소. 업스트림(derbruedi)이 아니라 여기로 받아야 한다.
 REPO_URL = "https://github.com/dnz3d4c/ff14-ko-accessibility"
 DOWNLOAD_URL = f"{REPO_URL}/releases/latest/download/{ZIP_NAME}"
@@ -129,12 +144,14 @@ REPO_JSON_URL = f"{REPO_URL}/releases/latest/download/{REPO_MANIFEST_NAME}"
 #: 한 릴리스에 같이 올라가야 하는 자산. `run\\release.bat`이 올리는 목록이다.
 #: 하나라도 빠지면 받는 쪽은 오류가 아니라 "새 판이 없다"로 읽는다.
 #:
-#: 첫째가 **사람이 받는 것**이고 나머지 다섯은 기계가 URL로 받는 것이다.
+#: 첫째가 **사람이 받는 것**이고, 문서 둘은 아카이브를 안 풀고 훑는 사람 몫이며,
+#: 나머지는 기계가 URL로 받는 것이다.
 RELEASE_ASSETS = (
     SETUP_ZIP_NAME,
     INSTALLER_NAME,
     ZIP_NAME,
     GUIDE_ASSET_NAME,
+    KEYS_ASSET_NAME,
     REPO_MANIFEST_NAME,
     INSTALLER_MANIFEST_NAME,
 )

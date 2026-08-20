@@ -42,15 +42,20 @@ INTERNAL_NAME = "FF14Accessibility"
 #: 받는 폴더에 함께 나가는 안내 문서. 원본은 `overlay/ko/README.ko.md`다.
 GUIDE_NAME = "사용 안내.md"
 
+#: 안내 문서 4장의 키만 모은 목록. 원본은 `overlay/ko/KEYS.ko.md`다.
+#: **정본은 사용 안내 쪽이고 이것은 사본이다** - 둘이 갈리지 않는지는
+#: `tools/docs-check`의 `check_key_docs`가 본다.
+KEYS_NAME = "단축키 목록.md"
+
 #: 릴리스에 같이 올라가는 매니페스트 둘. `tools/release-manifest`가 만들고
 #: `run\\pack.bat`이 부른다. 여기서는 **나갈 자리에 있나**만 본다 - 값이 맞나는
 #: 그 도구의 `--check`가, 릴리스에 올라갔나는 `--release`가 잰다.
 RELEASE_MANIFESTS = ("repo.json", "installer.json")
 
 #: 사람이 안 여는 것이 들어가는 자리. `dist` 루트는 **받는 사람에게 그대로 줄
-#: 수 있는 폴더**로 두고 여기에 기계용을 내린다 - 사용 안내가 "셋을 같은 폴더에
-#: 두고 실행합니다"라고 말하는 그 폴더라, 거기 파일이 많으면 무엇을 눌러야
-#: 하는지 헷갈린다. 이름의 원천은 `tools/release-manifest`의 `RELEASE_DIR_NAME`이다.
+#: 수 있는 폴더**로 두고 여기에 기계용을 내린다 - 사용 안내가 "압축을 풀면 그
+#: 안에 넷이 들어 있습니다"라고 세어 주는 그 폴더라, 거기 파일이 많으면 무엇을
+#: 눌러야 하는지 헷갈린다. 이름의 원천은 `tools/release-manifest`의 `RELEASE_DIR_NAME`이다.
 RELEASE_DIR_NAME = "release"
 
 #: 릴리스 노트. 사람이 쓰고, 받는 사람이 "이번에 뭐가 바뀌었나"를 읽는
@@ -289,16 +294,18 @@ def dist_layout_problems(dist: Path) -> list[str]:
     아니라 "새 판이 없다"로 읽는다.** 만드는 것은 `tools/release-manifest`고
     여기서는 나갈 자리에 있나만 본다.
 
-    **자리가 둘로 갈린다.** 루트는 받는 사람에게 그대로 주는 셋이고,
-    `release/`는 사람이 안 여는 것이다. 사용 안내가 "셋을 같은 폴더에 두고
-    실행합니다"라고 말하는 그 폴더가 루트라, 거기 파일이 많으면 무엇을
-    눌러야 하는지 헷갈린다.
+    **자리가 둘로 갈린다.** 루트는 받는 사람에게 그대로 주는 넷이고,
+    `release/`는 사람이 안 여는 것이다. 사용 안내가 "압축을 풀면 그 안에 넷이
+    들어 있습니다"라고 세어 주는 그 폴더가 루트라, 거기 파일이 많으면 무엇을
+    눌러야 하는지 헷갈린다. **개수를 세는 문장이 사용 안내에 있으므로 여기를
+    늘리면 그 문장도 같이 고친다.**
     """
     problems = []
     root_expected = {
         f"{INTERNAL_NAME}.zip",
         "FF14AccessibilityInstaller-KR.exe",
         GUIDE_NAME,
+        KEYS_NAME,
     }
     # 노트는 **있어도 되지만 여기서 요구하지는 않는다.** 판마다 사람이 쓰는
     # 것이고 `run\\pack.bat`은 그 전에 돈다 - 여기서 요구하면 그냥 빌드만

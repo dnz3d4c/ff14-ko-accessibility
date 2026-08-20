@@ -63,13 +63,19 @@ _LOC_LANG = re.compile(
 _LOC_KEY = re.compile(r'^\s+\["(\w+)"\]\s*=', re.M)
 _LOC_END = "\n        },"
 
-#: 단축키 목록을 갖는 **하나뿐인** 문서. 배포물에 나가는 것이 이것이라 뺄 수
-#: 없고, 다른 문서는 여기로 링크만 한다.
+#: 단축키 목록을 갖는 문서 둘. **정본이 사용 안내 4장이고 `KEYS_DOC`은 사본이다.**
+#: 둘 다 배포물에 나가므로 어느 한쪽만 고치면 사용자가 문서마다 다른 답을 듣는다.
 #:
-#: 전에는 루트 README도 같은 목록을 갖고 있어서 이 상수가 둘이었고, `check_keys`가
-#: 문서끼리 먼저 대조했다. W-65에서 README가 한국 서버 고유 내용만 갖게 되면서
-#: 그 사본이 없어졌다 - 목록을 한 자리에 두는 것이 대조보다 먼저다.
+#: 상수가 둘인 것은 이번이 두 번째다. 전에는 루트 README가 사본이었고 `check_keys`가
+#: 문서끼리 먼저 대조했는데, W-65에서 README가 한국 서버 고유 내용만 갖게 되면서
+#: 그 사본이 없어졌다. 그때 이 자리에 "다시 두 벌이 되면 그때 `KEY_DOC`이 먼저
+#: 늘어난다"고 적어 뒀고, W-73에서 실제로 그렇게 됐다 - 키 설명이 붙은 4장은
+#: 빠르게 훑을 수 없어서 키만 모은 문서를 뗐다.
+#:
+#: **`check_keys`는 늘리지 않았다.** 그쪽이 보는 `KeyXxx` 설정 이름은 사용 안내
+#: 7장 하나가 갖고 사본에는 없다 - 사본에 그것까지 실으면 세 번째 벌이 된다.
 KEY_DOC = "overlay/ko/README.ko.md"
+KEYS_DOC = "overlay/ko/KEYS.ko.md"
 
 _KEY_IN_SOURCE = re.compile(r"^\s*public string (Key\w+)\s*=", re.M)
 _KEY_IN_DOC = re.compile(r"`(Key\w+)`")
@@ -150,6 +156,19 @@ def installer_loc_keys(path: Path = INSTALLER_LOC) -> dict[str, set[str]]:
     return found
 
 
+def user_files(repo: Path = REPO) -> tuple[str, ...]:
+    """받는 사람이 실제로 손에 쥐는 파일. **정본은 `tools/release-manifest`다.**
+
+    판이 이 개수를 세어 적는데, `run\\pack.bat`의 복사 줄만 늘리고 저쪽을 안
+    고치면 파일이 `dist`에만 남아 아카이브에 안 들어간다. 그러면 판의 숫자가
+    맞는 채로 사용자는 그 파일을 못 받는다 - 그 어긋남을 여기서 잰다.
+    """
+    sys.path.insert(0, str(repo / "tools" / "release-manifest"))
+    import release_manifest  # noqa: PLC0415 - 위에서 경로를 넣어야 찾는다
+
+    return release_manifest.USER_FILES
+
+
 def guide_facts(repo: Path = REPO) -> dict[str, int]:
     """공식 가이드 코퍼스에서 센 값. `tools/ko-guide`가 원문에서 계산해 대장에 적는다.
 
@@ -207,6 +226,10 @@ def facts(repo: Path = REPO) -> dict[str, int]:
         "손으로 옮긴 자리": hand_sites(repo),
         "손으로 볼 자리": hand_type_sum(repo / "docs" / "korean" / "hand-cases.md"),
         "커밋 규칙 최대": lint_rule_max(repo / "tools" / "commit-lint" / "commit_lint.py"),
+        "배포물 파일": len(user_files(repo)),
+        # 사용 안내 4장과 단축키 목록이 함께 갖는 키. 둘이 갈리는 것은
+        # `check_key_docs`가 막고, 판이 개수를 낡게 적는 것은 여기가 막는다.
+        "두 문서 키": sum(len(keys) for keys in guide_key_sections(repo / KEY_DOC).values()),
     }
 
 
@@ -228,6 +251,10 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     ("docs/status.md", "손으로 옮긴 자리", r"\+ 손 (\d+)곳\)"),
     ("docs/status.md", "손으로 볼 자리", r"복잡해 못 읽은 것 \| (\d+)곳 중"),
     ("docs/status.md", "대장 낱말", r"대장은 (\d+)개가 됐고"),
+    # 배포물 개수와 단축키 개수. 둘 다 판이 세어 적는 자리이고, 늘어나는 쪽으로만
+    # 움직인다 - 늘려 놓고 판을 안 고치면 사용자가 받는 것과 판이 말하는 것이 갈린다.
+    ("docs/status.md", "배포물 파일", r"`dist/`에 \*\*파일 (\d+)개\*\*를 낸다"),
+    ("docs/status.md", "두 문서 키", r"함께 적은 키는 (\d+)개다"),
     # 설치 프로그램 사전. 2026-08-20까지 등록이 없어서 `147키 중 92개`가
     # 실측 189 대 161과 갈린 채 남아 있었고, 거기서 나온 `55키`도 같이 죽었다.
     ("docs/status.md", "설치 프로그램 키", r"\*\*(\d+)키 중 한국어"),
@@ -479,6 +506,101 @@ def check_keys() -> list[str]:
     return bad
 
 
+#: 목록 항목에서 **키 표기만** 뽑는다. 정본은 굵게 쓰고(`- **Ctrl+F1** — `)
+#: 사본은 안 쓴다.
+#:
+#: **백틱으로 시작하는 항목은 뺀다.** 그 자리는 키가 아니라 설정 항목 이름
+#: (`` `소리` ``), 명령어(`` `/acc help` ``), 파일 이름이라 같은 목록 꼴을
+#: 하고 있다. 그것까지 세면 두 문서가 영영 안 맞는다.
+_KEY_ITEM = re.compile(r"^- (?!`)(?:\*\*)?([^—*`]+?)(?:\*\*)? — ", re.M)
+
+#: 같은 목록인데 절 이름이 다른 자리. 설정 메뉴 조작 키는 정본에서 4장이
+#: 아니라 3장(게임 실행) 안에 있어서 제목이 짧다.
+KEYS_SECTION_ALIASES = {"설정 메뉴": "설정 메뉴 조작"}
+
+#: 정본에서 키 목록을 꺼내는 장. **제목으로 자른다.**
+KEY_CHAPTER = "키"
+OPTIONS_CHAPTER = "게임 실행"
+OPTIONS_SECTION = "설정 메뉴"
+
+
+def _numbered(text: str, level: int) -> dict[str, str]:
+    """`### 1) 제목` 꼴의 절. 제목 -> 다음 같은 깊이까지의 본문."""
+    pattern = re.compile(rf"^{'#' * level} \d+[.)] (.+)$", re.M)
+    hits = list(pattern.finditer(text))
+    return {
+        hit.group(1).strip(): text[hit.end(): hits[i + 1].start() if i + 1 < len(hits) else len(text)]
+        for i, hit in enumerate(hits)
+    }
+
+
+def _pick(sections: dict[str, str], name: str, path: Path) -> str:
+    """절 하나. **못 찾으면 실패다.**
+
+    제목으로 잘라 내므로 장을 재편하면 키를 하나도 못 찾고 **조용히 통과한다.**
+    빈 집합끼리는 언제나 같아서, 그날로 이 대조가 죽는다.
+    """
+    if name not in sections:
+        raise ValueError(
+            f"`{path.name}`에서 `{name}` 장을 못 찾았다. 장을 재편했으면 상수도 같이 고쳐라"
+        )
+    return sections[name]
+
+
+def guide_key_sections(path: Path) -> dict[str, set[str]]:
+    """정본이 절마다 적은 키. 4장과 3장의 설정 메뉴를 함께 본다.
+
+    키가 없는 절은 뺀다 - `게임 키와 겹치는 것`처럼 키를 나열하지 않고 산문으로
+    적는 절이 있고, 그런 절까지 사본에 요구하면 사본이 정본의 복사본이 된다.
+    """
+    chapters = _numbered(path.read_text(encoding="utf-8"), 2)
+    found = {
+        title: set(_KEY_ITEM.findall(body))
+        for title, body in _numbered(_pick(chapters, KEY_CHAPTER, path), 3).items()
+    }
+    options = _numbered(_pick(chapters, OPTIONS_CHAPTER, path), 3)
+    found[OPTIONS_SECTION] = set(_KEY_ITEM.findall(_pick(options, OPTIONS_SECTION, path)))
+    return {title: keys for title, keys in found.items() if keys}
+
+
+def mirror_key_sections(path: Path) -> dict[str, set[str]]:
+    """사본이 장마다 적은 키. 사본은 키만 갖는 문서라 장이 곧 갈래다."""
+    found = {
+        title: set(_KEY_ITEM.findall(body))
+        for title, body in _numbered(path.read_text(encoding="utf-8"), 2).items()
+    }
+    return {title: keys for title, keys in found.items() if keys}
+
+
+def check_key_docs(
+    guide: Path = REPO / KEY_DOC, mirror: Path = REPO / KEYS_DOC
+) -> list[str]:
+    """두 문서가 같은 키를 적고 있나.
+
+    **재는 것은 키 표기 집합이지 설명 문장이 아니다.** 사본은 정본에서 첫
+    구절만 가져오므로 문장은 일부러 다르다 - 문장까지 재면 사본이 정본의
+    복사본이 되고, 그러면 따로 둘 이유가 없어진다.
+    """
+    left = guide_key_sections(guide)
+    right = mirror_key_sections(mirror)
+    bad: list[str] = []
+
+    for title, keys in sorted(left.items()):
+        want = KEYS_SECTION_ALIASES.get(title, title)
+        if want not in right:
+            bad.append(
+                f"`{mirror.name}`에 `{want}` 절이 없다. "
+                f"정본이 키 {len(keys)}개를 거기 갖고 있다"
+            )
+            continue
+        mine = right.pop(want)
+        bad += [f"{want}: `{key}`가 정본에만 있다" for key in sorted(keys - mine)]
+        bad += [f"{want}: `{key}`가 사본에만 있다" for key in sorted(mine - keys)]
+
+    bad += [f"`{mirror.name}`의 `{title}` 절이 정본에 없다" for title in sorted(right)]
+    return bad
+
+
 # ------------------------------------------------------------- 문서 위생
 
 #: 마크다운에 있으면 안 되는 제어 문자. 탭(`0x09`)·줄바꿈(`0x0A`)·복귀(`0x0D`)는
@@ -575,6 +697,7 @@ def main(argv: list[str]) -> int:
         check_citations()
         + check_board()
         + check_keys()
+        + check_key_docs()
         + check_control_chars()
         + check_link_names()
         + check_retired()
@@ -586,7 +709,11 @@ def main(argv: list[str]) -> int:
         return 1
 
     keys = doc_keys(KEY_DOC)
-    print(f"통과 - 인용 {len(CITATIONS)}자리, 현황판 정합, 단축키 {len(keys)}개")
+    mirrored = sum(len(v) for v in guide_key_sections(REPO / KEY_DOC).values())
+    print(
+        f"통과 - 인용 {len(CITATIONS)}자리, 현황판 정합, "
+        f"설정 이름 {len(keys)}개, 두 문서가 함께 적은 키 {mirrored}개"
+    )
     return 0
 
 

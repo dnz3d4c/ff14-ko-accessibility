@@ -68,6 +68,26 @@ setx DALAMUD_RUNTIME "C:\Program Files\dotnet"
 
 hook 폴더 이름이 버전이라 **업데이트마다 바뀐다.** 빌드용 `DALAMUD_HOME`도 같이 옮겨야 한다.
 
+### 5-1. 업데이터가 쓰는 순서 — 설치 프로그램이 언제 이어가도 되는가
+
+**"Dalamud가 있다"를 폴더 하나로 판정하면 이르다.** 업데이터는 위 결과를 한 번에 내려놓지 않고 8초에 걸쳐 쓴다. 2026-08-20에 `%APPDATA%\XIVLauncherKR`의 타임스탬프를 재서 나온 순서다(업데이터 0.5.0 + Dalamud 15.0.3.2).
+
+| 시각 | 무엇이 생기나 |
+|------|---------------|
+| 07:57:38 | `FFXIVClientStructs.dll`, `version.json` — 공식 stable 압축 해제 |
+| 07:57:39 | `Dalamud.dll` + KR 패치 마커 3종 |
+| 07:57:40 | `runtimes\`, `kr-language-backup\` |
+| 07:57:45 | `dalamudAssets\437\` |
+| 07:57:46 | `dalamudAssets\asset.ver` |
+
+**설치 프로그램은 07:57:41에 이미 플러그인을 깔고 있었다.** 업데이터가 아직 런타임을 쓰던 중이었고 에셋은 5초 뒤에 왔다.
+
+그래서 준비 완료의 기준은 둘이다 — `addon\Hooks\<버전>\`에 KR 패치 마커가 있고, **`dalamudAssets\asset.ver`가 있다.** 뒤엣것이 마지막에 쓰이므로 그것이 "끝났다"의 표지다. 마커는 이름 셋(`Signature`·`Compatibility`·`Language`)을 못 박지 않고 `Dalamud.KR.*.Patch.json` 패턴으로 본다. 관찰이 한 조합뿐이라, 이름이나 개수를 고정하면 업데이터가 바뀌는 순간 영영 통과 못 하고 타임아웃으로 간다.
+
+**쓰지 않기로 한 것**: 업데이터 설정의 `HookVersion`. 같은 날 `settings.json`의 mtime이 08:08:00이었는데, 그건 [업데이트 확인]을 누른 때가 아니라 **게임에 적용할 때**다. 완료 판정으로는 늦다.
+
+판정 자체는 `Installer/KrProfile.cs`의 `DalamudMissingPiece`가 갖고, 조합 넷을 `tools/pack-check`가 실물 EXE에 물어본다.
+
 ## 6. 플러그인 빌드와 배치
 
 저장소 루트에서 vendor 클론에 KR 패치를 적용한 뒤 빌드한다(`overlay/patches/README.md` 참조).

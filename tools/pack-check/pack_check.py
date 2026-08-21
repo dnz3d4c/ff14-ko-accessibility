@@ -39,6 +39,10 @@ from pathlib import Path
 #: 플러그인 내부 이름. Dalamud는 폴더 이름·DLL 이름·매니페스트가 다 이것이길 요구한다.
 INTERNAL_NAME = "FF14Accessibility"
 
+#: 게임과 업데이터를 함께 띄우는 런처. 설치기가 자기 안에 품고 있다가
+#: `%LOCALAPPDATA%\\FF14Accessibility`에 꺼내 놓고 바로가기를 건다.
+LAUNCHER_EXE = "FF14AccessibilityPlay.exe"
+
 #: 받는 폴더에 함께 나가는 안내 문서. 원본은 `overlay/ko/README.ko.md`다.
 GUIDE_NAME = "사용 안내.md"
 
@@ -437,9 +441,16 @@ def _seed_profile(root: Path) -> None:
     )
 
 
-def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
+def run_installer(
+    exe: Path, root: Path, shortcut_dir: Path | None = None
+) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
     env["FF14ACC_KR_PROFILE"] = str(root)
+    # 바로가기를 버리는 폴더로 돌린다. 안 그러면 검사를 돌릴 때마다 실제
+    # 바탕화면에 바로가기가 하나씩 놓이고, 그러면 이 단계를 건너뛸 수밖에
+    # 없어진다 - 아무 검사도 안 지나는 단계가 되는 것이 W-52의 모양이다.
+    if shortcut_dir is not None:
+        env["FF14ACC_SHORTCUT_DIR"] = str(shortcut_dir)
     # .NET 감지는 지나가되 설치는 하지 않는다. 설치는 시스템 전역이라 버리는
     # 프로필로 격리가 안 되고, UAC 창이 뜨면 무인 실행이 거기서 멈춘다.
     # 감지 갈래를 지나는 것은 `dotnet_branch_ran`이 로그로 확인한다.
@@ -480,6 +491,68 @@ def run_check(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
         env=env,
         timeout=120,
     )
+
+
+#: 바로가기를 되읽는 스크립트. `WScript.Shell`은 파이썬에서 못 부르므로
+#: (pywin32가 이 저장소 의존성에 없다) 윈도가 기본으로 갖고 있는 `cscript`에
+#: 넘긴다. 설치기가 바로가기를 **만드는** 데 쓰는 것과 같은 COM 개체다.
+_READ_LNK_JS = """\
+var shell = new ActiveXObject("WScript.Shell");
+var link = shell.CreateShortcut(WScript.Arguments(0));
+WScript.Echo("TargetPath=" + link.TargetPath);
+WScript.Echo("Arguments=" + link.Arguments);
+WScript.Echo("WorkingDirectory=" + link.WorkingDirectory);
+"""
+
+
+def read_shortcut(link: Path) -> dict[str, str]:
+    """`.lnk`에 실제로 적힌 값. 못 읽으면 빈 사전.
+
+    **파일이 생겼다는 것만으로 완료로 치지 않기 위해 있다.** 대상이 빈 채로
+    저장된 바로가기도 파일로는 멀쩡히 존재한다.
+    """
+    workdir = Path(tempfile.mkdtemp(prefix="ff14acc-lnk-"))
+    try:
+        script = workdir / "readlnk.js"
+        script.write_text(_READ_LNK_JS, encoding="utf-8")
+        result = subprocess.run(
+            ["cscript", "//nologo", str(script), str(link)],
+            capture_output=True,
+            text=True,
+            encoding=locale.getpreferredencoding(False),
+            errors="replace",
+            timeout=60,
+        )
+        if result.returncode != 0:
+            return {}
+        pairs = (line.split("=", 1) for line in result.stdout.splitlines() if "=" in line)
+        return {key: value.strip() for key, value in pairs}
+    except (OSError, subprocess.SubprocessError):
+        return {}
+    finally:
+        shutil.rmtree(workdir, ignore_errors=True)
+
+
+def shortcut_problems(shortcut_dir: Path) -> list[str]:
+    """설치기가 만든 플레이 바로가기가 실제로 실행 가능한 것을 가리키나."""
+    links = list(shortcut_dir.glob("*.lnk"))
+    if not links:
+        return [f"플레이 바로가기를 안 만들었다: {shortcut_dir}"]
+    if len(links) != 1:
+        return [f"바로가기가 {len(links)}개다. 하나여야 한다: {shortcut_dir}"]
+
+    values = read_shortcut(links[0])
+    if not values:
+        return [f"바로가기를 되읽지 못했다: {links[0]}"]
+
+    target = Path(values.get("TargetPath", ""))
+    if target.name != LAUNCHER_EXE:
+        return [f"바로가기 대상이 런처가 아니다: {values.get('TargetPath', '(빈 값)')}"]
+    if not target.is_file():
+        return [f"바로가기가 없는 파일을 가리킨다: {target}"]
+    if not values.get("WorkingDirectory"):
+        return [f"바로가기에 작업 폴더가 없다: {links[0]}"]
+    return []
 
 
 def dotnet_branch_ran(stdout: str) -> bool:
@@ -610,10 +683,15 @@ def check_install_e2e(dist: Path) -> list[str]:
         dev_dir.mkdir(parents=True)
         (dev_dir / f"{INTERNAL_NAME}.dll").write_bytes(b"stale")
 
-        first = run_installer(exe, root)
+        shortcut_dir = workdir / "shortcuts"
+        shortcut_dir.mkdir()
+
+        first = run_installer(exe, root, shortcut_dir)
         if first.returncode != 0:
             problems.append(f"설치기가 실패했다(코드 {first.returncode}):\n{first.stdout}{first.stderr}")
             return problems
+
+        problems += shortcut_problems(shortcut_dir)
 
         if not dotnet_branch_ran(first.stdout):
             problems.append(
@@ -634,13 +712,16 @@ def check_install_e2e(dist: Path) -> list[str]:
         )
 
         # 두 번째 실행: 갱신 경로다. 신원이 바뀌면 프로필에 죽은 항목이 쌓인다.
-        second = run_installer(exe, root)
+        second = run_installer(exe, root, shortcut_dir)
         if second.returncode != 0:
             problems.append(f"두 번째 설치가 실패했다(코드 {second.returncode})")
         elif working_plugin_id(plugin_root) != first_id:
             problems.append("두 번 설치했더니 WorkingPluginId가 바뀌었다")
 
         problems += installed_layout_problems(plugin_root)
+        # 두 번 깔아도 바로가기는 하나다. 이름을 바꿔 만들면 바탕화면에 매
+        # 설치마다 하나씩 쌓인다.
+        problems += shortcut_problems(shortcut_dir)
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 

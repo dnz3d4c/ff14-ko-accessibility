@@ -573,6 +573,19 @@ def _gh(args: list[str], tag: str, timeout: int = 600, missing: str | None = Non
     return result.stdout
 
 
+def dotnet_runtime_url() -> str:
+    """설치 프로그램이 .NET을 받아 오는 주소.
+
+    여기서 다시 적지 않고 `tools/kr-setup/kr_profile.py`에서 가져온다. 그쪽이
+    설치기(`KrProfile.cs`)와 미러링돼 있고 갈라지면 테스트가 실패한다. 사본을
+    하나 더 만들면 그 그물 밖에 놓인다.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kr-setup"))
+    import kr_profile  # noqa: PLC0415 - 배치가 파일 경로로 직접 부른다
+
+    return kr_profile.DOTNET_DOWNLOAD_URL
+
+
 def link_status(url: str, timeout: int = 30) -> int | str:
     """주소가 실제로 열리나. 본문은 안 읽는다.
 
@@ -624,7 +637,7 @@ def gather_release(tag: str, workdir: Path, repo: str = GH_REPO) -> ReleaseFacts
     exe = downloaded.get(INSTALLER_NAME)
     zip_path = downloaded.get(ZIP_NAME)
     repo_manifest = _read_repo_manifest(downloaded.get(REPO_MANIFEST_NAME))
-    urls = {REPO_JSON_URL} | {
+    urls = {REPO_JSON_URL, dotnet_runtime_url()} | {
         url for field in DOWNLOAD_FIELDS if isinstance(url := repo_manifest[0].get(field), str)
     }
     return ReleaseFacts(
@@ -757,6 +770,15 @@ def _download_link_problems(facts: ReleaseFacts) -> list[str]:
         status = facts.link_status.get(url)
         if status != 200 and (why := _why_blocked(facts, url, status)) is not None:
             problems.append(why)
+
+    # 남의 주소라 `_why_blocked`의 설명(초안·비공개 저장소)이 하나도 안 맞는다.
+    # 그래서 따로 잰다. 우리 자산은 아니지만 **첫 설치가 여기 매여 있다** -
+    # 죽으면 갓 받은 사람이 런타임 없이 끝나고, 게임 안에서 모드가 안 뜬다.
+    if (status := facts.link_status.get(dotnet_runtime_url())) != 200:
+        problems.append(
+            f".NET 런타임 주소가 {status}다: {dotnet_runtime_url()}. "
+            f"설치 프로그램이 이 주소로 받으므로 첫 설치가 런타임 없이 끝난다"
+        )
     return problems
 
 

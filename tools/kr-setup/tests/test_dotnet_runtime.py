@@ -120,6 +120,43 @@ def test_설치기가_같은_코드를_읽는다():
         assert token in text, f"설치기에 `{token}`이 없다 - 두 판정이 갈라졌다"
 
 
+# --- 업데이터가 이미 떠 있나 -----------------------------------------------
+#
+# 막는 사고는 **업데이터를 두 번 띄우는 것**이다. 묶은 바로가기가 매번 새
+# 업데이터를 열면 같은 게임에 인젝터가 둘 붙는다.
+#
+# 이름이 하나가 아니다. 우리가 실행하는 것은 `Dalamud.Updater.exe`인데, 그건
+# 부트스트랩이라 `versions\<판>\Dalamud.Updater.Gui.exe`를 띄우고 물러난다.
+# 2026-08-21 실측에서 떠 있던 것은 `Dalamud.Updater.Gui` 하나뿐이었다 -
+# 정확히 일치하는 이름으로 물으면 **떠 있는 업데이터를 못 알아본다.**
+
+
+def test_실제로_뜨는_GUI_이름을_잡는다():
+    assert kr_profile.is_updater_process("Dalamud.Updater.Gui")
+
+
+def test_부트스트랩_이름도_잡는다():
+    assert kr_profile.is_updater_process("Dalamud.Updater")
+
+
+def test_대소문자를_안_따진다():
+    assert kr_profile.is_updater_process("dalamud.updater.gui")
+
+
+@pytest.mark.parametrize("name", ["Dalamud", "ffxiv_dx11", "Dalamud.Injector", ""])
+def test_남의_프로세스는_안_잡는다(name):
+    assert not kr_profile.is_updater_process(name)
+
+
+def test_설치기가_같은_접두사를_쓴다():
+    source = (kr_profile.REPO / "vendor" / "ff14-accessibility" / "Installer"
+              / "KrProfile.cs")
+    if not source.is_file():
+        pytest.skip("vendor 클론이 없다")
+    text = source.read_text(encoding="utf-8")
+    assert kr_profile.UPDATER_PROCESS_PREFIX in text, "설치기와 접두사가 갈라졌다"
+
+
 # --- 업데이터가 달라무드를 알아서 붙이는가 ---------------------------------
 #
 # 이 테스트가 받치는 것은 코드가 아니라 **문서**다. 사용 안내와 개발 문서가

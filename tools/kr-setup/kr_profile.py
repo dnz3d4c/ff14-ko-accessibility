@@ -154,6 +154,25 @@ def dotnet_install_result(exit_code: int) -> str:
     return DOTNET_FAILED
 
 
+# ── 업데이터가 이미 떠 있나 ────────────────────────────────────────────────
+
+#: 업데이터 프로세스 이름의 **접두사**. 정확히 일치로 물으면 안 된다.
+#:
+#: `Dalamud.Updater.exe`는 부트스트랩이고, 그것이
+#: `versions\<판>\Dalamud.Updater.Gui.exe`를 띄우고 물러난다. 2026-08-21
+#: 실측에서 떠 있던 것은 `Dalamud.Updater.Gui` 하나뿐이었다.
+UPDATER_PROCESS_PREFIX = "Dalamud.Updater"
+
+
+def is_updater_process(name: str) -> bool:
+    """프로세스 이름이 KR 달라무드 업데이터의 것인가.
+
+    묶은 바로가기가 이 판정으로 **두 번 띄우는 것**을 막는다. 같은 게임에
+    인젝터가 둘 붙으면 그 상태를 사용자가 귀로 알아챌 방법이 없다.
+    """
+    return name.lower().startswith(UPDATER_PROCESS_PREFIX.lower())
+
+
 def _appdata() -> str:
     return os.environ.get("APPDATA", "")
 

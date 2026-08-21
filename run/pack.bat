@@ -14,6 +14,8 @@ rem 장비세트 호출에서 죽는 물건이 나간다(2026-08-18 실제로 �
 set "INSTALLER=%REPO%\vendor\ff14-accessibility\Installer\FF14AccessibilityInstaller.csproj"
 set "PUBLISH=%REPO%\vendor\ff14-accessibility\Installer\bin\Release\net8.0-windows\win-x64\publish"
 set "PLUGINZIP=%REPO%\vendor\ff14-accessibility\FF14Accessibility\bin\Release\net10.0-windows\FF14Accessibility\latest.zip"
+set "LAUNCHER=%REPO%\vendor\ff14-accessibility\Launcher\FF14AccessibilityPlay.csproj"
+set "LAUNCHEREXE=%REPO%\vendor\ff14-accessibility\Launcher\bin\Release\net10.0-windows\win-x64\publish\FF14AccessibilityPlay.exe"
 set "OUT=%REPO%\dist"
 
 echo == 배포 폴더 만들기 ==
@@ -29,7 +31,7 @@ if not defined DALAMUD_HOME (
 )
 
 set "DOTNET_CLI_UI_LANGUAGE=en"
-echo 1/5  플러그인을 KR(7.51)로 다시 빌드한다.
+echo 1/6  플러그인을 KR(7.51)로 다시 빌드한다.
 set "PLUGINPROJ=%REPO%\vendor\ff14-accessibility\FF14Accessibility\FF14Accessibility.csproj"
 "%DOTNET%" build -c Release "%PLUGINPROJ%" -v quiet --nologo
 if errorlevel 1 (
@@ -42,7 +44,25 @@ if not exist "%PLUGINZIP%" (
 )
 
 echo.
-echo 2/5  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
+echo 2/6  게임과 업데이터를 함께 띄우는 런처를 낸다.
+rem **설치기보다 먼저다.** 설치기가 이 EXE를 리소스로 품고 나가므로, 순서가
+rem 뒤바뀌면 옛 런처가 배포물에 실린다. 없으면 설치기 빌드가 아예 깨진다 -
+rem csproj의 EmbeddedResource에 조건을 안 걸어 둔 것이 그래서다.
+rem
+rem 프레임워크 종속이다. 설치기가 .NET 10을 먼저 보장하므로 런타임을 한 벌
+rem 더 싣지 않는다.
+"%DOTNET%" publish -c Release "%LAUNCHER%" -v quiet --nologo
+if errorlevel 1 (
+  echo [실패] 런처 빌드가 깨졌다.
+  goto :fail
+)
+if not exist "%LAUNCHEREXE%" (
+  echo [실패] 런처 산출물이 없다: %LAUNCHEREXE%
+  goto :fail
+)
+
+echo.
+echo 3/6  설치기를 자체 포함 단일 EXE로 낸다. 몇 분 걸린다.
 "%DOTNET%" publish -c Release "%INSTALLER%"
 if errorlevel 1 (
   echo [실패] 설치기 빌드가 깨졌다.
@@ -50,7 +70,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo 3/5  배포 폴더에 모은다.
+echo 4/6  배포 폴더에 모은다.
 if not exist "%OUT%" mkdir "%OUT%"
 copy /y "%PUBLISH%\FF14AccessibilityInstaller-KR.exe" "%OUT%\" >nul
 if errorlevel 1 goto :fail
@@ -69,7 +89,7 @@ copy /y "%REPO%\overlay\ko\KEYS.ko.md" "%OUT%\단축키 목록.md" >nul
 if errorlevel 1 goto :fail
 
 echo.
-echo 4/5  릴리스에 같이 올릴 매니페스트를 산출물에서 만든다.
+echo 5/6  릴리스에 같이 올릴 매니페스트를 산출물에서 만든다.
 rem 자기 갱신은 installer.json을, Dalamud 커스텀 저장소는 repo.json을 읽는다.
 rem 릴리스에 이 둘이 안 올라가면 받는 쪽은 오류가 아니라 "새 판이 없다"로
 rem 읽는다. 값은 손으로 안 적고 방금 낸 산출물에서 뽑는다.
@@ -80,7 +100,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo 5/5  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
+echo 6/6  낸 것을 다시 잰다. 압축 내용과 설치 결과를 규칙으로 대조한다.
 uv run --no-project python "%REPO%\tools\pack-check\pack_check.py" --e2e --kr-dalamud "%DALAMUD_HOME%" --dotnet "%DOTNET%"
 if errorlevel 1 (
   echo [실패] 배포 검사가 걸렸다. 위 목록을 본다.

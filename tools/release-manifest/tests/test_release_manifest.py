@@ -533,7 +533,11 @@ def release_facts(tmp_path, **overrides) -> rm.ReleaseFacts:
         "plugin_manifest": plugin_manifest(),
         "exe": exe,
         "exe_version": "1.1.0.0",
-        "link_status": {rm.DOWNLOAD_URL: 200, rm.REPO_JSON_URL: 200},
+        "link_status": {
+            rm.DOWNLOAD_URL: 200,
+            rm.REPO_JSON_URL: 200,
+            rm.dotnet_runtime_url(): 200,
+        },
         "is_draft": False,
         "is_private": False,
     }
@@ -608,6 +612,26 @@ def test_저장소가_비공개면_repo_json_주소에서_드러난다(tmp_path)
 def test_링크를_못_열었으면_이유를_말한다(tmp_path):
     facts = release_facts(tmp_path, link_status={rm.DOWNLOAD_URL: "이름을 못 찾았다", rm.REPO_JSON_URL: 200})
     assert any("이름을 못 찾았다" in p for p in rm.release_problems(facts))
+
+
+def test_닷넷_주소가_죽으면_잡는다(tmp_path):
+    """우리 자산이 아니지만 첫 설치가 여기 매여 있다.
+
+    죽으면 갓 받은 사람이 런타임 없이 끝나고, 게임 안에서 모드가 안 뜬다.
+    """
+    facts = release_facts(
+        tmp_path,
+        link_status={rm.DOWNLOAD_URL: 200, rm.REPO_JSON_URL: 200, rm.dotnet_runtime_url(): 404},
+    )
+    assert any(rm.dotnet_runtime_url() in p for p in rm.release_problems(facts))
+
+
+def test_닷넷_주소를_아예_안_재면_잡는다(tmp_path):
+    """검사에서 주소가 빠지는 것이 404보다 나쁘다 - 조용히 통과한다."""
+    facts = release_facts(
+        tmp_path, link_status={rm.DOWNLOAD_URL: 200, rm.REPO_JSON_URL: 200}
+    )
+    assert any(rm.dotnet_runtime_url() in p for p in rm.release_problems(facts))
 
 
 def test_링크_셋이_갈리면_잡는다(tmp_path):

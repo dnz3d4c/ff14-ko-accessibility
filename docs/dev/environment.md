@@ -120,21 +120,19 @@ DALAMUD_HOME=%APPDATA%\XIVLauncherKR\addon\Hooks\15.0.3.2
 
 **업데이터가 hook 버전을 올릴 때마다 이 값이 낡는다.** 빌드가 갑자기 Dalamud 타입을 못 찾으면 여기부터 본다.
 
-### 아직 안 한 것 — 게임 주입
+### 게임 주입 — 업데이터가 알아서 한다
 
-Dalamud를 게임에 붙이는 마지막 단계는 GUI 조작이라 남아 있다. 프로필 초기화 CLI(`--initialize-first-install-profile`)는 안전장치가 걸려 있어 메인 프로필에 쓰지 못한다("테스트 전용 프로필만 허용").
+Dalamud를 게임에 붙이는 것은 업데이터가 스스로 한다. 설정의 `AutoStart`·`AutoApply`가 참이고 `DelaySeconds`가 `1`이라, 업데이터가 떠 있으면 게임 프로세스를 1초 간격으로 감시하다 주입한다. 근거와 실측은 [kr-runtime.md](kr-runtime.md) §9.
 
-절차(README-KR.txt 기준):
-
-1. ~~게임을 종료한 상태에서 `Dalamud.Updater.exe` 실행 → 업데이트 확인~~ (2026-08-17 완료)
-2. 게임 실행
-3. "달라무드 적용" 누름
+사람이 남아 있는 자리는 `[업데이트 확인]` 하나다. 그건 Dalamud 본체를 받아 KR 호환 패치를 입히는 것이라 주입과 별개이고, 게임을 끈 상태에서 누른다.
 
 실행 명령(복사용, Win+R):
 
 %LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe
 
-관리자 권한으로 재실행하려 들면 `--no-elevate`를 붙여 막을 수 있다.
+**`--no-elevate`를 붙이지 않는다.** KR 클라이언트가 관리자 권한으로 뜨므로 일반 권한에 고정된 업데이터의 `OpenProcess`는 구조적으로 실패한다 — 인젝터 로그에 `Win32Exception (5)`로 남는다. 업데이터는 필요할 때 스스로 권한을 올린다. 이 인자를 넘기고 있던 것이 실제 결함이었다(`docs/status.md` §5-8).
+
+프로필 초기화 CLI(`--initialize-first-install-profile`)는 안전장치가 걸려 있어 메인 프로필에 쓰지 못한다("테스트 전용 프로필만 허용"). 우리가 프로필을 손으로 만드는 이유가 그것이다.
 
 ## 4. 빌드 검증 — 조사 §7-7 해소
 

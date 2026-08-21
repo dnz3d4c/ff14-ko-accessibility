@@ -171,12 +171,23 @@ vnavmesh는 `awgil/ffxiv_navmesh`이고 **LICENSE 파일이 없다.** KR Dalamud
 
 배치가 하는 일은 이렇다.
 
-1. 한국어 런처로 게임 실행 — `%ProgramData%\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk`
-2. 로그인하고 게임 시작 (사람이 한다 — 배치가 여기서 기다린다)
-3. 업데이터 실행 — `%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
-4. **달라무드 적용** (사람이 누른다 — GUI 버튼이라 자동화가 안 된다)
+1. 업데이터 실행 — `%LOCALAPPDATA%\KR-Dalamud-Updater\app\Dalamud.Updater.exe`
+2. 한국어 런처로 게임 실행 — `%ProgramData%\Microsoft\Windows\Start Menu\Programs\FINAL FANTASY XIV - KOREA\FINAL FANTASY XIV - KOREA.lnk`
+3. 로그인하고 게임 시작 (사람이 한다)
+
+**달라무드 적용은 사람이 안 누른다.** 업데이터가 알아서 붙인다. 근거는 셋이다.
+
+- 업데이터 설정에 `AutoStart`와 `AutoApply`가 참이고 `DelaySeconds`가 `1`이다(`%APPDATA%\KrDalamudUpdater\settings.json`, 2026-08-21 실측)
+- `KrProfile.TryLaunchUpdater()`가 **인자 없이** 부르므로 그 기본값이 그대로 산다
+- `kr-dalamud-launch-state.json`에 게임 시작 `13:27:39.176`, 주입 `13:27:41.025`로 남아 있다 — **1.85초 차이다**
+
+**업데이터의 `README-KR.txt`는 아직 반대로 적고 있다**(8번 "게임을 실행한 뒤 달라무드 적용을 누릅니다"). 그 문서가 아니라 설정값과 실행 기록이 근거다. 남의 README가 실물과 어긋난 것을 이 저장소가 겪은 것은 이번이 두 번째다 — 첫 번째는 버튼 이름을 영어로 적어 둔 것이었다(`docs/status.md` §5-10).
+
+**그래서 순서도 고정이 아니다.** 업데이터가 1초 간격으로 게임 프로세스를 감시하므로 게임이 먼저 떠 있어도 찾아 붙는다. 업데이터를 먼저 띄우는 것은 그쪽이 자기 갱신을 확인하는 시간을 벌기 위한 것이지 필수 순서가 아니다.
 
 업데이터는 게임을 띄우지 않는다. 돌고 있는 `ffxiv_dx11` 프로세스에 붙을 뿐이다(`inject <pid>`). XIVLauncher는 이 구성에서 쓰지 않는다 — `XIVLauncherKR`은 프로그램이 아니라 폴더 이름이다.
+
+**사용자에게 나가는 것은 이 배치가 아니다.** 받는 쪽은 설치 프로그램이 놓는 `FF14 접근성 모드로 플레이` 바로가기 하나를 실행한다(`vendor/ff14-accessibility/Launcher/Play.cs`). 하는 일은 위 1·2와 같고, 이 배치는 저장소 클론에서 쓰는 개발용이다.
 
 **그렇다고 이름이 빈 것은 아니다.** KR Dalamud 업데이터가 쓰는 프로필 규약이고 그쪽 기본값이다. 유래와 "바꿀 수 있는데 왜 안 바꾸나"는 [environment.md](environment.md) §3이 갖는다.
 

@@ -27,14 +27,13 @@
 
 **한국 서버는 한국 전용 계정을 사용합니다.** 글로벌 서버 계정으로는 접속할 수 없습니다. 계정을 만드는 방법은 [사용 안내](overlay/ko/README.ko.md) 1장 2절에 있습니다.
 
-**Microsoft .NET 10 Desktop Runtime x64가 필요합니다.** 없으면 모드가 동작하지 않습니다. 아래 주소를 클릭하면 설치 파일 내려받기가 바로 시작됩니다. 이미 설치되어 있는지 확인하는 방법은 [사용 안내](overlay/ko/README.ko.md) 1장 3절에 있습니다.
+**셋은 설치 프로그램이 각 배포처에서 직접 내려받습니다.** 직접 준비하지 않아도 되며, 내려받을지 묻는 대화상자가 차례로 표시됩니다. 이 저장소에서 재배포하지 않습니다.
 
-https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe
-
-**KR Dalamud 업데이터와 vnavmesh는 설치 프로그램이 해당 프로그램의 저장소에서 직접 내려받으며**, 내려받을지 묻는 대화상자가 표시됩니다. 이 저장소에서 재배포하지 않습니다.
-
+- **[Microsoft .NET 10 Desktop Runtime x64](https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe)** — 모드가 게임 안에서 실행되는 데 필요합니다. 이미 설치되어 있으면 묻지 않고 넘어갑니다
 - **[KR Dalamud 업데이터](https://github.com/MiqoKR/kr-dalamud-updater)** — 게임에 Dalamud를 사용할 수 있게 해주는 프로그램입니다. 프로그램이 없으면 모드가 실행되지 않습니다
 - **[vnavmesh](https://github.com/awgil/ffxiv_navmesh)** — 자동 이동, 따라가기, 경로 미리 듣기에 필요합니다. 설치하지 않아도 나머지 모드 기능은 그대로 동작합니다
+
+**게임은 바탕화면의 [FF14 접근성 모드로 플레이] 바로가기로 실행합니다.** 설치 프로그램이 만들며, 게임과 KR Dalamud 업데이터를 함께 실행합니다. 로그인하면 모드가 자동으로 붙습니다.
 
 ## 4. 기능 제안과 문제 신고
 

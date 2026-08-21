@@ -84,6 +84,76 @@ UPDATER_APP_FOLDER = "app"
 UPDATER_EXE_NAME = "Dalamud.Updater.exe"
 
 
+# ── .NET 데스크톱 런타임 ───────────────────────────────────────────────────
+#
+# 아래 넷은 `Installer/KrProfile.cs`와 같은 값이어야 하고, 갈라지면
+# `tests/test_dotnet_runtime.py`가 실패한다. 없으면 게임 안에서 CLR이
+# 조용히 안 뜬다 - 오류가 아니라 침묵이라 사용자가 원인을 못 짚는다.
+
+#: 받는 곳. 채널 고정(`10.0`)이라 패치 판이 올라도 이 주소가 안 낡는다.
+#: 실측으로 301을 거쳐 `builds.dotnet.microsoft.com`의 실제 판본으로 간다.
+DOTNET_DOWNLOAD_URL = "https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe"
+
+#: 몇 판이 있어야 하나. 플러그인이 `net10.0-windows`로 빌드된다.
+DOTNET_REQUIRED_MAJOR = 10
+
+#: 무인 설치 인자. Microsoft Learn "Install .NET on Windows"의 규격이다.
+DOTNET_INSTALL_ARGS = "/install /quiet /norestart"
+
+#: 데스크톱 런타임이 판본별 폴더를 두는 자리. `<dotnetRoot>\shared\` 밑이다.
+DOTNET_DESKTOP_SHARED = "Microsoft.WindowsDesktop.App"
+
+#: 설치기가 남긴 종료 코드를 옮긴 값. C#의 `DotnetInstallResult`와 같다.
+DOTNET_INSTALLED = "installed"
+DOTNET_REBOOT_REQUIRED = "reboot_required"
+DOTNET_CANCELLED = "cancelled"
+DOTNET_FAILED = "failed"
+
+
+def has_desktop_runtime(dotnet_root: str, major: int = DOTNET_REQUIRED_MAJOR) -> bool:
+    """`dotnet_root`에 그 판의 데스크톱 런타임이 깔려 있나.
+
+    `dotnet --list-runtimes`를 부르지 않는다. 이 PC의 시스템 dotnet에는 SDK가
+    없어 프로세스 호출이 불안정하고(`dotnet --version`이 exit 155), 업데이터
+    부트스트랩도 같은 디렉토리 방식을 쓴다.
+
+    경로를 인자로 받는 것이 요점이다 - 그래야 "없음" 갈래를 빈 디렉토리로
+    실증할 수 있다. 이 머신에는 10이 있어서 그 갈래가 자연 발생하지 않는다.
+    """
+    shared = Path(dotnet_root) / "shared" / DOTNET_DESKTOP_SHARED
+    try:
+        entries = list(shared.iterdir())
+    except OSError:
+        return False  # 폴더가 없으면 런타임도 없다
+
+    for entry in entries:
+        if not entry.is_dir():
+            continue
+        head = entry.name.split(".", 1)[0]
+        if head.isdigit() and int(head) == major:
+            return True
+    return False
+
+
+def dotnet_install_result(exit_code: int) -> str:
+    """설치기의 종료 코드를 판정으로 옮긴다.
+
+    `3010`을 실패로 읽으면 **깔린 런타임을 두고 실패했다고 말한다.** 재부팅이
+    필요할 뿐 설치는 끝난 상태다.
+
+    `1223`은 종료 코드가 아니라 UAC를 껐을 때의 `Win32Exception` 오류 번호다.
+    프로세스가 시작조차 안 되니 코드가 없는데, 두 경로의 판정이 갈리면 안
+    되므로 같은 표에서 받는다.
+    """
+    if exit_code == 0:
+        return DOTNET_INSTALLED
+    if exit_code == 3010:
+        return DOTNET_REBOOT_REQUIRED
+    if exit_code == 1223:
+        return DOTNET_CANCELLED
+    return DOTNET_FAILED
+
+
 def _appdata() -> str:
     return os.environ.get("APPDATA", "")
 

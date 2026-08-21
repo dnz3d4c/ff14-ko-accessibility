@@ -440,6 +440,10 @@ def _seed_profile(root: Path) -> None:
 def run_installer(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
     env["FF14ACC_KR_PROFILE"] = str(root)
+    # .NET 감지는 지나가되 설치는 하지 않는다. 설치는 시스템 전역이라 버리는
+    # 프로필로 격리가 안 되고, UAC 창이 뜨면 무인 실행이 거기서 멈춘다.
+    # 감지 갈래를 지나는 것은 `dotnet_branch_ran`이 로그로 확인한다.
+    env["FF14ACC_SKIP_DOTNET"] = "1"
     return subprocess.run(
         [str(exe), "--install", "--skip-vnavmesh"],
         capture_output=True,
@@ -476,6 +480,26 @@ def run_check(exe: Path, root: Path) -> subprocess.CompletedProcess[str]:
         env=env,
         timeout=120,
     )
+
+
+def dotnet_branch_ran(stdout: str) -> bool:
+    """설치기가 .NET 런타임 갈래를 지났나.
+
+    **vnavmesh와 같은 구멍을 또 내지 않기 위해 있다.** vnavmesh 설치 경로는
+    e2e 밖이라 자동 이동 전체가 검사 없이 나간다(W-52). .NET은 없으면 게임
+    안에서 모드가 아예 안 뜨므로 같은 자리에 두면 안 된다.
+
+    재는 것은 판정이 아니라 **갈래를 지났다는 사실**이다. 이 머신에는 .NET
+    10이 있어 "있음"으로 끝나고, "없음"과 종료 코드 판정은
+    `tools/kr-setup/tests/test_dotnet_runtime.py`가 인위로 만들어 잰다.
+
+    표식이 제품명인 것은 우연이 아니다. 세 언어 사전이 전부 `.NET {0}`으로
+    시작하므로, 저장된 언어가 무엇이든 이 줄이 나온다.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kr-setup"))
+    import kr_profile  # noqa: PLC0415 - 배치가 파일 경로로 직접 부른다
+
+    return f".NET {kr_profile.DOTNET_REQUIRED_MAJOR}" in stdout
 
 
 def dalamud_ready(stdout: str) -> bool:
@@ -590,6 +614,12 @@ def check_install_e2e(dist: Path) -> list[str]:
         if first.returncode != 0:
             problems.append(f"설치기가 실패했다(코드 {first.returncode}):\n{first.stdout}{first.stderr}")
             return problems
+
+        if not dotnet_branch_ran(first.stdout):
+            problems.append(
+                ".NET 런타임 갈래를 안 지났다. 없으면 게임 안에서 모드가 "
+                "아예 안 뜨는데 검사가 그 자리를 한 번도 안 태운다"
+            )
 
         plugin_root = root / "installedPlugins" / INTERNAL_NAME
         problems += installed_layout_problems(plugin_root)

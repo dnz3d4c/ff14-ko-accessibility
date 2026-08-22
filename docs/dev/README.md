@@ -39,7 +39,7 @@ git config core.hooksPath .githooks && git config commit.template .gitmessage &&
 
 ## 자동으로 도는 검사
 
-- `commit-lint` — 커밋 메시지가 규칙 C1~C13을 지키는지 검사한다
+- `commit-lint` — 커밋 메시지가 규칙 C1~C14를 지키는지 검사한다
 - `patch-check` — 저장소가 기록한 vendor 포인터가 `kr-port`의 마지막 커밋이고, 핀이 그 이력의 조상인지 대조한다
 - `docs-check` — **문서가 인용한 숫자를 산출물에서 다시 계산해 대조한다.** 손으로 옮겨 적은 값이 낡으면 검사가 실패한다. 단축키 목록이 사용 안내와 소스에서 갈라지는 것도 여기서 잡는다
 - [`ko-words`](../../tools/ko-words/README.md) — 번역이 실제로 쓴 낱말을 모아 게임 덤프와 대조한다. 용어 대장에 적는 것을 잊어도 잡힌다

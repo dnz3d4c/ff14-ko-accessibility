@@ -75,6 +75,7 @@ UPSTREAM_OK = (
     "Status-Board: W-07 진행\n"
     "Upstream-Files: FF14Accessibility/Services/UIReaderService.cs\n"
     "Upstream-Subject: Bestaetigen-Button-Label je Sprache aus Daten lesen\n"
+    "Release-Note: 확인 버튼이 한국어 클라이언트에서도 눌리도록 함.\n"
 )
 
 
@@ -336,6 +337,84 @@ def test_본문에_쓴_같은_말은_막지_않는다():
         "Status-Board: W-49 진행\n"
     )
     assert "C13" not in codes(msg, ["docs/status.md"])
+
+
+# --- C14 릴리스 노트 줄 ---------------------------------------------------
+
+GUIDE_PATH = "overlay/ko/README.ko.md"
+
+
+def test_사용자가_받는_것을_바꿨는데_노트_줄이_없으면_거부한다():
+    assert "C14" in codes(
+        "[한국전용] Launcher: 바로가기를 만든다", [commit_lint.VENDOR_PATH]
+    )
+
+
+def test_노트_줄이_있으면_통과한다():
+    msg = (
+        "[한국전용] Launcher: 게임과 업데이터를 함께 띄우는 바로가기를 만든다\n"
+        "\n"
+        "Status-Board: W-76 진행\n"
+        "Release-Note: 바탕화면 바로가기로 게임과 KR 달라무드 업데이터가 "
+        "실행되도록 함.\n"
+    )
+    assert "C14" not in codes(msg, [commit_lint.VENDOR_PATH])
+
+
+def test_문서_갈래여도_배포되는_안내를_고치면_요구한다():
+    # b979baf가 `[문서]`로 배포되는 안내의 원본을 77줄 고쳤다. 갈래로 나누면
+    # 이 부류가 샌다 - 그래서 경로로 묻는다.
+    assert "C14" in codes("[문서] README.ko.md: 달라무드 절을 고친다", [GUIDE_PATH])
+
+
+def test_값이_비면_면제가_아니다():
+    msg = "[한국전용] ko.json: 문장을 고친다\n\nRelease-Note:\n"
+    assert "C14" in codes(msg, ["overlay/ko/ko.json"])
+
+
+def test_없음은_이유를_대야_통과한다():
+    msg = "[한국전용] ko.json: 주석 오타를 고친다\n\nRelease-Note: 없음 - 주석만 고침\n"
+    assert "C14" not in codes(msg, ["overlay/ko/ko.json"])
+
+
+def test_이유_없는_없음은_거부한다():
+    msg = "[한국전용] ko.json: 문장을 고친다\n\nRelease-Note: 없음\n"
+    assert "C14" in codes(msg, ["overlay/ko/ko.json"])
+
+
+def test_사용자가_읽을_문장은_함으로_끝낸다():
+    # 제목은 `~한다`, 노트는 `~함.`이다. 독자가 달라서 문체도 다르다.
+    msg = (
+        "[한국전용] Launcher: 바로가기를 만든다\n\n"
+        "Release-Note: 바탕화면 바로가기로 게임이 실행되도록 한다\n"
+    )
+    assert "C14" in codes(msg, [commit_lint.VENDOR_PATH])
+
+
+def test_노트에_내부_이름을_쓰면_거부한다():
+    # `Launcher`는 사용자 화면 어디에도 안 뜬다. 사용자가 보는 것은
+    # `바탕화면 바로가기`다.
+    msg = (
+        "[한국전용] Launcher: 바로가기를 만든다\n\n"
+        "Release-Note: Launcher가 게임과 업데이터를 함께 띄우도록 함.\n"
+    )
+    assert "C14" in codes(msg, [commit_lint.VENDOR_PATH])
+
+
+def test_백틱_안의_파일_이름은_내부_이름으로_보지_않는다():
+    # 사용자가 직접 실행하는 파일이라 노트에 나오는 것이 맞다.
+    msg = (
+        "[한국전용] Installer: 닷넷 10 데스크톱 런타임을 대신 받아 깐다\n\n"
+        "Release-Note: `FF14AccessibilityInstaller-KR.exe`가 .NET 10 데스크톱 "
+        "런타임을 자동으로 내려받아 설치하도록 함.\n"
+    )
+    assert "C14" not in codes(msg, [commit_lint.VENDOR_PATH])
+
+
+def test_사용자에게_안_닿는_경로만_고치면_요구하지_않는다():
+    assert "C14" not in codes(
+        "[검증] commit_lint: 검사를 더한다", ["tools/commit-lint/commit_lint.py"]
+    )
 
 
 # --- staged_paths 실패 경로 -----------------------------------------------

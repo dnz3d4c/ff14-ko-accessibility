@@ -55,6 +55,51 @@ BOARD_PATH = "docs/status.md"
 #: 현황판을 안 건드리는 이유를 밝히는 트레일러. 값이 비면 면제가 아니다.
 BOARD_TRAILER = "Status-Board"
 
+#: 사용자가 받는 것이 바뀌는 경로. 여기를 건드린 커밋은 릴리스 노트로 그대로
+#: 옮길 한 줄을 같이 남긴다.
+#:
+#: 갈래가 아니라 경로로 묻는 이유가 있다. `b979baf`는 `[문서]` 커밋인데
+#: 배포되는 안내의 원본을 77줄 고쳤다 - 사용자가 읽는 변경이다. 갈래로
+#: 나눴으면 그 부류가 샌다. C7·C11이 이미 경로로 묻는 것과 같은 방식이다.
+RELEASE_NOTE_PATHS = (
+    VENDOR_PATH,
+    "overlay/ko/README.ko.md",
+    "overlay/ko/KEYS.ko.md",
+    "overlay/ko/ko.json",
+)
+
+#: 릴리스 노트로 옮길 한 줄. **제목과 독자가 다르다** - 제목은 여섯 달 뒤에
+#: `git log --oneline`으로 커밋을 찾는 사람이 읽고(C12가 대상 이름을 요구하는
+#: 이유), 이 줄은 새 판을 받은 사람이 읽는다. 한 줄에 둘을 담으려니 판마다
+#: 한쪽이 졌고, 노트를 쓸 때마다 커밋 본문을 다시 읽어야 했다.
+#:
+#: `Upstream-Subject`와 발상이 같다. 변경이 머릿속에 있을 때 다른 독자를 위한
+#: 한 줄을 미리 써 두는 것이고, 몇 달 뒤 diff로 복원하는 것보다 정확하다.
+NOTE_TRAILER = "Release-Note"
+
+#: 노트를 안 남기는 이유를 밝히는 값. 뒤에 이유가 붙어야 한다.
+NOTE_EXEMPT_PREFIX = "없음"
+
+#: 노트 줄이 끝나야 하는 꼴. 사용자가 읽는 문장이라 명사형이다.
+NOTE_SUFFIX = "함."
+
+#: 노트 줄에 쓰지 않는 말. 사용자 화면 어디에도 안 뜨는 내부 이름이다.
+#: 백틱으로 감싼 자리는 안 본다 - 사용자가 직접 실행하는 파일 이름은
+#: 노트에 나오는 것이 맞다(`FF14AccessibilityInstaller-KR.exe`).
+#: SUBJECT_BANNED와 같이 목록이 규칙의 전부고, 오탐이 나면 여기서 뺀다.
+NOTE_BANNED = (
+    "Launcher",
+    "Installer",
+    "csproj",
+    "pack-check",
+    "release-manifest",
+    "commit-lint",
+    "KrProfile",
+    "Dalamud",
+    "repo.json",
+    "installer.json",
+)
+
 SUBJECT_MAX = 72
 
 #: 제목에 쓰지 않는 말. 고른 기준은 취향이 아니라 실측이다 - 이력 166건에서
@@ -100,6 +145,9 @@ _CONVENTIONAL_RE = re.compile(
 _SCISSORS_RE = re.compile(r"^#\s*-+\s*>8\s*-+")
 _UMLAUT_RE = re.compile(r"[äöüÄÖÜß]")
 
+#: 백틱으로 감싼 자리. 노트 줄에서 내부 이름을 찾을 때 먼저 걷어낸다.
+_BACKTICK_RE = re.compile(r"`[^`]*`")
+
 
 @dataclass(frozen=True)
 class Violation:
@@ -136,6 +184,43 @@ def trailer_value(message: str, key: str) -> str | None:
         if line.startswith(prefix):
             found = line[len(prefix) :].strip()
     return found
+
+
+def note_problem(note: str | None) -> str | None:
+    """릴리스 노트 줄의 문제. 없으면 None."""
+    if not note:
+        return (
+            "사용자가 받는 것이 바뀌었다. 릴리스 노트로 그대로 옮길 한 줄을 "
+            f"남겨라 - 예: `{NOTE_TRAILER}: 바탕화면 바로가기로 게임과 "
+            "KR 달라무드 업데이터가 실행되도록 함.` "
+            f"사용자에게 안 닿는 변경이면 `{NOTE_TRAILER}: 없음 - <이유>`"
+        )
+
+    if note.startswith(NOTE_EXEMPT_PREFIX):
+        reason = note[len(NOTE_EXEMPT_PREFIX) :].strip(" -")
+        if not reason:
+            return (
+                f"`{NOTE_TRAILER}: {NOTE_EXEMPT_PREFIX}` 뒤에 이유를 대라 - "
+                "예: `없음 - 주석만 고침`. 값이 비면 면제가 아니다"
+            )
+        return None
+
+    if not note.endswith(NOTE_SUFFIX):
+        return (
+            "노트 줄은 사용자가 읽을 문장 그대로다. "
+            f"`~하도록 {NOTE_SUFFIX}` 꼴로 끝내라 - 제목의 `~한다`와 독자가 다르다"
+        )
+
+    banned = [word for word in NOTE_BANNED if word in _BACKTICK_RE.sub("", note)]
+    if banned:
+        return (
+            f"노트 줄에 내부 이름을 쓰지 않는다: {', '.join(banned)}. "
+            "사용자 화면에 뜨는 이름으로 바꿔라 - 사용자가 보는 것은 "
+            "`Launcher`가 아니라 `바탕화면 바로가기`다. "
+            "직접 실행하는 파일 이름이면 백틱으로 감싼다"
+        )
+
+    return None
 
 
 def check(message: str, changed_paths: list[str]) -> list[Violation]:
@@ -296,6 +381,16 @@ def check(message: str, changed_paths: list[str]) -> list[Violation]:
                     f"`{BOARD_TRAILER}: 해당 없음 - 오타 수정`",
                 )
             )
+
+    touches_user = any(
+        path == prefix or path.startswith(f"{prefix}/")
+        for path in changed_paths
+        for prefix in RELEASE_NOTE_PATHS
+    )
+    if touches_user:
+        problem = note_problem(trailer_value(body, NOTE_TRAILER))
+        if problem:
+            violations.append(Violation("C14", problem))
 
     return violations
 

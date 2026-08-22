@@ -398,6 +398,25 @@ def test_사용자가_읽을_문장은_함으로_끝낸다():
     assert "C14" in codes(msg, [commit_lint.VENDOR_PATH])
 
 
+def test_함_말고_다른_명사형_종결도_통과한다():
+    # **`함.`은 명사형의 한 꼴일 뿐이다.** `~고침.`으로 끝나는 트레일러가
+    # 이미 이력에 있고(`v5.88.0.1` 노트의 셋째 항목), `함.`만 받으면 그 부류를
+    # 다시 쓸 때마다 어미를 억지로 바꿔야 한다. 재는 것은 종성 `ㅁ`이다.
+    msg = (
+        "[문서] README.ko.md: 달라무드 절을 고친다\n\n"
+        "Release-Note: 사용 안내의 달라무드 적용 절차를 실제 동작에 맞게 고침.\n"
+    )
+    assert "C14" not in codes(msg, [GUIDE_PATH])
+
+
+def test_마침표가_없으면_명사형이어도_거부한다():
+    msg = (
+        "[문서] README.ko.md: 달라무드 절을 고친다\n\n"
+        "Release-Note: 사용 안내의 달라무드 적용 절차를 고침\n"
+    )
+    assert "C14" in codes(msg, [GUIDE_PATH])
+
+
 def test_노트에_내부_이름을_쓰면_거부한다():
     # `Launcher`는 사용자 화면 어디에도 안 뜬다. 사용자가 보는 것은
     # `바탕화면 바로가기`다.

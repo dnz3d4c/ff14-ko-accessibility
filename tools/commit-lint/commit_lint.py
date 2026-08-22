@@ -80,8 +80,15 @@ NOTE_TRAILER = "Release-Note"
 #: 노트를 안 남기는 이유를 밝히는 값. 뒤에 이유가 붙어야 한다.
 NOTE_EXEMPT_PREFIX = "없음"
 
-#: 노트 줄이 끝나야 하는 꼴. 사용자가 읽는 문장이라 명사형이다.
+#: 노트 줄이 끝나야 하는 꼴을 안내할 때 드는 예. **재는 것은 이 글자가 아니라
+#: 명사형 종결이다**(아래 `_is_nominal`). `함.`만 받던 때 `~고침.`으로 끝나는
+#: 트레일러가 이미 이력에 있었고, 그러면 어미를 규칙에 맞추려고 억지로 바꾸게 된다.
 NOTE_SUFFIX = "함."
+
+#: 유니코드 한글 종성 인덱스에서 `ㅁ`. 명사형 어미 `-ㅁ/음`이 이 종성으로 끝난다.
+#: `ko_style._has_final_b`와 같은 수법이고, 그쪽을 가져다 쓰지 않는 것은 커밋
+#: 훅이 부르는 이 모듈에 형제 도구 경로 조작을 들이지 않기 위해서다.
+_FINAL_M = 16
 
 #: 노트 줄에 쓰지 않는 말. 사용자 화면 어디에도 안 뜨는 내부 이름이다.
 #: 백틱으로 감싼 자리는 안 본다 - 사용자가 직접 실행하는 파일 이름은
@@ -190,6 +197,18 @@ def trailer_value(message: str, key: str) -> str | None:
     return found
 
 
+def _is_nominal(note: str) -> bool:
+    """명사형 종결인가. 종성이 `ㅁ`인 음절에 마침표가 붙은 꼴이다.
+
+    `함.`·`고침.`·`바꿈.`이 통과하고 `한다`·`합니다.`는 안 된다. 마침표를
+    같이 요구하는 것은 `~하도록 함`처럼 끝을 안 맺은 줄을 거르기 위해서다.
+    """
+    if not note.endswith("."):
+        return False
+    last = note[-2:-1]
+    return "가" <= last <= "힣" and (ord(last) - 0xAC00) % 28 == _FINAL_M
+
+
 def note_problem(note: str | None) -> str | None:
     """릴리스 노트 줄의 문제. 없으면 None."""
     if not note:
@@ -208,10 +227,11 @@ def note_problem(note: str | None) -> str | None:
             )
         return None
 
-    if not note.endswith(NOTE_SUFFIX):
+    if not _is_nominal(note):
         return (
             "노트 줄은 사용자가 읽을 문장 그대로다. "
-            f"`~하도록 {NOTE_SUFFIX}` 꼴로 끝내라 - 제목의 `~한다`와 독자가 다르다"
+            f"`~하도록 {NOTE_SUFFIX}`처럼 명사형에 마침표를 붙여 끝내라 - "
+            "제목의 `~한다`와 독자가 다르다"
         )
 
     banned = [word for word in NOTE_BANNED if word in _BACKTICK_RE.sub("", note)]

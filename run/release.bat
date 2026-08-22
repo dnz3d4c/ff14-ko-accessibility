@@ -66,6 +66,20 @@ echo 태그: %TAG%
 echo 저장소: %GHREPO%
 echo.
 
+rem 노트 본문 검사. gh를 처음 부르기 전이라 자산을 올리는 갈래와 노트만
+rem 고치는 갈래를 한 자리로 다 덮는다. checkbump처럼 서브루틴으로 빼지
+rem 않는다 - 그쪽은 노트만 고치는 갈래를 일부러 통과시키려고 갈래 안에
+rem 뒀고, 노트 검사는 정확히 그 갈래를 막아야 한다.
+uv run --no-project python "%REPO%\tools\notes-check\notes_check.py" --version "%VER%" "%RELOUT%\release-notes.md"
+if errorlevel 1 (
+  echo.
+  echo [실패] 릴리스 노트가 규칙에 안 맞는다. 올리기 전에 고쳐라.
+  echo   규칙: docs\dev\release.md 의 3-2 절
+  echo   본:   tools\notes-check\template.md
+  goto :fail
+)
+echo.
+
 rem gh가 윈도에서 한글 파일 이름을 못 다룬다. 첫 릴리스에서 `사용 안내.md`가
 rem `default.md`로 올라갔고 오류도 안 났다 - 받는 사람 화면에서만 이름이
 rem 틀린다. 그래서 올릴 때만 ASCII 이름의 사본을 쓴다. 폴더에 나가는

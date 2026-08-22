@@ -24,6 +24,13 @@
 # Status-Board: W-01 진행
 # Status-Board: 해당 없음 - 오타 수정
 
+# 사용자가 받는 것이 바뀌면(vendor 포인터, overlay/ko의 README.ko.md·
+# KEYS.ko.md·ko.json) 릴리스 노트로 그대로 옮길 한 줄이 필수다. 없으면 훅이 막는다.
+#   명사형에 마침표를 붙여 끝낸다 - 제목의 ~한다와 독자가 다르다.
+#   사용자 화면에 안 뜨는 내부 이름(Launcher, csproj)을 쓰지 않는다.
+# Release-Note: 바탕화면 바로가기로 게임과 KR 달라무드 업데이터가 실행되도록 함.
+# Release-Note: 없음 - 주석만 고침
+
 # [업스트림] 커밋은 아래 두 줄이 필수다. 없으면 훅이 막는다.
 # Upstream-Files: FF14Accessibility/...
 # Upstream-Subject: 영어 제목. PR 보낼 때 옮길지는 그때 정한다 (commit-rules 3.1)

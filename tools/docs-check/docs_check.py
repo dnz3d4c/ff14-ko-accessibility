@@ -48,6 +48,7 @@ GOLDEN = REPO / "tools" / "strings-golden" / "golden" / "de-en.json"
 CATALOG = REPO / "overlay" / "ko" / "ko.json"
 TERMS = REPO / "overlay" / "ko" / "terms.json"
 LINT = REPO / "tools" / "commit-lint" / "commit_lint.py"
+NOTES_LINT = REPO / "tools" / "notes-check" / "notes_check.py"
 HAND_CASES_DOC = REPO / "docs" / "korean" / "hand-cases.md"
 GUIDE_SKILL = ".claude/skills/ko-user-guide/SKILL.md"
 LOC_SKILL = ".claude/skills/ko-localization/SKILL.md"
@@ -102,12 +103,29 @@ def hand_sites(repo: Path = REPO) -> int:
     return sum("IsKorean" in line for line in lines)
 
 
+def _rule_max(path: Path, prefix: str) -> int:
+    """검사기가 실제로 내는 규칙 코드의 최대값.
+
+    **접두를 인자로 받는다.** 검사기가 둘이 되면서 코드 공간이 갈렸는데
+    (커밋은 `C`, 릴리스 노트는 `N`), 한쪽 패턴을 박아 두면 다른 쪽 문서가
+    영원히 안 지켜진다.
+    """
+    codes = [
+        int(m) for m in re.findall(rf'"{prefix}(\d+)"', path.read_text(encoding="utf-8"))
+    ]
+    if not codes:
+        raise ValueError(f"`{prefix}` 규칙 코드를 못 찾았다: {path}")
+    return max(codes)
+
+
 def lint_rule_max(path: Path = LINT) -> int:
     """커밋 검사기가 실제로 내는 규칙 코드의 최대값."""
-    codes = [int(m) for m in re.findall(r'"C(\d+)"', path.read_text(encoding="utf-8"))]
-    if not codes:
-        raise ValueError(f"규칙 코드를 못 찾았다: {path}")
-    return max(codes)
+    return _rule_max(path, "C")
+
+
+def notes_rule_max(path: Path = NOTES_LINT) -> int:
+    """릴리스 노트 검사기가 실제로 내는 규칙 코드의 최대값."""
+    return _rule_max(path, "N")
 
 
 def hand_type_sum(path: Path = HAND_CASES_DOC) -> int:
@@ -226,6 +244,7 @@ def facts(repo: Path = REPO) -> dict[str, int]:
         "손으로 옮긴 자리": hand_sites(repo),
         "손으로 볼 자리": hand_type_sum(repo / "docs" / "korean" / "hand-cases.md"),
         "커밋 규칙 최대": lint_rule_max(repo / "tools" / "commit-lint" / "commit_lint.py"),
+        "노트 규칙 최대": notes_rule_max(repo / "tools" / "notes-check" / "notes_check.py"),
         "배포물 파일": len(user_files(repo)),
         # 사용 안내 4장과 단축키 목록이 함께 갖는 키. 둘이 갈리는 것은
         # `check_key_docs`가 막고, 판이 개수를 낡게 적는 것은 여기가 막는다.
@@ -244,6 +263,9 @@ CITATIONS: tuple[tuple[str, str, str], ...] = (
     # 통째로 여기로 옮겨 왔다 - 경로를 같이 안 고쳤으면 검사가 그 자리에서 죽는다.
     ("docs/dev/README.md", "커밋 규칙 최대", r"규칙 C1~C(\d+)"),
     ("docs/dev/commit-rules.md", "커밋 규칙 최대", r"규칙 코드는 C1~C(\d+)"),
+    # 릴리스 노트 검사기. 규칙을 늘리고 문서를 안 고치면 여기서 빨개진다.
+    ("docs/dev/README.md", "노트 규칙 최대", r"규칙 N1~N(\d+)"),
+    ("docs/dev/release.md", "노트 규칙 최대", r"규칙 N1~N(\d+)"),
     ("docs/status.md", "골든 쌍", r"`AccessibilityStrings` 삼항 \| (\d+)쌍"),
     ("docs/status.md", "골든 고유 쌍", r"삼항 \| \d+쌍\(고유 (\d+)\)"),
     ("docs/status.md", "카탈로그 문장", r"→ \*\*(\d+)자리 옮김"),

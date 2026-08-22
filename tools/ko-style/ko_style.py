@@ -64,8 +64,17 @@ REPO = Path(__file__).resolve().parents[2]
 
 #: 사용자가 읽는 문서. 여기만 습니다체이고 금지 표현 검사도 여기만 돈다.
 #: 개발 문서에서 `기능 전체`는 정당할 수 있어서 같이 재지 않는다.
+#:
+#: `tools/notes-check/template.md`는 `tools/` 아래 있지만 **사용자가 읽을
+#: 릴리스 노트의 본**이라 여기 든다. 넣지 않으면 본을 만든 커밋에서 바로
+#: 빨개진다 - 이 검사는 추적 마크다운 전부를 훑는다.
 USER_DOCS = frozenset(
-    {"README.md", "overlay/ko/README.ko.md", "overlay/ko/KEYS.ko.md"}
+    {
+        "README.md",
+        "overlay/ko/README.ko.md",
+        "overlay/ko/KEYS.ko.md",
+        "tools/notes-check/template.md",
+    }
 )
 
 #: 훑지 않는 자리. vendor는 업스트림 것이라 독일어·영어이고,

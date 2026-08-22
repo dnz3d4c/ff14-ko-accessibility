@@ -77,7 +77,9 @@ uv run --no-project python tools/release-manifest/release_manifest.py --release 
 
 `release-notes.md`는 판마다 사람이 쓰지만 **맨손으로 쓰지 않는다.** 지난 태그 이후의 `Release-Note:` 줄을 모으면 `## 이번 판에서 바뀐 것`의 초안이 나온다.
 
-git log v5.88.0.1..HEAD --format="%(trailers:key=Release-Note,valueonly)"
+git fetch --tags && git log v5.88.0.1..HEAD --format="%(trailers:key=Release-Note,valueonly)"
+
+**`git fetch --tags`를 앞에 붙이는 이유가 있다.** `gh release create`는 태그를 **원격에만** 만든다. 방금 낸 판이라도 로컬에는 없어서, 그냥 실행하면 `unknown revision`으로 죽는다. 실제로 `v5.88.0.1`을 내고 바로 이 명령을 돌렸다가 그렇게 실패했다.
 
 그 줄을 커밋할 때 남기는 규칙은 [commit-rules.md](commit-rules.md) §2.11이고, C14가 검사한다. **초안까지다** — 순서를 정하고 중요한 것을 위로 올리는 것은 기계가 못 한다.
 

@@ -382,6 +382,13 @@ def test_이유_없는_없음은_거부한다():
     assert "C14" in codes(msg, ["overlay/ko/ko.json"])
 
 
+def test_없음_뒤에_구분자가_없으면_거부한다():
+    # `없음주석만 고침`처럼 붙여 쓰면 이유를 댄 것으로 보지 않는다. 문서가
+    # `없음 - <이유>`라고 못박았으니 검사도 그 형식만 받는다.
+    msg = "[한국전용] ko.json: 문장을 고친다\n\nRelease-Note: 없음주석만 고침\n"
+    assert "C14" in codes(msg, ["overlay/ko/ko.json"])
+
+
 def test_사용자가_읽을_문장은_함으로_끝낸다():
     # 제목은 `~한다`, 노트는 `~함.`이다. 독자가 달라서 문체도 다르다.
     msg = (

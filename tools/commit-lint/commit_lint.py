@@ -148,6 +148,10 @@ _UMLAUT_RE = re.compile(r"[äöüÄÖÜß]")
 #: 백틱으로 감싼 자리. 노트 줄에서 내부 이름을 찾을 때 먼저 걷어낸다.
 _BACKTICK_RE = re.compile(r"`[^`]*`")
 
+#: `없음 - <이유>`. 구분자를 요구하는 이유는 `없음주석만 고침`처럼 붙여 쓴 값이
+#: 이유를 댄 것으로 통과하면 문서(§2.11)와 검사가 어긋나서다.
+_NOTE_EXEMPT_RE = re.compile(rf"^{NOTE_EXEMPT_PREFIX}\s*-\s*\S")
+
 
 @dataclass(frozen=True)
 class Violation:
@@ -197,10 +201,9 @@ def note_problem(note: str | None) -> str | None:
         )
 
     if note.startswith(NOTE_EXEMPT_PREFIX):
-        reason = note[len(NOTE_EXEMPT_PREFIX) :].strip(" -")
-        if not reason:
+        if not _NOTE_EXEMPT_RE.match(note):
             return (
-                f"`{NOTE_TRAILER}: {NOTE_EXEMPT_PREFIX}` 뒤에 이유를 대라 - "
+                f"`{NOTE_TRAILER}: {NOTE_EXEMPT_PREFIX} - <이유>` 꼴로 이유를 대라 - "
                 "예: `없음 - 주석만 고침`. 값이 비면 면제가 아니다"
             )
         return None
